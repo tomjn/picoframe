@@ -1,3 +1,4 @@
+import { useMouseNavigation } from "../history/useMouseNavigation";
 import { useFrame } from "../context/frame";
 import { usePersistentState } from "../lib/usePersistentState";
 import { RouteHost } from "./RouteHost";
@@ -8,6 +9,7 @@ import { TopBar } from "./TopBar";
 export function AppLayout() {
   const { nav, title } = useFrame();
   const [collapsed, setCollapsed] = usePersistentState("picoframe.sidebar.collapsed", false);
+  useMouseNavigation();
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">

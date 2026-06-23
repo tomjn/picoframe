@@ -27,6 +27,7 @@
     }
   },
   "bundle": {
+    "externalBin": ["binaries/pr-downloader"],
     "active": true,
     "targets": "all",
     "icon": [

@@ -9,6 +9,7 @@ export interface AppPaths {
   mainRs: string;
   manifest: string;
   capabilitiesDir: string;
+  tauriConf: string;
 }
 
 export function appPaths(root: string): AppPaths {
@@ -19,6 +20,7 @@ export function appPaths(root: string): AppPaths {
     mainRs: join(root, "src-tauri", "src", "main.rs"),
     manifest: join(root, "src", "app.plugins.ts"),
     capabilitiesDir: join(root, "src-tauri", "capabilities"),
+    tauriConf: join(root, "src-tauri", "tauri.conf.json"),
   };
 }
 

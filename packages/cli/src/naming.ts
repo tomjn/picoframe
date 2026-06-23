@@ -43,5 +43,5 @@ export function pluginNames(short: string): PluginNames {
   };
 }
 
-/** First-party plugins the CLI knows how to wire. `prdownloader` lands in Phase 4. */
-export const FIRST_PARTY: readonly string[] = ["hello"];
+/** First-party plugins the CLI knows how to wire. */
+export const FIRST_PARTY: readonly string[] = ["hello", "prdownloader"];

@@ -1,0 +1,16 @@
+{
+  "name": "@picoframe/registry",
+  "version": "0.0.1",
+  "description": "picoframe shadcn source registry: owned, customizable shadcn primitives copied into consumer apps via `shadcn add @picoframe/<name>`",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomjn/picoframe.git",
+    "directory": "packages/registry"
+  },
+  "type": "module",
+  "scripts": {
+    "registry:build": "shadcn build"
+  }
+}

@@ -12,13 +12,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pluginNames } from "../naming";
 import { insertPluginIntoBuilder, pluginLine } from "../wiring/rust-builder";
-import { insertPluginIntoManifest } from "../wiring/manifest";
+import { arrayEntry, importLine, insertPluginIntoManifest } from "../wiring/manifest";
 import { appPaths, assertApp } from "./app";
 import { scaffold } from "./create";
 
 const repoRoot = `${import.meta.dir}/../../../..`;
 const demo = (rel: string) => readFileSync(`${repoRoot}/apps/demo/${rel}`, "utf8");
 const hello = pluginNames("hello");
+const prd = pluginNames("prdownloader");
 
 const dir = mkdtempSync(join(tmpdir(), "picoframe-create-"));
 scaffold(dir, { name: "acme-app", identifier: "com.acme.app" });
@@ -74,8 +75,12 @@ test("scaffold writes a real .gitignore (npm strips a literal .gitignore, so the
 });
 
 test("frame-only app.plugins.ts + add hello reproduces the demo byte-for-byte", () => {
+  // Reverse the demo's prdownloader wiring so it reads as hello-only.
+  const demoHelloOnly = demo("src/app.plugins.ts")
+    .replace(`\n${importLine(prd)}`, "")
+    .replace(`\n${arrayEntry(prd)}`, "");
   const wired = insertPluginIntoManifest(read("src/app.plugins.ts"), hello);
-  expect(wired).toBe(demo("src/app.plugins.ts"));
+  expect(wired).toBe(demoHelloOnly);
 });
 
 test("frame-only main.rs + add hello inserts the demo's builder line", () => {

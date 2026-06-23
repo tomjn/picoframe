@@ -12,6 +12,7 @@
   "dependencies": {
     "@picoframe/frame": "workspace:*",
     "@picoframe/plugin-hello": "workspace:*",
+    "@picoframe/plugin-prdownloader": "workspace:*",
     "@picoframe/plugin-sdk": "workspace:*",
     "@tauri-apps/api": "^2.11.0",
     "react": "^19.2.6",

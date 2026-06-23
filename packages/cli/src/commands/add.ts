@@ -11,6 +11,7 @@ import { insertCargoDependency, picoframeCargoRhs } from "../wiring/cargo";
 import { insertPluginIntoManifest } from "../wiring/manifest";
 import { insertNpmDependency, picoframeNpmSpec } from "../wiring/npm-deps";
 import { insertPluginIntoBuilder } from "../wiring/rust-builder";
+import { SIDECARS, insertExternalBin } from "../wiring/sidecar";
 import { appPaths, assertApp } from "./app";
 
 interface AddOptions {
@@ -66,6 +67,16 @@ export function add(plugin: string, opts: AddOptions): void {
     console.log(`  + capability: ${names.capabilityFile} (grants ${names.aclId}:default)`);
     if (!opts.dryRun) writeFileSync(capPath, capContent);
     changed = true;
+  }
+
+  // Sidecar plugins also declare an `externalBin` in tauri.conf.json. The binary
+  // itself is built/fetched per platform, so we only wire the config and warn.
+  const sidecar = SIDECARS[plugin];
+  if (sidecar) {
+    changed = applyToFile(p.tauriConf, (s) => insertExternalBin(s, sidecar), opts.dryRun, "tauri.conf.json") || changed;
+    console.log(
+      `  ! ${names.short} bundles a sidecar — provide the binary at ${sidecar.map((e) => `src-tauri/${e}-<target-triple>`).join(", ")}`,
+    );
   }
 
   if (!changed) {

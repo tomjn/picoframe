@@ -1,0 +1,37 @@
+{
+  "name": "@picoframe/plugin-prdownloader",
+  "version": "0.0.1",
+  "description": "pr-downloader plugin for picoframe (frontend half): rapid-repo explorer view, typed IPC bindings to the sidecar crate",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomjn/picoframe.git",
+    "directory": "plugins/prdownloader"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "lucide-react": "^1.16.0"
+  },
+  "peerDependencies": {
+    "@picoframe/frame": "*",
+    "@picoframe/plugin-sdk": "*",
+    "@tauri-apps/api": "^2.11.0",
+    "react": "^19.0.0",
+    "react-router": "^7.6.0"
+  }
+}

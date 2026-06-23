@@ -12,5 +12,8 @@ dist
 **/src-tauri/gen
 **/gen/schemas
 
+# Sidecar binaries (built/fetched per platform, not committed)
+**/src-tauri/binaries
+
 # OS
 .DS_Store

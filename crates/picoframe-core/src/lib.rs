@@ -11,6 +11,9 @@ use tauri::{
     Runtime,
 };
 
+#[cfg(target_os = "macos")]
+mod mouse_nav;
+
 /// Uniform result envelope returned by picoframe plugin commands.
 #[derive(Debug, Clone, Serialize)]
 pub struct CliResult {
@@ -35,9 +38,17 @@ impl CliResult {
 
 /// The base frame plugin. Registered first in every picoframe app's builder.
 ///
-/// It currently registers no commands — window/theme commands land in Phase 1.
-/// It exists now so the generated `main.rs` template can call
-/// `.plugin(picoframe_core::init())` as a stable anchor above the plugin markers.
+/// On macOS its `setup` installs a native NSEvent monitor that emits `mouse-nav`
+/// for the X1/X2 mouse buttons (the frame's `useMouseNavigation` hook handles the
+/// DOM path on Windows/Linux). It registers no commands yet — window/theme
+/// commands land later — and anchors the generated `main.rs`
+/// `.plugin(picoframe_core::init())` call above the plugin markers.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
-    Builder::new("picoframe").build()
+    Builder::new("picoframe")
+        .setup(|_app, _api| {
+            #[cfg(target_os = "macos")]
+            mouse_nav::install(_app.clone());
+            Ok(())
+        })
+        .build()
 }
