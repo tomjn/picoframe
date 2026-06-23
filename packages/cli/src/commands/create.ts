@@ -1,7 +1,7 @@
 /**
  * `picoframe create <name>` — scaffold a new, standalone picoframe app from the
  * bundled frame-only template. The template ships with `{{APP_NAME}}` /
- * `{{APP_IDENTIFIER}}` placeholders and published (`^0.0.1` / `"0.0.1"`)
+ * `{{APP_IDENTIFIER}}` placeholders and published (`^0.0.2` / `"0.0.2"`)
  * dependency specs, so the result builds outside this monorepo. After scaffolding
  * it runs `bun install`; `picoframe add <plugin>` wires plugins in from there.
  */

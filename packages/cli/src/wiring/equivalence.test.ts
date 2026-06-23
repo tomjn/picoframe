@@ -16,7 +16,6 @@ import { insertPluginIntoBuilder, pluginLine } from "./rust-builder";
 const repoRoot = `${import.meta.dir}/../../../..`;
 const demo = (rel: string) => readFileSync(`${repoRoot}/apps/demo/${rel}`, "utf8");
 const names = pluginNames("hello");
-const prd = pluginNames("prdownloader");
 
 test("main.rs: add hello reproduces the demo builder", () => {
   const after = demo("src-tauri/src/main.rs");
@@ -26,9 +25,7 @@ test("main.rs: add hello reproduces the demo builder", () => {
 });
 
 test("Cargo.toml: add hello reproduces the demo dependency", () => {
-  // Cargo deps are appended (not sorted), so the round-trip only holds when hello
-  // is the last dep. Strip the later-added prdownloader crate to get that state.
-  const after = demo("src-tauri/Cargo.toml").replace(`\n${depLine(prd.crateName)}`, "");
+  const after = demo("src-tauri/Cargo.toml");
   const before = after.replace(`\n${depLine(names.crateName)}`, "");
   expect(before).not.toBe(after);
   expect(insertCargoDependency(before, names.crateName)).toBe(after);

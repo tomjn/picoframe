@@ -6,7 +6,6 @@ fn main() {
         .plugin(picoframe_core::init());
     // picoframe:plugins-start
     builder = builder.plugin(tauri_plugin_picoframe_hello::init());
-    builder = builder.plugin(tauri_plugin_picoframe_prdownloader::init());
     // picoframe:plugins-end
     builder
         .run(tauri::generate_context!())

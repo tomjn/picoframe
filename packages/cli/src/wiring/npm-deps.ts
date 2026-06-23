@@ -11,12 +11,12 @@ const ENTRY_KEY = /^\s*"([^"]+)"\s*:/;
 /**
  * The version spec the app uses for its picoframe dependencies, read from
  * `@picoframe/frame`. The monorepo demo declares it as `workspace:*`; a
- * standalone app scaffolded by `create` declares a published `^0.0.1`. `add`
+ * standalone app scaffolded by `create` declares a published `^0.0.2`. `add`
  * mirrors this so a new plugin matches the app's world. Falls back to the
  * published spec when no frame dep is present.
  */
 export function picoframeNpmSpec(source: string): string {
-  return source.match(/"@picoframe\/frame"\s*:\s*"([^"]+)"/)?.[1] ?? "^0.0.1";
+  return source.match(/"@picoframe\/frame"\s*:\s*"([^"]+)"/)?.[1] ?? "^0.0.2";
 }
 
 /** Insert (or no-op) a dependency into the `dependencies` block. */

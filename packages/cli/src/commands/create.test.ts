@@ -12,14 +12,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pluginNames } from "../naming";
 import { insertPluginIntoBuilder, pluginLine } from "../wiring/rust-builder";
-import { arrayEntry, importLine, insertPluginIntoManifest } from "../wiring/manifest";
+import { insertPluginIntoManifest } from "../wiring/manifest";
 import { appPaths, assertApp } from "./app";
 import { scaffold } from "./create";
 
 const repoRoot = `${import.meta.dir}/../../../..`;
 const demo = (rel: string) => readFileSync(`${repoRoot}/apps/demo/${rel}`, "utf8");
 const hello = pluginNames("hello");
-const prd = pluginNames("prdownloader");
 
 const dir = mkdtempSync(join(tmpdir(), "picoframe-create-"));
 scaffold(dir, { name: "acme-app", identifier: "com.acme.app" });
@@ -41,13 +40,13 @@ test("scaffold substitutes the app name and identifier", () => {
 
 test("scaffold uses published deps, not workspace inheritance, and omits hello", () => {
   const pkg = read("package.json");
-  expect(pkg).toContain(`"@picoframe/frame": "^0.0.1"`);
-  expect(pkg).toContain(`"@picoframe/plugin-sdk": "^0.0.1"`);
+  expect(pkg).toContain(`"@picoframe/frame": "^0.0.2"`);
+  expect(pkg).toContain(`"@picoframe/plugin-sdk": "^0.0.2"`);
   expect(pkg).not.toContain("workspace:*");
   expect(pkg).not.toContain("plugin-hello");
 
   const cargo = read("src-tauri/Cargo.toml");
-  expect(cargo).toContain(`picoframe-core = "0.0.1"`);
+  expect(cargo).toContain(`picoframe-core = "0.0.2"`);
   expect(cargo).not.toContain("workspace = true");
   expect(cargo).not.toContain("hello");
 });
@@ -75,12 +74,8 @@ test("scaffold writes a real .gitignore (npm strips a literal .gitignore, so the
 });
 
 test("frame-only app.plugins.ts + add hello reproduces the demo byte-for-byte", () => {
-  // Reverse the demo's prdownloader wiring so it reads as hello-only.
-  const demoHelloOnly = demo("src/app.plugins.ts")
-    .replace(`\n${importLine(prd)}`, "")
-    .replace(`\n${arrayEntry(prd)}`, "");
   const wired = insertPluginIntoManifest(read("src/app.plugins.ts"), hello);
-  expect(wired).toBe(demoHelloOnly);
+  expect(wired).toBe(demo("src/app.plugins.ts"));
 });
 
 test("frame-only main.rs + add hello inserts the demo's builder line", () => {

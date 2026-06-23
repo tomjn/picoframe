@@ -13,4 +13,3 @@ tauri-build = { workspace = true }
 tauri = { workspace = true }
 picoframe-core = { workspace = true }
 tauri-plugin-picoframe-hello = { workspace = true }
-tauri-plugin-picoframe-prdownloader = { workspace = true }

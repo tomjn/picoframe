@@ -44,4 +44,4 @@ export function pluginNames(short: string): PluginNames {
 }
 
 /** First-party plugins the CLI knows how to wire. */
-export const FIRST_PARTY: readonly string[] = ["hello", "prdownloader"];
+export const FIRST_PARTY: readonly string[] = ["hello"];

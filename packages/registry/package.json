@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/registry",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "picoframe shadcn source registry: owned, customizable shadcn primitives copied into consumer apps via `shadcn add @picoframe/<name>`",
   "license": "MIT",
   "private": true,

@@ -29,8 +29,8 @@ test("picoframeNpmSpec reads the frame spec from package.json", () => {
   expect(picoframeNpmSpec(publishedPkg)).toBe("^0.0.1");
 });
 
-test("picoframeNpmSpec falls back to ^0.0.1 when no frame dep is present", () => {
-  expect(picoframeNpmSpec(`{ "dependencies": {} }`)).toBe("^0.0.1");
+test("picoframeNpmSpec falls back to ^0.0.2 when no frame dep is present", () => {
+  expect(picoframeNpmSpec(`{ "dependencies": {} }`)).toBe("^0.0.2");
 });
 
 test("insertNpmDependency honors an explicit published spec", () => {

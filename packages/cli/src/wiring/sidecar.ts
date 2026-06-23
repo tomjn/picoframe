@@ -8,10 +8,11 @@
  * platform); `add` declares the config and prints a setup note instead.
  */
 
-/** Short plugin name -> `externalBin` config entries (target-triple stripped). */
-export const SIDECARS: Record<string, string[]> = {
-  prdownloader: ["binaries/pr-downloader"],
-};
+/**
+ * Short plugin name -> `externalBin` config entries (target-triple stripped).
+ * Empty until a first-party sidecar plugin lands; the wiring below stays ready.
+ */
+export const SIDECARS: Record<string, string[]> = {};
 
 const BUNDLE_RE = /^(\s*)"bundle"\s*:\s*\{/;
 

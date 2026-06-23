@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/plugin-hello",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Example hello plugin for picoframe (frontend half): nav group, lazy routes, top-bar slot, typed IPC bindings",
   "license": "MIT",
   "repository": {

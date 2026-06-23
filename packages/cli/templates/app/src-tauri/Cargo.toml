@@ -10,4 +10,4 @@ tauri-build = { version = "2" }
 
 [dependencies]
 tauri = { version = "2" }
-picoframe-core = "0.0.1"
+picoframe-core = "0.0.2"

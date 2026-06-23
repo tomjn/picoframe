@@ -2,9 +2,7 @@
 /* Generate utility classes from the frame and the wired plugins (Tailwind v4
    ignores node_modules by default, so point it at the workspace sources). */
 @source "../../../packages/frame/src";
-@source "../../../plugins/hello/src";
-@source "../../../plugins/prdownloader/src";
-@import "@picoframe/frame/theme.css";
+@source "../../../plugins/hello/src";@import "@picoframe/frame/theme.css";
 
 html,
 body,

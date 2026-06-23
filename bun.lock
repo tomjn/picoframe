@@ -22,7 +22,6 @@
       "dependencies": {
         "@picoframe/frame": "workspace:*",
         "@picoframe/plugin-hello": "workspace:*",
-        "@picoframe/plugin-prdownloader": "workspace:*",
         "@picoframe/plugin-sdk": "workspace:*",
         "@tauri-apps/api": "^2.11.0",
         "react": "^19.2.6",
@@ -86,20 +85,6 @@
         "react-router": "^7.6.0",
       },
     },
-    "plugins/prdownloader": {
-      "name": "@picoframe/plugin-prdownloader",
-      "version": "0.0.1",
-      "dependencies": {
-        "lucide-react": "^1.16.0",
-      },
-      "peerDependencies": {
-        "@picoframe/frame": "*",
-        "@picoframe/plugin-sdk": "*",
-        "@tauri-apps/api": "^2.11.0",
-        "react": "^19.0.0",
-        "react-router": "^7.6.0",
-      },
-    },
   },
   "packages": {
     "@emnapi/core": ["@emnapi/core@1.11.1", "", { "dependencies": { "@emnapi/wasi-threads": "1.2.2", "tslib": "^2.4.0" } }, "sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ=="],
@@ -129,8 +114,6 @@
     "@picoframe/frame": ["@picoframe/frame@workspace:packages/frame"],
 
     "@picoframe/plugin-hello": ["@picoframe/plugin-hello@workspace:plugins/hello"],
-
-    "@picoframe/plugin-prdownloader": ["@picoframe/plugin-prdownloader@workspace:plugins/prdownloader"],
 
     "@picoframe/plugin-sdk": ["@picoframe/plugin-sdk@workspace:packages/plugin-sdk"],
 

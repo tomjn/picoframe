@@ -15,7 +15,7 @@ export function depLine(crateName: string, rhs = "{ workspace = true }"): string
 /**
  * The right-hand side the app uses for its picoframe crates, read from
  * `picoframe-core`. The monorepo demo inherits via `{ workspace = true }`; a
- * standalone `create` app pins a published `"0.0.1"`. `add` mirrors this so a
+ * standalone `create` app pins a published `"0.0.2"`. `add` mirrors this so a
  * new plugin crate matches. Falls back to workspace inheritance when core is
  * absent.
  */
