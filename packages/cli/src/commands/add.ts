@@ -7,9 +7,9 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { FIRST_PARTY, pluginNames } from "../naming";
 import { buildCapability, serializeCapability } from "../wiring/capability";
-import { insertCargoDependency } from "../wiring/cargo";
+import { insertCargoDependency, picoframeCargoRhs } from "../wiring/cargo";
 import { insertPluginIntoManifest } from "../wiring/manifest";
-import { insertNpmDependency } from "../wiring/npm-deps";
+import { insertNpmDependency, picoframeNpmSpec } from "../wiring/npm-deps";
 import { insertPluginIntoBuilder } from "../wiring/rust-builder";
 import { appPaths, assertApp } from "./app";
 
@@ -52,8 +52,8 @@ export function add(plugin: string, opts: AddOptions): void {
   console.log(`Wiring ${names.npmPackage} into ${p.root}${opts.dryRun ? " (dry run)" : ""}:`);
 
   let changed = false;
-  changed = applyToFile(p.packageJson, (s) => insertNpmDependency(s, names.npmPackage), opts.dryRun, "package.json") || changed;
-  changed = applyToFile(p.cargoToml, (s) => insertCargoDependency(s, names.crateName), opts.dryRun, "Cargo.toml") || changed;
+  changed = applyToFile(p.packageJson, (s) => insertNpmDependency(s, names.npmPackage, picoframeNpmSpec(s)), opts.dryRun, "package.json") || changed;
+  changed = applyToFile(p.cargoToml, (s) => insertCargoDependency(s, names.crateName, picoframeCargoRhs(s)), opts.dryRun, "Cargo.toml") || changed;
   changed = applyToFile(p.mainRs, (s) => insertPluginIntoBuilder(s, names.crateName), opts.dryRun, "main.rs") || changed;
   changed = applyToFile(p.manifest, (s) => insertPluginIntoManifest(s, names), opts.dryRun, "app.plugins.ts") || changed;
 

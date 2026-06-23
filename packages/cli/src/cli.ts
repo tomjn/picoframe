@@ -1,9 +1,10 @@
 #!/usr/bin/env bun
 /**
- * picoframe CLI. v1 commands: `add`, `list`, `doctor`. (`create` lands with
- * publishing in Phase 4.) Wiring is explicit, marker-anchored, and idempotent.
+ * picoframe CLI. Commands: `create`, `add`, `list`, `doctor`. Wiring is
+ * explicit, marker-anchored, and idempotent.
  */
 import { add } from "./commands/add";
+import { create } from "./commands/create";
 import { doctor } from "./commands/doctor";
 import { list } from "./commands/list";
 
@@ -11,39 +12,50 @@ interface Parsed {
   positionals: string[];
   appDir: string;
   dryRun: boolean;
+  install: boolean;
 }
 
 function parse(argv: string[]): Parsed {
   const positionals: string[] = [];
   let appDir = process.cwd();
   let dryRun = false;
+  let install = true;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--app") appDir = argv[++i] ?? appDir;
     else if (a === "--dry-run") dryRun = true;
+    else if (a === "--no-install") install = false;
     else positionals.push(a);
   }
-  return { positionals, appDir, dryRun };
+  return { positionals, appDir, dryRun, install };
 }
 
 const HELP = `picoframe — Tauri v2 app-frame CLI
 
 Usage:
-  picoframe add <plugin> [--app <dir>] [--dry-run]   Wire a first-party plugin into an app
-  picoframe list [--app <dir>]                        List first-party plugins + install state
-  picoframe doctor [--app <dir>]                      Verify per-plugin wiring (Cargo/builder/capability/manifest)
+  picoframe create <name> [--app <dir>] [--no-install]   Scaffold a new standalone app
+  picoframe add <plugin> [--app <dir>] [--dry-run]       Wire a first-party plugin into an app
+  picoframe list [--app <dir>]                            List first-party plugins + install state
+  picoframe doctor [--app <dir>]                          Verify per-plugin wiring (Cargo/builder/capability/manifest)
 
 Options:
-  --app <dir>   Target app directory (default: current directory)
-  --dry-run     Preview changes without writing (add only)
+  --app <dir>    Target directory (parent for create; the app for add/list/doctor). Default: current directory
+  --dry-run      Preview changes without writing (add only)
+  --no-install   Skip \`bun install\` after scaffolding (create only)
 `;
 
 function main(): number {
   const [cmd, ...rest] = process.argv.slice(2);
-  const { positionals, appDir, dryRun } = parse(rest);
+  const { positionals, appDir, dryRun, install } = parse(rest);
 
   try {
     switch (cmd) {
+      case "create": {
+        const name = positionals[0];
+        if (!name) throw new Error("usage: picoframe create <name>");
+        create(name, { appDir, install });
+        return 0;
+      }
       case "add": {
         const plugin = positionals[0];
         if (!plugin) throw new Error("usage: picoframe add <plugin>");

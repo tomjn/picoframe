@@ -4,9 +4,23 @@
  * inheritance reference, matching how the demo and template are wired.
  */
 
-/** `tauri-plugin-picoframe-hello = { workspace = true }` */
-export function depLine(crateName: string): string {
-  return `${crateName} = { workspace = true }`;
+/**
+ * `tauri-plugin-picoframe-hello = { workspace = true }`, or with an explicit
+ * right-hand side (e.g. `"0.0.1"`) for a standalone app outside a workspace.
+ */
+export function depLine(crateName: string, rhs = "{ workspace = true }"): string {
+  return `${crateName} = ${rhs}`;
+}
+
+/**
+ * The right-hand side the app uses for its picoframe crates, read from
+ * `picoframe-core`. The monorepo demo inherits via `{ workspace = true }`; a
+ * standalone `create` app pins a published `"0.0.1"`. `add` mirrors this so a
+ * new plugin crate matches. Falls back to workspace inheritance when core is
+ * absent.
+ */
+export function picoframeCargoRhs(source: string): string {
+  return source.match(/^\s*picoframe-core\s*=\s*(.+?)\s*$/m)?.[1] ?? "{ workspace = true }";
 }
 
 /**
@@ -14,7 +28,7 @@ export function depLine(crateName: string): string {
  * if the crate is already a dependency). Throws if there is no `[dependencies]`
  * section.
  */
-export function insertCargoDependency(source: string, crateName: string): string {
+export function insertCargoDependency(source: string, crateName: string, rhs?: string): string {
   const lines = source.split("\n");
   const header = lines.findIndex((l) => l.trim() === "[dependencies]");
   if (header === -1) {
@@ -44,6 +58,6 @@ export function insertCargoDependency(source: string, crateName: string): string
     if (lines[i].trim() !== "") insertAt = i + 1;
   }
 
-  lines.splice(insertAt, 0, depLine(crateName));
+  lines.splice(insertAt, 0, depLine(crateName, rhs));
   return lines.join("\n");
 }

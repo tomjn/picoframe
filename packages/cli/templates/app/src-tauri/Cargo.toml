@@ -1,0 +1,13 @@
+[package]
+name = "{{APP_NAME}}"
+version = "0.0.0"
+description = "{{APP_NAME}}"
+edition = "2021"
+license = "MIT"
+
+[build-dependencies]
+tauri-build = { version = "2" }
+
+[dependencies]
+tauri = { version = "2" }
+picoframe-core = "0.0.1"

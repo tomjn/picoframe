@@ -12,7 +12,7 @@
   "bin": {
     "picoframe": "dist/cli.js"
   },
-  "files": ["dist"],
+  "files": ["dist", "templates"],
   "publishConfig": {
     "access": "public"
   },

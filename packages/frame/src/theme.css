@@ -2,7 +2,7 @@
  * picoframe theme. Import after `@import "tailwindcss";` in your app's CSS:
  *
  *   @import "tailwindcss";
- *   @source "../node_modules/@picoframe/frame/src";  // generate the frame's utility classes
+ *   @source "../node_modules/@picoframe/frame/dist";  // generate the frame's utility classes from its published build
  *   @import "@picoframe/frame/theme.css";
  *
  * Override any token by redefining its CSS variable in your own `:root` / `.dark`.
