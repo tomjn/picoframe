@@ -1,0 +1,12 @@
+[package]
+name = "picoframe-core"
+version = "0.0.0"
+description = "Core types and the base frame plugin for picoframe Tauri apps"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+tauri = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

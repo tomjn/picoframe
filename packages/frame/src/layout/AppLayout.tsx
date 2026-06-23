@@ -1,0 +1,23 @@
+import { useFrame } from "../context/frame";
+import { usePersistentState } from "../lib/usePersistentState";
+import { RouteHost } from "./RouteHost";
+import { Sidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
+
+/** The frame's single layout route: sidebar + top bar + routed content. */
+export function AppLayout() {
+  const { nav, title } = useFrame();
+  const [collapsed, setCollapsed] = usePersistentState("picoframe.sidebar.collapsed", false);
+
+  return (
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
+      <Sidebar groups={nav} collapsed={collapsed} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <TopBar title={title} onToggleSidebar={() => setCollapsed((v) => !v)} />
+        <main data-slot="content-scroll" className="min-h-0 flex-1 overflow-auto">
+          <RouteHost />
+        </main>
+      </div>
+    </div>
+  );
+}

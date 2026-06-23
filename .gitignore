@@ -1,0 +1,16 @@
+# Rust
+/target
+**/target
+
+# Node / bun
+node_modules
+dist
+*.tsbuildinfo
+.turbo
+
+# Tauri generated
+**/src-tauri/gen
+**/gen/schemas
+
+# OS
+.DS_Store

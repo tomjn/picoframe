@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-hello-greet"
+description = "Enables the hello_greet command without any pre-configured scope."
+commands.allow = ["hello_greet"]
+
+[[permission]]
+identifier = "deny-hello-greet"
+description = "Denies the hello_greet command without any pre-configured scope."
+commands.deny = ["hello_greet"]

@@ -1,0 +1,18 @@
+[package]
+name = "tauri-plugin-picoframe-hello"
+version = "0.0.0"
+description = "Example 'hello' plugin for picoframe (Rust half). ACL identifier: picoframe-hello"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+# Tauri requires `links` to equal `package.name`. The ACL identifier is this
+# name with the `tauri-plugin-` prefix stripped -> `picoframe-hello`.
+links = "tauri-plugin-picoframe-hello"
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dependencies]
+tauri = { workspace = true }
+serde_json = { workspace = true }
+picoframe-core = { workspace = true }

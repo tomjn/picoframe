@@ -1,0 +1,15 @@
+[package]
+name = "picoframe-demo"
+version = "0.0.0"
+description = "picoframe demo app"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[build-dependencies]
+tauri-build = { workspace = true }
+
+[dependencies]
+tauri = { workspace = true }
+picoframe-core = { workspace = true }
+tauri-plugin-picoframe-hello = { workspace = true }

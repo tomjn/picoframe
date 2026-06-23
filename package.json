@@ -1,0 +1,21 @@
+{
+  "name": "picoframe",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*", "plugins/*", "apps/*"],
+  "scripts": {
+    "dev": "bun run --cwd apps/demo tauri dev",
+    "test": "bun test",
+    "typecheck": "tsc --build"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2.11.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router": "^7.6.3",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/picoframe-core",
+    "crates/tauri-plugin-picoframe-hello",
+    "apps/demo/src-tauri",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/tomjn/picoframe"
+
+[workspace.dependencies]
+tauri = { version = "2" }
+tauri-build = { version = "2" }
+tauri-plugin = { version = "2" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+picoframe-core = { path = "crates/picoframe-core", version = "0.0.0" }
+tauri-plugin-picoframe-hello = { path = "crates/tauri-plugin-picoframe-hello", version = "0.0.0" }
