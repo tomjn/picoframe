@@ -1,14 +1,30 @@
 {
   "name": "@picoframe/frame",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Reusable Tauri v2 app-frame React shell: sidebar, top bar, hash routing, nav and slot composition, theme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomjn/picoframe.git",
+    "directory": "packages/frame"
+  },
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./theme.css": "./src/theme.css"
   },
-  "files": ["src"],
+  "files": ["dist", "src/theme.css"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "dependencies": {
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.6.0",

@@ -1,9 +1,25 @@
 {
   "name": "@picoframe/cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "picoframe CLI: wire Tauri v2 app-frame plugins into an app (add/list/doctor)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomjn/picoframe.git",
+    "directory": "packages/cli"
+  },
   "type": "module",
   "bin": {
-    "picoframe": "./src/cli.ts"
+    "picoframe": "dist/cli.js"
   },
-  "files": ["src", "templates"]
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
 }
