@@ -1,4 +1,5 @@
 export { AppFrame, type AppFrameProps } from "./AppFrame";
+export type { HomeOverride } from "./home";
 export { framePlugin } from "./framePlugin";
 export { useFrame } from "./context/frame";
 export { ThemeProvider, useTheme, type ThemeMode } from "./context/theme";
