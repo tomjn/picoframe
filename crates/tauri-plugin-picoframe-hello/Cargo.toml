@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-picoframe-hello"
-version = "0.0.0"
+version = "0.0.1"
 description = "Example 'hello' plugin for picoframe (Rust half). ACL identifier: picoframe-hello"
 edition.workspace = true
 license.workspace = true

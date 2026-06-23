@@ -2125,7 +2125,7 @@ dependencies = [
 
 [[package]]
 name = "picoframe-core"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -3077,7 +3077,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-picoframe-hello"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "picoframe-core",
  "serde_json",

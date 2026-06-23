@@ -1,6 +1,6 @@
 [package]
 name = "picoframe-core"
-version = "0.0.0"
+version = "0.0.1"
 description = "Core types and the base frame plugin for picoframe Tauri apps"
 edition.workspace = true
 license.workspace = true
