@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { aclIdentifier, buildCapability } from "./capability";
 import { insertPluginIntoBuilder, pluginLine } from "./rust-builder";
 
 const repoRoot = `${import.meta.dir}/../../../..`;
@@ -23,14 +22,4 @@ test("insertion is idempotent", () => {
 
 test("missing markers throw", () => {
   expect(() => insertPluginIntoBuilder("fn main() {}", HELLO_CRATE)).toThrow();
-});
-
-test("acl identifier strips the tauri-plugin- prefix", () => {
-  expect(aclIdentifier(HELLO_CRATE)).toBe("picoframe-hello");
-});
-
-test("generated capability grants <id>:default", () => {
-  const cap = buildCapability(HELLO_CRATE);
-  expect(cap.identifier).toBe("picoframe-hello");
-  expect(cap.permissions).toEqual(["picoframe-hello:default"]);
 });

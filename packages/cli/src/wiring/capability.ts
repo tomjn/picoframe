@@ -1,15 +1,12 @@
 /**
  * Per-app Tauri capability file generation for a picoframe plugin.
  *
- * The ACL identifier is the crate name with a leading `tauri-plugin-` stripped
- * (Tauri's own derivation — see tauri-utils acl/build.rs). Granting
- * `<identifier>:default` enables the plugin's default command set on the window.
+ * A capability has two distinct names: its own `identifier` (an arbitrary unique
+ * label — we use the short plugin name) and the ACL permission string it grants
+ * (`picoframe-<short>:default`, the plugin's real ACL id). Only the latter is
+ * load-bearing for Tauri; the former just has to be unique among capabilities.
  */
-
-/** Crate name -> Tauri ACL identifier (e.g. `tauri-plugin-picoframe-hello` -> `picoframe-hello`). */
-export function aclIdentifier(crateName: string): string {
-  return crateName.replace(/^tauri-plugin-/, "");
-}
+import type { PluginNames } from "../naming";
 
 export interface Capability {
   $schema: string;
@@ -20,13 +17,30 @@ export interface Capability {
 }
 
 /** Build the capability object granting a plugin's default permission set. */
-export function buildCapability(crateName: string): Capability {
-  const id = aclIdentifier(crateName);
+export function buildCapability(names: PluginNames): Capability {
   return {
     $schema: "../gen/schemas/desktop-schema.json",
-    identifier: id,
-    description: `Grants the ${id} plugin's default commands to the main window.`,
+    identifier: names.capabilityIdentifier,
+    description: `Grants the ${names.short} plugin's default commands to the main window.`,
     windows: ["main"],
-    permissions: [`${id}:default`],
+    permissions: [`${names.aclId}:default`],
   };
+}
+
+/**
+ * Serialize a capability to the exact on-disk format picoframe uses: 2-space
+ * indent, single-line string arrays, trailing newline. We template it rather
+ * than `JSON.stringify` because the latter expands one-element arrays across
+ * multiple lines, which would not match the hand-authored demo file.
+ */
+export function serializeCapability(c: Capability): string {
+  const arr = (xs: string[]) => `[${xs.map((x) => `"${x}"`).join(", ")}]`;
+  return `{
+  "$schema": "${c.$schema}",
+  "identifier": "${c.identifier}",
+  "description": "${c.description}",
+  "windows": ${arr(c.windows)},
+  "permissions": ${arr(c.permissions)}
+}
+`;
 }
