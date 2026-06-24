@@ -40,6 +40,26 @@ export interface FrameRoute {
   children?: FrameRoute[];
 }
 
+/**
+ * A settings section contributed by a plugin. Sections form a tree via `parent` and
+ * merge by `id` across plugins, so a plugin can attach a sub-section to a category it
+ * does not own. Each `id` is the stable hot-link key: the section is reachable at
+ * `/settings/<id>`.
+ */
+export interface SettingsSection {
+  /** Globally-unique, namespaced, path-safe id, e.g. "recoil.engine.graphics". */
+  id: string;
+  title: string;
+  /** Sibling sort within the parent; default 100. */
+  order?: number;
+  description?: string;
+  icon?: IconComponent;
+  /** Nest under another section/category id. Omit for a top-level category. */
+  parent?: string;
+  /** Renders the section's controls. Optional for pure grouping/category nodes. */
+  Component?: ComponentType;
+}
+
 /** Named injection points the frame shell exposes. String-widened for forward-compat. */
 export type SlotId =
   | "topbar.left"
@@ -63,6 +83,7 @@ export interface FramePlugin {
   nav?: NavGroup[];
   routes: FrameRoute[];
   slots?: SlotContribution[];
+  settings?: SettingsSection[];
   /** Optional provider wrapping the whole app (e.g. a React Query context). */
   Provider?: ComponentType<{ children: ReactNode }>;
 }
