@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["bun", "node"],
+    "paths": {
+      "@picoframe/plugin-sdk": ["./packages/plugin-sdk/src/index.ts"],
+      "@picoframe/frame": ["./packages/frame/src/index.ts"],
+      "@picoframe/plugin-hello": ["./plugins/hello/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/plugin-sdk/src",
+    "packages/frame/src",
+    "packages/cli/src",
+    "plugins/hello/src",
+    "apps/demo/src",
+    "apps/demo/vite.config.ts"
+  ]
+}

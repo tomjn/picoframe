@@ -7,7 +7,7 @@
     "dev": "bun run --cwd apps/demo tauri dev",
     "build": "bun run --cwd packages/plugin-sdk build && bun run --cwd packages/frame build && bun run --cwd plugins/hello build",
     "test": "bun test",
-    "typecheck": "tsc --build"
+    "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.11.0",
