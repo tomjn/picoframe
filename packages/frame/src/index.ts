@@ -7,7 +7,12 @@ export { useNavigationStack } from "./history/navigation-stack";
 export { Slot } from "./slots/slots";
 export { cn } from "./lib/cn";
 
-// Shared shadcn-style UI primitives for plugins (token-driven).
+// The ONLY UI components exported from @picoframe/frame: token-driven primitives that
+// npm-published plugins must be able to import (plugins can't use a consumer app's
+// copied-in shadcn files). EVERY other component (select, checkbox, textarea, form, …)
+// is a shadcn source-registry item in packages/registry, consumed via
+// `npx shadcn add @picoframe/<name>` — it is NOT and will not be exported here.
+// See AGENTS.md ("Two @picoframe/ channels").
 export { Button, buttonVariants, type ButtonProps } from "./components/button";
 export { Input } from "./components/input";
 
