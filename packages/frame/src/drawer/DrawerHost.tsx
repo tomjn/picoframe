@@ -40,7 +40,10 @@ export function DrawerHost() {
           >
             {options?.description ?? "Side drawer"}
           </Dialog.Description>
-          <div className="min-h-0 flex-1 overflow-auto">{options?.content}</div>
+          {/* `-m-1 p-1`: give the scroll viewport ~4px of interior room so focus
+              rings (box-shadows extend past the control box) aren't clipped at the
+              edges, without shifting the content's apparent position. */}
+          <div className="-m-1 min-h-0 flex-1 overflow-auto p-1">{options?.content}</div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
