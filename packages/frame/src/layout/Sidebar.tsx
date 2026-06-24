@@ -45,8 +45,9 @@ export function Sidebar({ groups, collapsed }: { groups: NavGroup[]; collapsed: 
   return (
     <aside
       data-slot="sidebar"
+      data-collapsed={collapsed || undefined}
       className={cn(
-        "flex h-full flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200",
+        "group/sidebar flex h-full flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200",
         collapsed ? "w-14" : "w-60",
       )}
     >

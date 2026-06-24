@@ -1,5 +1,6 @@
 import { useMouseNavigation } from "../history/useMouseNavigation";
 import { useFrame } from "../context/frame";
+import { DrawerHost } from "../drawer/DrawerHost";
 import { usePersistentState } from "../lib/usePersistentState";
 import { RouteHost } from "./RouteHost";
 import { Sidebar } from "./Sidebar";
@@ -20,6 +21,7 @@ export function AppLayout() {
           <RouteHost />
         </main>
       </div>
+      <DrawerHost />
     </div>
   );
 }

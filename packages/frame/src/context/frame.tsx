@@ -1,5 +1,6 @@
 import type { NavGroup } from "@picoframe/plugin-sdk";
 import { type ReactNode, createContext, useContext } from "react";
+import type { ComposedSettings } from "../settings/composeSettings";
 
 export interface FrameContextValue {
   title: string;
@@ -8,6 +9,8 @@ export interface FrameContextValue {
   crumbs: Map<string, string>;
   /** Generic route-loading fallback (no per-component skeletons). */
   fallback: ReactNode;
+  /** Composed plugin settings sections (tree + id lookup) for the /settings page. */
+  settings: ComposedSettings;
 }
 
 const FrameContext = createContext<FrameContextValue | null>(null);

@@ -16,6 +16,13 @@ export { cn } from "./lib/cn";
 export { Button, buttonVariants, type ButtonProps } from "./components/button";
 export { Input } from "./components/input";
 
+// Side drawer: open a single, frame-managed modal drawer from anywhere.
+export { useDrawer, type DrawerController, type DrawerOptions } from "./drawer/DrawerProvider";
+
+// Settings: read/write persisted settings, and supply a custom storage backend.
+export { useSetting } from "./settings/SettingsStoreProvider";
+export { localStorageAdapter, memoryStorage, type SettingsStorage } from "./settings/storage";
+
 // Re-export the plugin authoring contract so consumers import from one place.
 export type {
   FramePlugin,
@@ -24,6 +31,7 @@ export type {
   FrameRoute,
   SlotId,
   SlotContribution,
+  SettingsSection,
   IconComponent,
 } from "@picoframe/plugin-sdk";
 export { defineCommand, type CliResult } from "@picoframe/plugin-sdk";
