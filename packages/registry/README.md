@@ -5,8 +5,9 @@ primitives as source you copy into your own app — `shadcn add @picoframe/butto
 writes `button.tsx` into your project so you own and customize it. It is **not** an
 npm package you import from.
 
-Components: `button`, `dialog`, `tooltip`, `popover`, `collapsible`, `select`
-(plus the `utils` `cn` helper, pulled in automatically).
+Components: `button`, `dialog`, `tooltip`, `popover`, `collapsible`, `select`,
+`input`, `textarea`, `label`, `checkbox`, `radio-group`, `switch`, `slider`,
+`form` (plus the `utils` `cn` helper, pulled in automatically).
 
 These are the current Tailwind v4 / React 19 shadcn sources and consume the
 picoframe theme tokens (`bg-primary`, `border-input`, `bg-accent`, `ring-ring`,
@@ -45,9 +46,11 @@ npx shadcn@latest add https://raw.githubusercontent.com/tomjn/picoframe/main/pac
 `shadcn add` installs npm dependencies for you, but for reference each component
 declares:
 
-- All UI components: `radix-ui`
+- Most UI components: `radix-ui` (`input` and `textarea` are plain elements
+  and need none)
 - `button`: also `class-variance-authority`
-- `dialog`, `select`: also `lucide-react`
+- `dialog`, `select`, `checkbox`, `radio-group`: also `lucide-react`
+- `form`: also `react-hook-form`
 - `utils`: `clsx`, `tailwind-merge`
 
 ## Layout
