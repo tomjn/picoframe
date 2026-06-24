@@ -14,9 +14,13 @@
     "@picoframe/plugin-hello": "workspace:*",
     "@picoframe/plugin-sdk": "workspace:*",
     "@tauri-apps/api": "^2.11.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.21.0",
+    "radix-ui": "^1.6.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router": "^7.6.3"
+    "react-router": "^7.6.3",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",

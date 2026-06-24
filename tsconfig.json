@@ -5,7 +5,8 @@
     "paths": {
       "@picoframe/plugin-sdk": ["./packages/plugin-sdk/src/index.ts"],
       "@picoframe/frame": ["./packages/frame/src/index.ts"],
-      "@picoframe/plugin-hello": ["./plugins/hello/src/index.ts"]
+      "@picoframe/plugin-hello": ["./plugins/hello/src/index.ts"],
+      "@/*": ["./apps/demo/src/*"]
     }
   },
   "include": [
