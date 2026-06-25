@@ -1,7 +1,8 @@
 import type { FramePlugin } from "@picoframe/plugin-sdk";
-import { Settings as SettingsIcon } from "lucide-react";
+import { Palette, Settings as SettingsIcon } from "lucide-react";
 import { NavLink } from "react-router";
 import { cn } from "../lib/cn";
+import { AppearanceSettings } from "./AppearanceSettings";
 
 function SettingsFooterLink() {
   return (
@@ -23,8 +24,9 @@ function SettingsFooterLink() {
 
 /**
  * Built-in plugin contributing the frame-owned `/settings` route (+ deep-link
- * `/settings/:sectionId`) and a sidebar-footer link. `AppFrame` injects it only when at
- * least one settings section is registered.
+ * `/settings/:sectionId`), a sidebar-footer link, and the always-present Appearance
+ * (theme) section. `AppFrame` injects it unconditionally, so every app has a settings
+ * area with at least the theme control.
  */
 export function settingsPlugin(): FramePlugin {
   return {
@@ -35,5 +37,15 @@ export function settingsPlugin(): FramePlugin {
       { path: "settings/:sectionId", lazy: () => import("../pages/Settings") },
     ],
     slots: [{ slot: "sidebar.footer", order: 100, Component: SettingsFooterLink }],
+    settings: [
+      {
+        id: "frame.appearance",
+        title: "Appearance",
+        icon: Palette,
+        order: 10,
+        description: "Theme and visual preferences.",
+        Component: AppearanceSettings,
+      },
+    ],
   };
 }

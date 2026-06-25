@@ -56,12 +56,10 @@ export function AppFrame({
     () => [homePlugin(home), ...plugins.filter((p) => p.id !== "frame")],
     [plugins, home],
   );
-  const settings = useMemo(() => composeSettings(resolved), [resolved]);
-  // Inject the frame-owned settings route + footer link only when sections exist.
-  const composed = useMemo(
-    () => (settings.nodes.length ? [...resolved, settingsPlugin()] : resolved),
-    [resolved, settings],
-  );
+  // The frame always owns the settings route, footer link, and Appearance (theme)
+  // section, so settings compose from the full plugin set including settingsPlugin.
+  const composed = useMemo(() => [...resolved, settingsPlugin()], [resolved]);
+  const settings = useMemo(() => composeSettings(composed), [composed]);
   const routes = useMemo(() => buildRoutes(composed), [composed]);
   const nav = useMemo(() => composeNav(resolved), [resolved]);
   const crumbs = useMemo(() => buildCrumbMap(composed), [composed]);

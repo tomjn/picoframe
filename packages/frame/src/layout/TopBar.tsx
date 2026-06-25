@@ -1,8 +1,7 @@
-import { ChevronLeft, ChevronRight, Monitor, Moon, PanelLeft, Sun } from "lucide-react";
+import { ChevronLeft, ChevronRight, PanelLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useFrame } from "../context/frame";
-import { type ThemeMode, useTheme } from "../context/theme";
 import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
 import { titleCase } from "../routing/crumbs";
@@ -33,20 +32,6 @@ function IconButton({
     >
       {children}
     </button>
-  );
-}
-
-const THEME_CYCLE: ThemeMode[] = ["light", "dark", "system"];
-const THEME_ICON = { light: Sun, dark: Moon, system: Monitor } as const;
-
-function ThemeToggle() {
-  const { mode, setMode } = useTheme();
-  const Icon = THEME_ICON[mode];
-  const next = THEME_CYCLE[(THEME_CYCLE.indexOf(mode) + 1) % THEME_CYCLE.length];
-  return (
-    <IconButton label={`Theme: ${mode} (click for ${next})`} onClick={() => setMode(next)}>
-      <Icon size={18} />
-    </IconButton>
   );
 }
 
@@ -102,7 +87,6 @@ export function TopBar({ title, onToggleSidebar }: { title: string; onToggleSide
       </div>
       <div className="ml-auto flex items-center gap-1">
         <Slot id="topbar.right" />
-        <ThemeToggle />
       </div>
     </header>
   );
