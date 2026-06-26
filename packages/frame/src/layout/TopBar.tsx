@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { useFrame } from "../context/frame";
 import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
-import { titleCase } from "../routing/crumbs";
+import { resolveCrumb, titleCase } from "../routing/crumbs";
 import { Slot } from "../slots/slots";
 
 function IconButton({
@@ -38,20 +38,23 @@ function IconButton({
 export function TopBar({ title, onToggleSidebar }: { title: string; onToggleSidebar: () => void }) {
   const navigate = useNavigate();
   const { canBack, canForward } = useNavigationStack();
-  const { crumbs: crumbMap } = useFrame();
+  const { crumbs: resolvers } = useFrame();
   const { pathname } = useLocation();
 
-  // Build cumulative breadcrumb labels from the path; honor explicit `crumb`
-  // labels where set, otherwise title-case the segment.
+  // Build cumulative breadcrumb labels from the path; honor static parent labels
+  // and per-route `crumb` (string or param-aware function), else title-case.
   const crumbs: string[] = [];
   let acc = "";
   for (const seg of pathname.split("/").filter(Boolean)) {
     acc += `/${seg}`;
-    crumbs.push(crumbMap.get(acc) ?? titleCase(seg));
+    const label = resolveCrumb(resolvers, acc);
+    // A label may expand one segment into several crumbs (e.g. settings ancestry).
+    if (Array.isArray(label)) crumbs.push(...label);
+    else crumbs.push(label ?? titleCase(seg));
   }
   if (crumbs.length === 0) {
-    const root = crumbMap.get("/");
-    if (root) crumbs.push(root);
+    const root = resolveCrumb(resolvers, "/");
+    if (typeof root === "string") crumbs.push(root);
   }
 
   return (

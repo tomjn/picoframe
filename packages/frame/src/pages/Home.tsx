@@ -1,6 +1,9 @@
 import { Link } from "react-router";
 import type { NavItem } from "@picoframe/plugin-sdk";
+import { ExternalLink } from "lucide-react";
 import { useFrame } from "../context/frame";
+import { cn } from "../lib/cn";
+import { openExternal } from "../lib/openExternal";
 
 /**
  * Default landing page contributed by the built-in `framePlugin`: a launcher that
@@ -50,20 +53,34 @@ export default function Home() {
 
 function ToolCard({ item }: { item: NavItem }) {
   const Icon = item.icon;
-  return (
-    <Link
-      to={item.to}
-      className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 text-card-foreground transition-colors hover:border-ring hover:bg-accent"
-    >
+  const cardClass =
+    "group flex items-center gap-3 rounded-lg border border-border bg-card p-4 text-left text-card-foreground transition-colors hover:border-ring hover:bg-accent";
+  const inner = (
+    <>
       {Icon && (
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors group-hover:bg-background">
           <Icon size={20} />
         </span>
       )}
-      <span className="min-w-0">
+      <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{item.label}</span>
-        <span className="block truncate text-xs text-muted-foreground">{item.to}</span>
+        <span className="block truncate text-xs text-muted-foreground">{item.href ?? item.to}</span>
       </span>
+      {item.href && <ExternalLink size={16} className="shrink-0 text-muted-foreground" />}
+    </>
+  );
+
+  if (item.href) {
+    const href = item.href;
+    return (
+      <button type="button" onClick={() => openExternal(href)} className={cn(cardClass, "w-full")}>
+        {inner}
+      </button>
+    );
+  }
+  return (
+    <Link to={item.to ?? "/"} className={cardClass}>
+      {inner}
     </Link>
   );
 }

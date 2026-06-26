@@ -18,7 +18,7 @@ export function AppLayout() {
       <Sidebar groups={nav} collapsed={collapsed} width={width} onResize={setWidth} />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar title={title} onToggleSidebar={() => setCollapsed((v) => !v)} />
-        <main data-slot="content-scroll" className="min-h-0 flex-1 overflow-auto">
+        <main data-slot="content-scroll" className="min-h-0 flex-1 overflow-auto overscroll-none">
           <RouteHost />
         </main>
       </div>

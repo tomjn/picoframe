@@ -9,7 +9,7 @@ import { NavigationStackProvider } from "./history/navigation-stack";
 import { DefaultFallback } from "./layout/DefaultFallback";
 import { composeNav } from "./nav/composeNav";
 import { buildRoutes } from "./routing/buildRoutes";
-import { buildCrumbMap } from "./routing/crumbs";
+import { buildCrumbResolvers } from "./routing/crumbs";
 import { composeSettings } from "./settings/composeSettings";
 import { SettingsStoreProvider } from "./settings/SettingsStoreProvider";
 import { settingsPlugin } from "./settings/settingsPlugin";
@@ -62,7 +62,24 @@ export function AppFrame({
   const settings = useMemo(() => composeSettings(composed), [composed]);
   const routes = useMemo(() => buildRoutes(composed), [composed]);
   const nav = useMemo(() => composeNav(resolved), [resolved]);
-  const crumbs = useMemo(() => buildCrumbMap(composed), [composed]);
+  const crumbs = useMemo(() => {
+    const resolvers = buildCrumbResolvers(composed);
+    // Settings deep-links are flat (`/settings/<id>`), so the section id is the URL
+    // segment. Map each to its ancestor title chain so the bar reads e.g.
+    // "Settings / Engine / Graphics" instead of title-casing the raw id.
+    for (const [id, node] of settings.byId) {
+      const chain: string[] = [];
+      const seen = new Set<string>();
+      let cur: typeof node | undefined = node;
+      while (cur && !seen.has(cur.id)) {
+        seen.add(cur.id);
+        chain.unshift(cur.title);
+        cur = cur.parent ? settings.byId.get(cur.parent) : undefined;
+      }
+      resolvers.static.set(`/settings/${id}`, chain.length > 1 ? chain : node.title);
+    }
+    return resolvers;
+  }, [composed, settings]);
   const slots = useMemo(() => composeSlots(composed.flatMap((p) => p.slots ?? [])), [composed]);
 
   let routed: ReactNode = <RoutedApp routes={routes} />;

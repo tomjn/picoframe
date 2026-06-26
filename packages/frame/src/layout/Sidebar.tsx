@@ -1,4 +1,5 @@
 import type { NavGroup, NavItem } from "@picoframe/plugin-sdk";
+import { ExternalLink } from "lucide-react";
 import {
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
@@ -6,7 +7,12 @@ import {
 } from "react";
 import { NavLink } from "react-router";
 import { cn } from "../lib/cn";
+import { openExternal } from "../lib/openExternal";
 import { Slot } from "../slots/slots";
+
+/** Shared base styling for sidebar entries (internal links and external buttons). */
+const navItemBase =
+  "flex items-center gap-3 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
 
 export const SIDEBAR_MIN_WIDTH = 160;
 export const SIDEBAR_MAX_WIDTH = 420;
@@ -19,21 +25,42 @@ const clampWidth = (px: number) => Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_
 
 function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
   const Icon = item.icon;
+  const glyph = Icon ? (
+    <Icon size={18} className="shrink-0" />
+  ) : (
+    <span className="h-[18px] w-[18px] shrink-0" />
+  );
+
+  if (item.href) {
+    const href = item.href;
+    return (
+      <button
+        type="button"
+        onClick={() => openExternal(href)}
+        title={collapsed ? item.label : undefined}
+        className={cn(navItemBase, "w-full text-left", collapsed && "justify-center")}
+      >
+        {glyph}
+        {!collapsed && <span className="truncate">{item.label}</span>}
+        {!collapsed && <ExternalLink size={14} className="ml-auto shrink-0 text-muted-foreground" />}
+      </button>
+    );
+  }
+
   return (
     <NavLink
-      to={item.to}
+      to={item.to ?? "/"}
       end={item.end}
       title={collapsed ? item.label : undefined}
       className={({ isActive }) =>
         cn(
-          "flex items-center gap-3 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground transition-colors",
-          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          navItemBase,
           isActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
           collapsed && "justify-center",
         )
       }
     >
-      {Icon ? <Icon size={18} className="shrink-0" /> : <span className="h-[18px] w-[18px] shrink-0" />}
+      {glyph}
       {!collapsed && <span className="truncate">{item.label}</span>}
       {!collapsed && item.badge && <span className="ml-auto text-xs text-muted-foreground">{item.badge()}</span>}
     </NavLink>
@@ -124,9 +151,14 @@ export function Sidebar({
       )}
     >
       <nav className="flex-1 space-y-3 overflow-y-auto p-2">
-        {groups.map((group) => (
-          <NavGroupView key={group.id} group={group} collapsed={collapsed} />
-        ))}
+        {/* Drop items opted out via `sidebar: false` (still shown on the home launcher),
+            and any group left empty as a result. */}
+        {groups
+          .map((g) => ({ ...g, items: g.items.filter((i) => i.sidebar !== false) }))
+          .filter((g) => g.items.length > 0)
+          .map((group) => (
+            <NavGroupView key={group.id} group={group} collapsed={collapsed} />
+          ))}
       </nav>
       <div className="border-t border-sidebar-border p-2">
         <Slot id="sidebar.footer" />

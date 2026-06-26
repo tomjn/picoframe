@@ -41,6 +41,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.5rem;
   --background: 0 0% 100%;
   --foreground: 240 10% 12%;
@@ -69,6 +70,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: 240 6% 7%;
   --foreground: 0 0% 95%;
   --card: 240 5% 10%;
@@ -93,6 +95,16 @@
   --sidebar-accent: 240 4% 16%;
   --sidebar-accent-foreground: 0 0% 98%;
   --sidebar-border: 240 4% 14%;
+}
+
+/* Paint the document root with the theme background so an overscroll/rubber-band
+   never reveals the browser's default white canvas, and stop the whole document
+   from scroll-chaining when the inner content scroller hits its end. `color-scheme`
+   also tints the overscroll area and native scrollbars to match the active theme. */
+html,
+body {
+  background-color: hsl(var(--background));
+  overscroll-behavior: none;
 }
 
 /* Side-drawer animations (used by the frame's DrawerHost via `animate-[pf-...]`).
