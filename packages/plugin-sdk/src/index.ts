@@ -3,6 +3,8 @@ export type {
   NavItem,
   NavGroup,
   FrameRoute,
+  CrumbContext,
+  CrumbFn,
   SlotId,
   SlotContribution,
   SettingsSection,

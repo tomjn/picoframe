@@ -3,16 +3,24 @@ import type { ComponentType, ReactNode } from "react";
 /** Icon component compatible with lucide-react and similar. */
 export type IconComponent = ComponentType<{ size?: number; className?: string }>;
 
-/** A single sidebar navigation entry, linking to a route. */
+/** A single sidebar navigation entry, linking to a route or an external URL. */
 export interface NavItem {
   /** Stable, plugin-namespaced id, e.g. "hello.home". */
   id: string;
   label: string;
-  /** Route path this item links to; must match a registered FrameRoute. */
-  to: string;
+  /** Internal route path this item links to; must match a registered FrameRoute. Omit when using `href`. */
+  to?: string;
+  /** External URL opened in the system browser (via the Tauri opener). Mutually exclusive with `to`. */
+  href?: string;
   icon?: IconComponent;
   /** Exact-match the link (React Router NavLink `end`). */
   end?: boolean;
+  /**
+   * Show this item in the sidebar. Default `true`; set `false` for items that should
+   * only appear on the home launcher (e.g. an external docs link you don't want
+   * cluttering the sidebar).
+   */
+  sidebar?: boolean;
   /** Sort order within the group (default 100). */
   order?: number;
   /** Optional live badge (count, dot) rendered next to the label. */
@@ -28,6 +36,17 @@ export interface NavGroup {
   items: NavItem[];
 }
 
+/** Context passed to a dynamic breadcrumb label function. */
+export interface CrumbContext {
+  /** Matched route params for the crumb's path, e.g. `{ id: "42" }` for pattern `/users/:id`. */
+  params: Record<string, string | undefined>;
+  /** The concrete absolute path this crumb resolves, e.g. `/users/42`. */
+  pathname: string;
+}
+
+/** Resolve a breadcrumb label dynamically from the matched route params. */
+export type CrumbFn = (ctx: CrumbContext) => string;
+
 /** A route contributed by a plugin. Lazy by default for code-splitting. */
 export interface FrameRoute {
   /** Path relative to the app root (no leading slash needed). Omit for an index route. */
@@ -35,8 +54,12 @@ export interface FrameRoute {
   /** Marks this as the index route of its parent (mutually exclusive with `path`). */
   index?: boolean;
   lazy: () => Promise<{ default: ComponentType }>;
-  /** Breadcrumb label; falls back to a title-cased path segment. */
-  crumb?: string;
+  /**
+   * Breadcrumb label: a string, or a function of the matched route params for
+   * dynamic segments (e.g. `(c) => userName(c.params.id)`). Falls back to a
+   * title-cased path segment when omitted.
+   */
+  crumb?: string | CrumbFn;
   children?: FrameRoute[];
 }
 
@@ -82,6 +105,13 @@ export interface FramePlugin {
   version: string;
   nav?: NavGroup[];
   routes: FrameRoute[];
+  /**
+   * Static breadcrumb labels for absolute paths that are not themselves a
+   * registered route — typically an intermediate parent segment. Keys are
+   * absolute paths (leading slash optional): `{ "reports/archive": "Archived" }`.
+   * For labels that depend on route params, use a `FrameRoute.crumb` function instead.
+   */
+  crumbs?: Record<string, string>;
   slots?: SlotContribution[];
   settings?: SettingsSection[];
   /** Optional provider wrapping the whole app (e.g. a React Query context). */
