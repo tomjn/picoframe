@@ -1,5 +1,5 @@
 import { type FramePlugin, Button, Input, useDrawer, useSetting } from "@picoframe/frame";
-import { Cpu, PanelRight, SlidersHorizontal } from "lucide-react";
+import { Cpu, Globe, PanelRight, SlidersHorizontal } from "lucide-react";
 import { useNavigate } from "react-router";
 
 /** Settings: General → display name (text), Appearance → compact mode (toggle). */
@@ -95,6 +95,25 @@ export const demoExtrasPlugin: FramePlugin = {
   id: "demo.extras",
   version: "0.0.0",
   routes: [],
+  nav: [
+    {
+      id: "demo.resources",
+      label: "Resources",
+      order: 90,
+      // `href` nav items open in the system browser via the Tauri opener; they
+      // also appear as launcher cards on the home page. `sidebar: false` keeps
+      // this one off the sidebar so it shows only on the home launcher.
+      items: [
+        {
+          id: "demo.resources.source",
+          label: "Source on GitHub",
+          href: "https://github.com/tomjn/picoframe",
+          icon: Globe,
+          sidebar: false,
+        },
+      ],
+    },
+  ],
   slots: [{ slot: "topbar.right", order: 10, Component: DrawerTrigger }],
   settings: [
     { id: "general", title: "General", order: 0, icon: SlidersHorizontal, Component: GeneralSettings },
