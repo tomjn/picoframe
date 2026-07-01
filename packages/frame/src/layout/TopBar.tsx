@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { useFrame } from "../context/frame";
 import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
-import { resolveCrumb, titleCase } from "../routing/crumbs";
+import { decodeSegment, resolveCrumb, titleCase } from "../routing/crumbs";
 import { Slot } from "../slots/slots";
 
 function IconButton({
@@ -45,7 +45,10 @@ export function TopBar({ title, onToggleSidebar }: { title: string; onToggleSide
   // and per-route `crumb` (string or param-aware function), else title-case.
   const crumbs: string[] = [];
   let acc = "";
-  for (const seg of pathname.split("/").filter(Boolean)) {
+  for (const rawSeg of pathname.split("/").filter(Boolean)) {
+    // `pathname` is URL-encoded (spaces -> %20); decode so lookups match the
+    // unencoded route/crumb definitions and the fallback label reads cleanly.
+    const seg = decodeSegment(rawSeg);
     acc += `/${seg}`;
     const label = resolveCrumb(resolvers, acc);
     // A label may expand one segment into several crumbs (e.g. settings ancestry).
