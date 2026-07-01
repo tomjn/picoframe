@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import type { ComponentType } from "react";
 import type { FramePlugin, FrameRoute } from "@picoframe/plugin-sdk";
-import { buildCrumbResolvers, decodeSegment, resolveCrumb, titleCase } from "./crumbs";
+import { buildCrumbResolvers, decodeSegment, isRoutePath, resolveCrumb, titleCase } from "./crumbs";
 
 const page = () => Promise.resolve({ default: (() => null) as ComponentType });
 
@@ -45,6 +45,29 @@ test("static label wins over a matching route pattern", () => {
     plugin("p", [{ path: "users/:id", lazy: page, crumb: "Dynamic" }], { "/users/42": "Ada" }),
   ]);
   expect(resolveCrumb(r, "/users/42")).toBe("Ada");
+});
+
+test("isRoutePath is true for a contributed route but false for a labeled route-less parent", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [{ path: "reports/archive/q1", lazy: page, crumb: "Q1" }], { "reports/archive": "Archived" }),
+  ]);
+  expect(isRoutePath(r, "/reports/archive/q1")).toBe(true);
+  // Labeled by the static map, but no route exists there — not navigable.
+  expect(isRoutePath(r, "/reports/archive")).toBe(false);
+  expect(isRoutePath(r, "/reports")).toBe(false);
+});
+
+test("isRoutePath matches crumb-less routes, dynamic segments, and nested children", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [
+      { path: "users/:id", lazy: page },
+      { path: "hello", lazy: page, children: [{ path: "settings", lazy: page, crumb: "Settings" }] },
+    ]),
+  ]);
+  expect(isRoutePath(r, "/users/42")).toBe(true);
+  expect(isRoutePath(r, "/hello")).toBe(true);
+  expect(isRoutePath(r, "/hello/settings")).toBe(true);
+  expect(isRoutePath(r, "/nope")).toBe(false);
 });
 
 test("unmatched path resolves to undefined (caller falls back to titleCase)", () => {

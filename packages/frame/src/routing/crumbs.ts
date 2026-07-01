@@ -29,6 +29,12 @@ export interface CrumbResolvers {
   static: Map<string, string | string[]>;
   /** Route patterns (possibly with `:params`) and their crumb, in registration order. */
   patterns: { pattern: string; crumb: string | CrumbFn }[];
+  /**
+   * Full pattern of every contributed route (with or without a `crumb`), so a
+   * breadcrumb segment can be tested for navigability. A static label alone does
+   * not imply a route — parent segments may be labeled but have nowhere to go.
+   */
+  routes: string[];
 }
 
 /**
@@ -40,6 +46,7 @@ export interface CrumbResolvers {
 export function buildCrumbResolvers(plugins: FramePlugin[]): CrumbResolvers {
   const staticMap = new Map<string, string>();
   const patterns: { pattern: string; crumb: string | CrumbFn }[] = [];
+  const routes: string[] = [];
 
   for (const p of plugins) {
     for (const [path, label] of Object.entries(p.crumbs ?? {})) {
@@ -47,16 +54,17 @@ export function buildCrumbResolvers(plugins: FramePlugin[]): CrumbResolvers {
     }
   }
 
-  const walk = (routes: FrameRoute[], base: string) => {
-    for (const r of routes) {
+  const walk = (rs: FrameRoute[], base: string) => {
+    for (const r of rs) {
       const full = r.index ? base || "/" : joinPath(base, r.path ?? "");
+      routes.push(full);
       if (r.crumb !== undefined) patterns.push({ pattern: full, crumb: r.crumb });
       if (r.children) walk(r.children, full);
     }
   };
   walk(plugins.flatMap((p) => p.routes), "/");
 
-  return { static: staticMap, patterns };
+  return { static: staticMap, patterns, routes };
 }
 
 /**
@@ -85,6 +93,15 @@ export function decodeSegment(segment: string): string {
   } catch {
     return segment;
   }
+}
+
+/**
+ * True if any contributed route pattern matches this absolute path exactly, i.e.
+ * navigating there lands on a real route. Used to decide whether a breadcrumb
+ * segment is clickable; a static label is not enough (its parent may be routeless).
+ */
+export function isRoutePath(resolvers: CrumbResolvers, path: string): boolean {
+  return resolvers.routes.some((pattern) => matchPath({ path: pattern, end: true }, path) != null);
 }
 
 /** Fallback breadcrumb label for a path segment: "user-settings" -> "User Settings". */
