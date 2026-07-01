@@ -15,7 +15,8 @@ tauri = { version = "2" }
 tauri-build = { version = "2" }
 tauri-plugin = { version = "2" }
 tauri-plugin-opener = { version = "2" }
+tauri-plugin-store = { version = "2" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-picoframe-core = { path = "crates/picoframe-core", version = "0.0.2" }
+picoframe-core = { path = "crates/picoframe-core", version = "0.0.3" }
 tauri-plugin-picoframe-hello = { path = "crates/tauri-plugin-picoframe-hello", version = "0.0.2" }

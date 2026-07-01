@@ -8,7 +8,7 @@ use serde::Serialize;
 use serde_json::Value;
 use tauri::{
     plugin::{Builder, TauriPlugin},
-    Runtime,
+    AppHandle, Runtime,
 };
 
 #[cfg(target_os = "macos")]
@@ -51,4 +51,18 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             Ok(())
         })
         .build()
+}
+
+/// The single disk store file picoframe apps share, in the app data dir. Both the JS
+/// side (`@picoframe/store`'s `createTauriStore`) and Rust plugins open this file, so
+/// no plugin needs to own "the" store. Namespace keys by convention, e.g. `"hello.draft"`.
+pub const STORE_PATH: &str = "picoframe.json";
+
+/// Handle to the shared picoframe store for the Rust side. Requires the app to register
+/// `tauri_plugin_store::Builder::default().build()` (the CLI app template does this).
+pub fn store<R: Runtime>(
+    app: &AppHandle<R>,
+) -> Result<std::sync::Arc<tauri_plugin_store::Store<R>>, tauri_plugin_store::Error> {
+    use tauri_plugin_store::StoreExt;
+    app.store(STORE_PATH)
 }
