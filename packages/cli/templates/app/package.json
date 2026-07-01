@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@picoframe/frame": "^0.0.2",
+    "@picoframe/store": "^0.0.1",
     "@picoframe/plugin-sdk": "^0.0.2",
     "@tauri-apps/api": "^2.11.0",
+    "@tauri-apps/plugin-store": "^2.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router": "^7.6.3"
