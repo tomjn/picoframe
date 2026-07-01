@@ -1,0 +1,33 @@
+{
+  "name": "@picoframe/store",
+  "version": "0.0.1",
+  "description": "Disk-backed persistence adapter for picoframe, built on tauri-plugin-store",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomjn/picoframe.git",
+    "directory": "packages/store"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@tauri-apps/plugin-store": "^2.2.0"
+  },
+  "peerDependencies": {
+    "@picoframe/frame": "*"
+  }
+}
