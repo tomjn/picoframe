@@ -74,6 +74,19 @@ export function resolveCrumb(resolvers: CrumbResolvers, path: string): string | 
   return undefined;
 }
 
+/**
+ * Decode a single URL path segment (e.g. `my%20page` -> `my page`) for crumb
+ * lookups and labels. Falls back to the raw segment if it isn't valid encoding,
+ * so a stray `%` never throws.
+ */
+export function decodeSegment(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
+}
+
 /** Fallback breadcrumb label for a path segment: "user-settings" -> "User Settings". */
 export function titleCase(segment: string): string {
   return segment.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
