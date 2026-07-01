@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "picoframe CLI: wire Tauri v2 app-frame plugins into an app (add/list/doctor)",
   "license": "MIT",
   "repository": {

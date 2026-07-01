@@ -19,9 +19,19 @@ export { Input } from "./components/input";
 // Side drawer: open a single, frame-managed modal drawer from anywhere.
 export { useDrawer, type DrawerController, type DrawerOptions } from "./drawer/DrawerProvider";
 
-// Settings: read/write persisted settings, and supply a custom storage backend.
-export { useSetting } from "./settings/SettingsStoreProvider";
-export { localStorageAdapter, memoryStorage, type SettingsStorage } from "./settings/storage";
+// Persistence: read/write persisted values, and supply a custom storage backend.
+// `useSetting` is the settings-flavoured alias of `usePersistentValue`.
+export {
+  usePersistentValue,
+  useSetting,
+  PersistentStoreProvider,
+} from "./settings/SettingsStoreProvider";
+export {
+  localStorageAdapter,
+  memoryStorage,
+  type PersistentStorage,
+  type SettingsStorage,
+} from "./settings/storage";
 
 // Re-export the plugin authoring contract so consumers import from one place.
 export type {

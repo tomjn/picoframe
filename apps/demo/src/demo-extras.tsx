@@ -1,4 +1,4 @@
-import { type FramePlugin, Button, Input, useDrawer, useSetting } from "@picoframe/frame";
+import { type FramePlugin, Button, Input, useDrawer, usePersistentValue, useSetting } from "@picoframe/frame";
 import { Cpu, Globe, PanelRight, SlidersHorizontal } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -42,6 +42,25 @@ function GraphicsSettings() {
       />
       Enable VSync
     </label>
+  );
+}
+
+/** A page whose draft text survives navigating away and back — via the disk store. */
+function DraftPage() {
+  const [draft, setDraft] = usePersistentValue("demo.notes.draft", "");
+  return (
+    <div className="grid max-w-lg gap-3 p-6">
+      <h1 className="text-lg font-semibold">Scratch notes</h1>
+      <textarea
+        className="min-h-40 rounded-md border p-3 text-sm"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        placeholder="Type here, navigate away, come back — it's still here."
+      />
+      <p className="text-xs text-muted-foreground">
+        Persisted to disk via usePersistentValue; survives navigation and reload.
+      </p>
+    </div>
   );
 }
 
@@ -94,8 +113,13 @@ function DrawerTrigger() {
 export const demoExtrasPlugin: FramePlugin = {
   id: "demo.extras",
   version: "0.0.0",
-  routes: [],
+  routes: [{ path: "notes", lazy: () => Promise.resolve({ default: DraftPage }), crumb: "Notes" }],
   nav: [
+    {
+      id: "demo.main",
+      order: 10,
+      items: [{ id: "demo.notes", label: "Notes", to: "/notes", order: 10 }],
+    },
     {
       id: "demo.resources",
       label: "Resources",

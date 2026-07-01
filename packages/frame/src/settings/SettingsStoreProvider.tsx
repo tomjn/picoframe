@@ -6,32 +6,43 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
-import { type SettingsStorage, localStorageAdapter } from "./storage";
-import { type SettingsStore, createSettingsStore } from "./store";
+import { type PersistentStorage, localStorageAdapter } from "./storage";
+import { type SettingsStore, createPersistentStore } from "./store";
 
-const SettingsStoreContext = createContext<SettingsStore | null>(null);
+const PersistentStoreContext = createContext<SettingsStore | null>(null);
 
-export function SettingsStoreProvider({
+export function PersistentStoreProvider({
   storage,
   children,
 }: {
-  storage?: SettingsStorage;
+  storage?: PersistentStorage;
   children: ReactNode;
 }) {
-  const store = useMemo(() => createSettingsStore(storage ?? localStorageAdapter()), [storage]);
-  return <SettingsStoreContext.Provider value={store}>{children}</SettingsStoreContext.Provider>;
+  const [store] = useState(() => createPersistentStore(storage ?? localStorageAdapter()));
+
+  // Disk/IPC-backed adapters load asynchronously. Hydrate once; when it resolves the
+  // adapter fires per-key changes so mounted hooks re-read and restored values appear.
+  useEffect(() => {
+    storage?.hydrate?.();
+  }, [storage]);
+
+  return <PersistentStoreContext.Provider value={store}>{children}</PersistentStoreContext.Provider>;
 }
 
+/** Back-compat alias. */
+export const SettingsStoreProvider = PersistentStoreProvider;
+
 /**
- * Read/write a persisted setting. Frame-managed and reactive: components bound to the
- * same `key` stay in sync, and the value persists via the configured `settingsStorage`.
+ * Read/write a persisted value. Frame-managed and reactive: components bound to the same
+ * `key` stay in sync, the value persists via the configured `store`, and a value written
+ * by another process (e.g. the Rust side) updates live. Namespace `key` yourself, e.g.
+ * `"myPlugin.formDraft"`.
  */
-export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => void] {
-  const store = useContext(SettingsStoreContext);
-  if (!store) throw new Error("useSetting must be used within <AppFrame>");
+export function usePersistentValue<T>(key: string, defaultValue: T): [T, (value: T) => void] {
+  const store = useContext(PersistentStoreContext);
+  if (!store) throw new Error("usePersistentValue must be used within <AppFrame>");
 
   const [value, setValue] = useState<T>(() => store.get(key, defaultValue));
 
@@ -45,3 +56,6 @@ export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => v
   const set = useCallback((next: T) => store.set(key, next), [store, key]);
   return [value, set];
 }
+
+/** Settings-flavoured name for {@link usePersistentValue}; identical behaviour. */
+export const useSetting = usePersistentValue;

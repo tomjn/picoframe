@@ -5,7 +5,7 @@
   "workspaces": ["packages/*", "plugins/*", "apps/*"],
   "scripts": {
     "dev": "bun run --cwd apps/demo tauri dev",
-    "build": "bun run --cwd packages/plugin-sdk build && bun run --cwd packages/frame build && bun run --cwd plugins/hello build",
+    "build": "bun run --cwd packages/plugin-sdk build && bun run --cwd packages/frame build && bun run --cwd packages/store build && bun run --cwd plugins/hello build",
     "test": "bun test",
     "typecheck": "tsc -p tsconfig.json"
   },

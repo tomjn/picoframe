@@ -4,7 +4,8 @@
 fn main() {
     let mut builder = tauri::Builder::default()
         .plugin(picoframe_core::init())
-        .plugin(tauri_plugin_opener::init());
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_store::Builder::default().build());
     // picoframe:plugins-start
     // picoframe:plugins-end
     builder

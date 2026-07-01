@@ -11,9 +11,9 @@ import { composeNav } from "./nav/composeNav";
 import { buildRoutes } from "./routing/buildRoutes";
 import { buildCrumbResolvers } from "./routing/crumbs";
 import { composeSettings } from "./settings/composeSettings";
-import { SettingsStoreProvider } from "./settings/SettingsStoreProvider";
+import { PersistentStoreProvider } from "./settings/SettingsStoreProvider";
 import { settingsPlugin } from "./settings/settingsPlugin";
-import type { SettingsStorage } from "./settings/storage";
+import type { PersistentStorage } from "./settings/storage";
 import { SlotProvider, composeSlots } from "./slots/slots";
 
 export interface AppFrameProps {
@@ -31,11 +31,13 @@ export interface AppFrameProps {
   /** Override the generic route-loading fallback. */
   fallback?: ReactNode;
   /**
-   * Backend for persisting settings values (`useSetting`). Defaults to `localStorage`;
-   * supply your own to persist elsewhere (e.g. a Tauri store) when settings are part of
-   * a larger app.
+   * Backend for persisting values (`useSetting` / `usePersistentValue`). Defaults to
+   * `localStorage`; supply a disk-backed adapter (e.g. `createTauriStore()` from
+   * `@picoframe/store`) to persist to disk and share state with the Rust side.
    */
-  settingsStorage?: SettingsStorage;
+  store?: PersistentStorage;
+  /** @deprecated Use `store`. */
+  settingsStorage?: PersistentStorage;
 }
 
 function RoutedApp({ routes }: { routes: RouteObject[] }) {
@@ -49,6 +51,7 @@ export function AppFrame({
   home,
   theme,
   fallback,
+  store,
   settingsStorage,
 }: AppFrameProps) {
   // The frame owns the home route/nav; replace any user-passed `frame` plugin.
@@ -95,7 +98,7 @@ export function AppFrame({
       <HashRouter>
         <NavigationStackProvider>
           <SlotProvider slots={slots}>
-            <SettingsStoreProvider storage={settingsStorage}>
+            <PersistentStoreProvider storage={store ?? settingsStorage}>
               <DrawerProvider>
                 <FrameProvider
                   value={{ title, nav, crumbs, settings, fallback: fallback ?? <DefaultFallback /> }}
@@ -103,7 +106,7 @@ export function AppFrame({
                   {routed}
                 </FrameProvider>
               </DrawerProvider>
-            </SettingsStoreProvider>
+            </PersistentStoreProvider>
           </SlotProvider>
         </NavigationStackProvider>
       </HashRouter>
