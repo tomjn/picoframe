@@ -1,4 +1,4 @@
-import type { SettingsStorage } from "./storage";
+import type { PersistentStorage } from "./storage";
 
 /**
  * Serializes settings values over a {@link SettingsStorage} backend and notifies live
@@ -11,7 +11,7 @@ export interface SettingsStore {
   subscribe(key: string, listener: () => void): () => void;
 }
 
-export function createSettingsStore(storage: SettingsStorage): SettingsStore {
+export function createPersistentStore(storage: PersistentStorage): SettingsStore {
   const listeners = new Map<string, Set<() => void>>();
 
   return {
@@ -33,9 +33,15 @@ export function createSettingsStore(storage: SettingsStorage): SettingsStore {
       const set = listeners.get(key) ?? new Set();
       set.add(listener);
       listeners.set(key, set);
+      // Also receive changes written underneath us (e.g. by the Rust side).
+      const unsubStorage = storage.subscribe?.(key, listener);
       return () => {
         set.delete(listener);
+        unsubStorage?.();
       };
     },
   };
 }
+
+/** Back-compat alias. */
+export const createSettingsStore = createPersistentStore;
