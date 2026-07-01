@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@picoframe/frame": "workspace:*",
-    "@picoframe/store": "workspace:*",
     "@picoframe/plugin-hello": "workspace:*",
     "@picoframe/plugin-sdk": "workspace:*",
+    "@picoframe/store": "workspace:*",
     "@tauri-apps/api": "^2.11.0",
     "@tauri-apps/plugin-store": "^2.2.0",
     "clsx": "^2.1.1",
