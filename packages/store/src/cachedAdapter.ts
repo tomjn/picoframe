@@ -2,9 +2,9 @@ import type { PersistentStorage } from "@picoframe/frame";
 
 /** The subset of a tauri-plugin-store `Store` this adapter depends on. */
 export interface RawStore {
-  entries<T = unknown>(): Promise<[string, T][]>;
+  entries(): Promise<[string, unknown][]>;
   set(key: string, value: unknown): Promise<void>;
-  onChange<T = unknown>(cb: (key: string, value: T | undefined) => void): Promise<() => void>;
+  onChange(cb: (key: string, value: unknown) => void): Promise<() => void>;
 }
 
 /** Values are the JSON strings produced by the store layer; pass them through as-is. */

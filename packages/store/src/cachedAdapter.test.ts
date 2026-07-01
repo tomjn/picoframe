@@ -11,7 +11,7 @@ function fakeStore(initial: Record<string, unknown> = {}) {
       data.set(k, v);
     },
     onChange: async (cb) => {
-      onChangeCb = cb as (key: string, value: unknown) => void;
+      onChangeCb = cb;
       return () => {
         onChangeCb = null;
       };
