@@ -3,7 +3,7 @@ import { type ReactNode, useMemo } from "react";
 import { HashRouter, type RouteObject, useRoutes } from "react-router";
 import { FrameProvider } from "./context/frame";
 import { type HomeOverride, homePlugin } from "./home";
-import { ThemeProvider, type ThemeMode } from "./context/theme";
+import { ThemeProvider, type ThemeMode, type Accent } from "./context/theme";
 import { DrawerProvider } from "./drawer/DrawerProvider";
 import { NavigationStackProvider } from "./history/navigation-stack";
 import { DefaultFallback } from "./layout/DefaultFallback";
@@ -27,7 +27,7 @@ export interface AppFrameProps {
    * redirects to the first sidebar route).
    */
   home?: HomeOverride | false;
-  theme?: { defaultMode?: ThemeMode };
+  theme?: { defaultMode?: ThemeMode; defaultAccent?: Accent };
   /** Override the generic route-loading fallback. */
   fallback?: ReactNode;
   /**
@@ -94,7 +94,7 @@ export function AppFrame({
   }
 
   return (
-    <ThemeProvider defaultMode={theme?.defaultMode}>
+    <ThemeProvider defaultMode={theme?.defaultMode} defaultAccent={theme?.defaultAccent}>
       <HashRouter>
         <NavigationStackProvider>
           <SlotProvider slots={slots}>
