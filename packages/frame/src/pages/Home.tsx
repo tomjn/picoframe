@@ -31,7 +31,10 @@ export default function Home() {
           <p className="mt-1 text-muted-foreground">Choose a tool to get started.</p>
           <div className="mt-6 space-y-8">
             {groups.map((group) => (
-              <section key={group.id}>
+              // Collapse the section (header included) when it has no visible card, so an
+              // all-hidden group leaves no empty heading. `data-nav-item` is rendered by
+              // each visible ToolCard.
+              <section key={group.id} className="hidden has-[[data-nav-item]]:block">
                 {group.label && (
                   <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     {group.label}
@@ -52,6 +55,12 @@ export default function Home() {
 }
 
 function ToolCard({ item }: { item: NavItem }) {
+  // Mirror the sidebar: an item gated off via `useVisible` is hidden everywhere, the
+  // launcher included. Called unconditionally (per-item component, so hook-safe) before
+  // the early return. Visible cards carry `data-nav-item` so their section stays shown.
+  const visible = item.useVisible ? item.useVisible() : true;
+  if (!visible) return null;
+
   const Icon = item.icon;
   const cardClass =
     "group flex items-center gap-3 rounded-lg border border-border bg-card p-4 text-left text-card-foreground transition-colors hover:border-ring hover:bg-accent";
@@ -73,13 +82,18 @@ function ToolCard({ item }: { item: NavItem }) {
   if (item.href) {
     const href = item.href;
     return (
-      <button type="button" onClick={() => openExternal(href)} className={cn(cardClass, "w-full")}>
+      <button
+        type="button"
+        data-nav-item=""
+        onClick={() => openExternal(href)}
+        className={cn(cardClass, "w-full")}
+      >
         {inner}
       </button>
     );
   }
   return (
-    <Link to={item.to ?? "/"} className={cardClass}>
+    <Link to={item.to ?? "/"} data-nav-item="" className={cardClass}>
       {inner}
     </Link>
   );

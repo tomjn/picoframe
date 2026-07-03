@@ -40,13 +40,13 @@ test("scaffold substitutes the app name and identifier", () => {
 
 test("scaffold uses published deps, not workspace inheritance, and omits hello", () => {
   const pkg = read("package.json");
-  expect(pkg).toContain(`"@picoframe/frame": "^0.0.2"`);
-  expect(pkg).toContain(`"@picoframe/plugin-sdk": "^0.0.2"`);
+  expect(pkg).toContain(`"@picoframe/frame": "^0.0.12"`);
+  expect(pkg).toContain(`"@picoframe/plugin-sdk": "^0.0.5"`);
   expect(pkg).not.toContain("workspace:*");
   expect(pkg).not.toContain("plugin-hello");
 
   const cargo = read("src-tauri/Cargo.toml");
-  expect(cargo).toContain(`picoframe-core = "0.0.2"`);
+  expect(cargo).toContain(`picoframe-core = "0.0.3"`);
   expect(cargo).not.toContain("workspace = true");
   expect(cargo).not.toContain("hello");
 });
