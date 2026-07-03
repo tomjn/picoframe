@@ -5,6 +5,7 @@ export { useFrame } from "./context/frame";
 export { ThemeProvider, useTheme, type ThemeMode } from "./context/theme";
 export { useNavigationStack } from "./history/navigation-stack";
 export { Slot } from "./slots/slots";
+export { NavGate } from "./nav/NavGate";
 export { cn } from "./lib/cn";
 
 // The ONLY UI components exported from @picoframe/frame: token-driven primitives that
