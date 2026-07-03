@@ -68,6 +68,15 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
 }
 
 function NavGroupView({ group, collapsed }: { group: NavGroup; collapsed: boolean }) {
+  // Single evaluation point for live visibility. `useVisible` is a hook, so it is called
+  // here in a stable loop over the statically-composed `items` array (nav is composed
+  // once in AppFrame, so length and order are constant across renders — safe hook order).
+  const visibleItems = group.items.filter((item) =>
+    // biome-ignore lint/correctness/useHookAtTopLevel: items array is static (composed once in AppFrame), so hook order is stable
+    item.useVisible ? item.useVisible() : true,
+  );
+  if (visibleItems.length === 0) return null;
+
   return (
     <div className="space-y-1">
       {group.label && !collapsed && (
@@ -75,7 +84,7 @@ function NavGroupView({ group, collapsed }: { group: NavGroup; collapsed: boolea
           {group.label}
         </div>
       )}
-      {group.items.map((item) => (
+      {visibleItems.map((item) => (
         <NavItemView key={item.id} item={item} collapsed={collapsed} />
       ))}
     </div>
