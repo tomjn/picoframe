@@ -3,6 +3,7 @@ import type { NavItem } from "@picoframe/plugin-sdk";
 import { ExternalLink } from "lucide-react";
 import { useFrame } from "../context/frame";
 import { cn } from "../lib/cn";
+import { useResolvedNavItem } from "../nav/useResolvedNavItem";
 import { openExternal } from "../lib/openExternal";
 
 /**
@@ -56,12 +57,11 @@ export default function Home() {
 
 function ToolCard({ item }: { item: NavItem }) {
   // Mirror the sidebar: an item gated off via `useVisible` is hidden everywhere, the
-  // launcher included. Called unconditionally (per-item component, so hook-safe) before
+  // launcher included. Resolved unconditionally (per-item component, so hook-safe) before
   // the early return. Visible cards carry `data-nav-item` so their section stays shown.
-  const visible = item.useVisible ? item.useVisible() : true;
+  const { visible, label, icon: Icon, description } = useResolvedNavItem(item);
   if (!visible) return null;
 
-  const Icon = item.icon;
   const cardClass =
     "group flex items-center gap-3 rounded-lg border border-border bg-card p-4 text-left text-card-foreground transition-colors hover:border-ring hover:bg-accent";
   const inner = (
@@ -72,8 +72,10 @@ function ToolCard({ item }: { item: NavItem }) {
         </span>
       )}
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-medium">{item.label}</span>
-        <span className="block truncate text-xs text-muted-foreground">{item.href ?? item.to}</span>
+        <span className="block truncate font-medium">{label}</span>
+        {description != null && (
+          <span className="block truncate text-xs text-muted-foreground">{description}</span>
+        )}
       </span>
       {item.href && <ExternalLink size={16} className="shrink-0 text-muted-foreground" />}
     </>

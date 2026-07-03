@@ -13,6 +13,11 @@ export interface NavItem {
   /** External URL opened in the system browser (via the Tauri opener). Mutually exclusive with `to`. */
   href?: string;
   icon?: IconComponent;
+  /**
+   * Sub-text shown beneath the label on the home-launcher card (not the sidebar). Replaces
+   * the route path that would otherwise appear there; omit to show nothing in its place.
+   */
+  description?: ReactNode;
   /** Exact-match the link (React Router NavLink `end`). */
   end?: boolean;
   /**
@@ -37,6 +42,18 @@ export interface NavItem {
    * `useVisible` or never — since the sidebar evaluates it as a hook per item.
    */
   useVisible?: () => boolean;
+  /**
+   * Reactive overrides for the item's presentation, each a hook evaluated in the item's
+   * own render (sidebar and/or launcher), so they may call `useSetting` / `useContext`.
+   * When present, each replaces its static counterpart and updates live — handy for a
+   * temporary route named after a resolving domain object. Same rules-of-hooks constraint
+   * as `useVisible`: a given item `id` must consistently define, or not define, each hook.
+   */
+  useLabel?: () => string;
+  /** Reactive override for {@link description} (launcher card sub-text). */
+  useDescription?: () => ReactNode;
+  /** Reactive override for {@link icon}. */
+  useIcon?: () => IconComponent;
 }
 
 /** A labelled group of nav items. Groups with the same `id` merge across plugins. */

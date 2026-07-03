@@ -7,6 +7,7 @@ import {
 } from "react";
 import { NavLink } from "react-router";
 import { cn } from "../lib/cn";
+import { useResolvedNavItem } from "../nav/useResolvedNavItem";
 import { openExternal } from "../lib/openExternal";
 import { Slot } from "../slots/slots";
 
@@ -24,13 +25,13 @@ const SIDEBAR_KEY_STEP = 16;
 const clampWidth = (px: number) => Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, px));
 
 function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
-  // Each item owns its own visibility hook, so items can be added or removed at runtime
-  // (a whole fiber mounts/unmounts) without shifting any sibling's hook order. Called
-  // unconditionally before the early return below.
-  const visible = item.useVisible ? item.useVisible() : true;
+  // Each item owns its own hooks (via the shared resolver), so items can be added or
+  // removed at runtime (a whole fiber mounts/unmounts) without shifting any sibling's hook
+  // order. Resolved unconditionally before the early return below. `description` is
+  // launcher-only and ignored here.
+  const { visible, label, icon: Icon } = useResolvedNavItem(item);
   if (!visible) return null;
 
-  const Icon = item.icon;
   const glyph = Icon ? (
     <Icon size={18} className="shrink-0" />
   ) : (
@@ -44,11 +45,11 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
         type="button"
         data-nav-item=""
         onClick={() => openExternal(href)}
-        title={collapsed ? item.label : undefined}
+        title={collapsed ? label : undefined}
         className={cn(navItemBase, "w-full text-left", collapsed && "justify-center")}
       >
         {glyph}
-        {!collapsed && <span className="truncate">{item.label}</span>}
+        {!collapsed && <span className="truncate">{label}</span>}
         {!collapsed && <ExternalLink size={14} className="ml-auto shrink-0 text-muted-foreground" />}
       </button>
     );
@@ -59,7 +60,7 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
       to={item.to ?? "/"}
       data-nav-item=""
       end={item.end}
-      title={collapsed ? item.label : undefined}
+      title={collapsed ? label : undefined}
       className={({ isActive }) =>
         cn(
           navItemBase,
@@ -69,7 +70,7 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
       }
     >
       {glyph}
-      {!collapsed && <span className="truncate">{item.label}</span>}
+      {!collapsed && <span className="truncate">{label}</span>}
       {!collapsed && item.badge && <span className="ml-auto text-xs text-muted-foreground">{item.badge()}</span>}
     </NavLink>
   );

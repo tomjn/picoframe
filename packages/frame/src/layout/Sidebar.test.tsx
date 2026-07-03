@@ -102,6 +102,82 @@ test("adding a useVisible item to an existing group at runtime does not break ho
   expect(screen.getByText("Beta")).toBeTruthy();
 });
 
+const StarIcon = ({ className }: { size?: number; className?: string }) => (
+  <svg data-testid="icon-star" className={className} />
+);
+const BoltIcon = ({ className }: { size?: number; className?: string }) => (
+  <svg data-testid="icon-bolt" className={className} />
+);
+
+test("uses useLabel over the static label", () => {
+  renderSidebar([
+    { id: "main", items: [{ id: "a", label: "Static", to: "/a", useLabel: () => "Dynamic" }] },
+  ]);
+  expect(screen.getByText("Dynamic")).toBeTruthy();
+  expect(screen.queryByText("Static")).toBeNull();
+});
+
+test("uses useIcon over the static icon", () => {
+  const { container } = renderSidebar([
+    { id: "main", items: [{ id: "a", label: "Alpha", to: "/a", icon: StarIcon, useIcon: () => BoltIcon }] },
+  ]);
+  expect(container.querySelector("[data-testid=icon-bolt]")).not.toBeNull();
+  expect(container.querySelector("[data-testid=icon-star]")).toBeNull();
+});
+
+test("re-renders the label live when its backing useSetting changes", () => {
+  const groups: NavGroup[] = [
+    {
+      id: "main",
+      items: [{ id: "a", label: "Off", to: "/a", useLabel: () => (useSetting("on", false)[0] ? "On" : "Off") }],
+    },
+  ];
+  function Toggle() {
+    const [on, setOn] = useSetting("on", false);
+    return (
+      <button type="button" onClick={() => setOn(!on)}>
+        toggle
+      </button>
+    );
+  }
+  render(
+    <PersistentStoreProvider storage={memoryStorage()}>
+      <MemoryRouter>
+        <Toggle />
+        <Sidebar groups={groups} collapsed={false} width={200} onResize={() => {}} />
+      </MemoryRouter>
+    </PersistentStoreProvider>,
+  );
+  expect(screen.getByText("Off")).toBeTruthy();
+  fireEvent.click(screen.getByText("toggle"));
+  expect(screen.getByText("On")).toBeTruthy();
+});
+
+test("re-renders a badge live when its backing useSetting changes", () => {
+  const groups: NavGroup[] = [
+    { id: "main", items: [{ id: "a", label: "Alpha", to: "/a", badge: () => <span>{useSetting("count", 0)[0]}</span> }] },
+  ];
+  function Bump() {
+    const [n, setN] = useSetting("count", 0);
+    return (
+      <button type="button" onClick={() => setN(n + 1)}>
+        bump
+      </button>
+    );
+  }
+  render(
+    <PersistentStoreProvider storage={memoryStorage()}>
+      <MemoryRouter>
+        <Bump />
+        <Sidebar groups={groups} collapsed={false} width={200} onResize={() => {}} />
+      </MemoryRouter>
+    </PersistentStoreProvider>,
+  );
+  expect(screen.getByText("0")).toBeTruthy();
+  fireEvent.click(screen.getByText("bump"));
+  expect(screen.getByText("1")).toBeTruthy();
+});
+
 test("flips an item live when its backing useSetting flag changes", () => {
   const groups: NavGroup[] = [
     {
