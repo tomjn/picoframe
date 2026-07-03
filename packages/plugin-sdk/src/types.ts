@@ -31,6 +31,10 @@ export interface NavItem {
    * item from the sidebar; default is always visible. Purely presentational — to also
    * make the route unreachable while hidden, wrap the page in `<NavGate>` using the same
    * predicate. Distinct from `sidebar: false`, which is a static "never a sidebar entry".
+   *
+   * Items may be added to or removed from the nav at runtime. The one rule (React's rules
+   * of hooks): a given item `id` must keep a stable shape — either always define
+   * `useVisible` or never — since the sidebar evaluates it as a hook per item.
    */
   useVisible?: () => boolean;
 }

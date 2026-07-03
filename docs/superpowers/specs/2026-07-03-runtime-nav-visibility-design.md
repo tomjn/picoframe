@@ -77,28 +77,34 @@ currently hidden) are distinct and non-overlapping; neither replaces the other.
 
 ### 2. Sidebar reactivity
 
-`useVisible` is a hook, so it must be called in a stable order every render. The single
-evaluation point is `NavGroupView`, which already receives the group's items:
+`useVisible` is a hook, so it must be called in a stable order every render. To stay safe
+when items are **added or removed at runtime** (e.g. a licence-gated plugin appearing
+later), each item owns its own hook rather than the parent evaluating all of them:
 
-- The static `sidebar !== false` filter stays where it is (`Sidebar.tsx:157`) — it does
-  not involve a hook and runs before `NavGroupView` is rendered.
-- Inside `NavGroupView`, map the (already statically-filtered) `group.items` to their
-  live visibility: `const visible = group.items.filter((i) => i.useVisible?.() ?? true)`.
-  This calls the hook once per item in a `.map`/`.filter` over a **statically-composed,
-  memoized array** whose length and order are constant across renders (nav is composed
-  once — `AppFrame.tsx:67`), which satisfies the rules of hooks. The `?.` call/skip
-  pattern is stable per index because each index holds the same item object across
-  renders. An `eslint-disable-next-line react-hooks/rules-of-hooks` with this
-  justification covers the linter's loop heuristic.
-- `NavGroupView` renders the header **and** the items from that `visible` subset, and
-  returns `null` when `visible.length === 0`. So group auto-hide (header included) falls
-  out of the same single evaluation.
-- `NavItemView` stays a pure presentational component (no hook) — it only renders items
-  the group already decided are visible.
+- The static `sidebar !== false` filter stays where it is (`Sidebar.tsx`) — it does not
+  involve a hook and runs before `NavGroupView` is rendered.
+- `NavItemView` (keyed by `item.id`) calls `const visible = item.useVisible ?
+  item.useVisible() : true` unconditionally at the top of its render and returns `null`
+  when hidden. Because each item is its own fiber, adding/removing items mounts/unmounts
+  whole fibers — React allows that — and a given fiber's hook count never changes. (The
+  one residual rule, documented on the type: a given item `id` must consistently
+  have-or-not-have `useVisible`.)
+- Group auto-hide is handled by **CSS**, not a parent-side count: `NavGroupView` always
+  renders its header and all items, on a container classed
+  `hidden ... has-[[data-nav-item]]:block`. Every *visible* item renders a
+  `data-nav-item` marker, so a group with no visible item has no `:has([data-nav-item])`
+  match and stays `hidden` (header included). `:has()` is fully supported in the Tauri
+  webview and in Tailwind v4. This keeps the group's render hook-free while still
+  collapsing empty groups with no flicker.
+- Tests assert the structural contract (presence/absence of `[data-nav-item]` and the
+  collapse classes) rather than computed display, since happy-dom does not evaluate
+  `:has()`. A dedicated test re-renders the sidebar with an extra `useVisible` item added
+  to an existing group and asserts no hook-order crash — the exact scenario the earlier
+  parent-side-filter design would have broken.
 
 This makes visibility reactive end-to-end: `useVisible` subscribes (via `useSetting` /
-`useContext`) inside `NavGroupView`'s render, so flipping the backing state re-renders the
-group.
+`useContext`) inside each item's render, so flipping the backing state re-renders that
+item live.
 
 ### 3. Route gating — `<NavGate>`
 

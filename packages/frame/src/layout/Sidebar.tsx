@@ -24,6 +24,12 @@ const SIDEBAR_KEY_STEP = 16;
 const clampWidth = (px: number) => Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, px));
 
 function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
+  // Each item owns its own visibility hook, so items can be added or removed at runtime
+  // (a whole fiber mounts/unmounts) without shifting any sibling's hook order. Called
+  // unconditionally before the early return below.
+  const visible = item.useVisible ? item.useVisible() : true;
+  if (!visible) return null;
+
   const Icon = item.icon;
   const glyph = Icon ? (
     <Icon size={18} className="shrink-0" />
@@ -36,6 +42,7 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
     return (
       <button
         type="button"
+        data-nav-item=""
         onClick={() => openExternal(href)}
         title={collapsed ? item.label : undefined}
         className={cn(navItemBase, "w-full text-left", collapsed && "justify-center")}
@@ -50,6 +57,7 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
   return (
     <NavLink
       to={item.to ?? "/"}
+      data-nav-item=""
       end={item.end}
       title={collapsed ? item.label : undefined}
       className={({ isActive }) =>
@@ -68,23 +76,19 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
 }
 
 function NavGroupView({ group, collapsed }: { group: NavGroup; collapsed: boolean }) {
-  // Single evaluation point for live visibility. `useVisible` is a hook, so it is called
-  // here in a stable loop over the statically-composed `items` array (nav is composed
-  // once in AppFrame, so length and order are constant across renders — safe hook order).
-  const visibleItems = group.items.filter((item) =>
-    // biome-ignore lint/correctness/useHookAtTopLevel: items array is static (composed once in AppFrame), so hook order is stable
-    item.useVisible ? item.useVisible() : true,
-  );
-  if (visibleItems.length === 0) return null;
-
+  // Items self-hide (NavItemView returns null when its `useVisible` is false), so this
+  // component's hook order never depends on how many items are visible — items may be
+  // added or removed at runtime safely. The group collapses itself (header included) via
+  // CSS when it contains no visible item: `hidden` by default, shown only when it
+  // `:has([data-nav-item])`, which every visible item renders.
   return (
-    <div className="space-y-1">
+    <div data-nav-group className="hidden space-y-1 has-[[data-nav-item]]:block">
       {group.label && !collapsed && (
         <div className="px-2 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {group.label}
         </div>
       )}
-      {visibleItems.map((item) => (
+      {group.items.map((item) => (
         <NavItemView key={item.id} item={item} collapsed={collapsed} />
       ))}
     </div>

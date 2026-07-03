@@ -30,8 +30,8 @@ test("hides an item whose useVisible returns false, keeps visible siblings", () 
   expect(screen.queryByText("Hidden")).toBeNull();
 });
 
-test("collapses the whole group (header included) when every item is hidden", () => {
-  renderSidebar([
+test("collapses the group when every item is hidden (no visible nav items, group stays hidden)", () => {
+  const { container } = renderSidebar([
     {
       id: "dev",
       label: "Dev Tools",
@@ -41,13 +41,18 @@ test("collapses the whole group (header included) when every item is hidden", ()
       ],
     },
   ]);
-  expect(screen.queryByText("Dev Tools")).toBeNull();
+  // Both items self-hide, so nothing carries [data-nav-item]; the group's CSS rule
+  // (`hidden ... has-[[data-nav-item]]:block`) therefore leaves it collapsed, header included.
+  expect(container.querySelector("[data-nav-item]")).toBeNull();
   expect(screen.queryByText("Inspector")).toBeNull();
   expect(screen.queryByText("Logs")).toBeNull();
+  const groupEl = container.querySelector("[data-nav-group]");
+  expect(groupEl?.className).toContain("hidden");
+  expect(groupEl?.className).toContain("has-[[data-nav-item]]:block");
 });
 
-test("keeps the group header when at least one item is visible", () => {
-  renderSidebar([
+test("shows the group (header + visible items) when at least one item is visible", () => {
+  const { container } = renderSidebar([
     {
       id: "dev",
       label: "Dev Tools",
@@ -60,6 +65,41 @@ test("keeps the group header when at least one item is visible", () => {
   expect(screen.getByText("Dev Tools")).toBeTruthy();
   expect(screen.getByText("Inspector")).toBeTruthy();
   expect(screen.queryByText("Logs")).toBeNull();
+  // One visible item carries [data-nav-item], so the CSS `:has()` rule un-hides the group.
+  expect(container.querySelector("[data-nav-item]")).not.toBeNull();
+});
+
+test("adding a useVisible item to an existing group at runtime does not break hook order", () => {
+  const base: NavGroup[] = [
+    { id: "main", label: "Main", items: [{ id: "a", label: "Alpha", to: "/a" }] },
+  ];
+  const { rerender } = render(
+    <MemoryRouter>
+      <Sidebar groups={base} collapsed={false} width={200} onResize={() => {}} />
+    </MemoryRouter>,
+  );
+  expect(screen.getByText("Alpha")).toBeTruthy();
+
+  // Add a second item to the SAME group id, carrying a useVisible hook. With per-item
+  // fibers this mounts a fresh fiber (safe). The old parent-side filter would have
+  // changed NavGroupView's own hook count and thrown "rendered more hooks than before".
+  const extended: NavGroup[] = [
+    {
+      id: "main",
+      label: "Main",
+      items: [
+        { id: "a", label: "Alpha", to: "/a" },
+        { id: "b", label: "Beta", to: "/b", useVisible: () => true },
+      ],
+    },
+  ];
+  rerender(
+    <MemoryRouter>
+      <Sidebar groups={extended} collapsed={false} width={200} onResize={() => {}} />
+    </MemoryRouter>,
+  );
+  expect(screen.getByText("Alpha")).toBeTruthy();
+  expect(screen.getByText("Beta")).toBeTruthy();
 });
 
 test("flips an item live when its backing useSetting flag changes", () => {
