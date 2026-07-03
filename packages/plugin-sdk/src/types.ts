@@ -25,6 +25,14 @@ export interface NavItem {
   order?: number;
   /** Optional live badge (count, dot) rendered next to the label. */
   badge?: () => ReactNode;
+  /**
+   * Live visibility gate. A hook, evaluated in the item's own render (in the sidebar),
+   * so it may call `useSetting` / `useContext` / any hook. Return `false` to hide the
+   * item from the sidebar; default is always visible. Purely presentational — to also
+   * make the route unreachable while hidden, wrap the page in `<NavGate>` using the same
+   * predicate. Distinct from `sidebar: false`, which is a static "never a sidebar entry".
+   */
+  useVisible?: () => boolean;
 }
 
 /** A labelled group of nav items. Groups with the same `id` merge across plugins. */
