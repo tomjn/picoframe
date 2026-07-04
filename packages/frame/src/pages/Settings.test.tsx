@@ -69,3 +69,24 @@ test("flips a section's tree presence live when its backing useSetting changes",
   fireEvent.click(screen.getByText("toggle"));
   expect(screen.queryByText("Dev Section")).toBeNull();
 });
+
+test("hides a hidden child from its parent category's card grid", () => {
+  const settings = compose([
+    { id: "cat", title: "Category" },
+    { id: "cat.vis", title: "Visible Child", parent: "cat" },
+    { id: "cat.hid", title: "Hidden Child", parent: "cat", useVisible: () => false },
+  ]);
+  renderAt(settings, "cat");
+  // Visible child appears in both the tree and the card grid; hidden child in neither.
+  expect(screen.getAllByText("Visible Child").length).toBe(2);
+  expect(screen.queryByText("Hidden Child")).toBeNull();
+});
+
+test("still renders a hidden section when navigated to directly (soft hide)", () => {
+  const settings = compose([
+    { id: "home", title: "Home" },
+    { id: "secret", title: "Secret", useVisible: () => false, Component: () => <div>SECRET BODY</div> },
+  ]);
+  renderAt(settings, "secret");
+  expect(screen.getByText("SECRET BODY")).toBeTruthy();
+});

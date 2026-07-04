@@ -45,6 +45,35 @@ function NavNode({ node, activeId, nested = false }: { node: SettingsNode; activ
   );
 }
 
+function SectionCard({ node }: { node: SettingsNode }) {
+  // Per-child fiber so `useVisible` is a stable, hook-safe call (a hook in the parent's
+  // `.map` would violate rules of hooks). Mirrors the tree guard in `NavNode`.
+  const visible = node.useVisible ? node.useVisible() : true;
+  if (!visible) return null;
+  const Icon = node.icon;
+  return (
+    <li>
+      <NavLink
+        to={`/settings/${node.id}`}
+        className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3 text-card-foreground transition-colors hover:border-ring hover:bg-accent"
+      >
+        {Icon && (
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors group-hover:bg-background">
+            <Icon size={16} />
+          </span>
+        )}
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium">{node.title}</span>
+          {node.description && (
+            <span className="block truncate text-xs text-muted-foreground">{node.description}</span>
+          )}
+        </span>
+        <ChevronRight size={16} className="shrink-0 text-muted-foreground" />
+      </NavLink>
+    </li>
+  );
+}
+
 function SectionContent({ node }: { node: SettingsNode }) {
   const Component = node.Component;
   return (
@@ -56,30 +85,9 @@ function SectionContent({ node }: { node: SettingsNode }) {
           <Component />
         ) : node.children.length ? (
           <ul className="grid gap-2">
-            {node.children.map((child) => {
-              const ChildIcon = child.icon;
-              return (
-                <li key={child.id}>
-                  <NavLink
-                    to={`/settings/${child.id}`}
-                    className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3 text-card-foreground transition-colors hover:border-ring hover:bg-accent"
-                  >
-                    {ChildIcon && (
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors group-hover:bg-background">
-                        <ChildIcon size={16} />
-                      </span>
-                    )}
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">{child.title}</span>
-                      {child.description && (
-                        <span className="block truncate text-xs text-muted-foreground">{child.description}</span>
-                      )}
-                    </span>
-                    <ChevronRight size={16} className="shrink-0 text-muted-foreground" />
-                  </NavLink>
-                </li>
-              );
-            })}
+            {node.children.map((child) => (
+              <SectionCard key={child.id} node={child} />
+            ))}
           </ul>
         ) : null}
       </div>
