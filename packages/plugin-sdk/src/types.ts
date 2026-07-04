@@ -110,6 +110,18 @@ export interface SettingsSection {
   parent?: string;
   /** Renders the section's controls. Optional for pure grouping/category nodes. */
   Component?: ComponentType;
+  /**
+   * Live visibility gate. A hook, evaluated in the section's own render within the
+   * settings tree, so it may call `useSetting` / `useContext` / any hook. Return
+   * `false` to hide the section (and its rendered subtree) from the settings
+   * navigation; default is visible. Purely presentational and independent of the
+   * feature's nav item — the section stays reachable at `/settings/<id>` by direct
+   * link. Note: the `/settings` default redirect targets the first node structurally
+   * and is not visibility-filtered, so it may land on a hidden first section. A given
+   * section `id` must consistently define, or never define, `useVisible` (React's
+   * rules of hooks).
+   */
+  useVisible?: () => boolean;
 }
 
 /** Named injection points the frame shell exposes. String-widened for forward-compat. */

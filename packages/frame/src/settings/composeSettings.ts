@@ -34,6 +34,7 @@ export function composeSettings(plugins: FramePlugin[]): ComposedSettings {
         existing.icon ??= s.icon;
         existing.parent ??= s.parent;
         existing.Component ??= s.Component;
+        existing.useVisible ??= s.useVisible;
       } else {
         byId.set(s.id, { ...s, children: [] });
       }
