@@ -6,6 +6,7 @@ import { FrameProvider, type FrameContextValue } from "../context/frame";
 import { PersistentStoreProvider, useSetting } from "../settings/SettingsStoreProvider";
 import { memoryStorage } from "../settings/storage";
 import { type ComposedSettings, composeSettings } from "../settings/composeSettings";
+import { FRAME_APPEARANCE_SETTINGS_ID, settingsPlugin } from "../settings/settingsPlugin";
 import Settings from "./Settings";
 
 afterEach(cleanup);
@@ -20,6 +21,19 @@ function renderAt(settings: ComposedSettings, sectionId: string) {
     <MemoryRouter initialEntries={[`/settings/${sectionId}`]}>
       <FrameProvider value={{ settings } as unknown as FrameContextValue}>
         <Routes>
+          <Route path="/settings/:sectionId" element={<Settings />} />
+        </Routes>
+      </FrameProvider>
+    </MemoryRouter>,
+  );
+}
+
+function renderIndex(settings: ComposedSettings) {
+  return render(
+    <MemoryRouter initialEntries={["/settings"]}>
+      <FrameProvider value={{ settings } as unknown as FrameContextValue}>
+        <Routes>
+          <Route path="/settings" element={<Settings />} />
           <Route path="/settings/:sectionId" element={<Settings />} />
         </Routes>
       </FrameProvider>
@@ -89,4 +103,52 @@ test("still renders a hidden section when navigated to directly (soft hide)", ()
   ]);
   renderAt(settings, "secret");
   expect(screen.getByText("SECRET BODY")).toBeTruthy();
+});
+
+test("/settings skips a hidden first section and lands on the next visible one", () => {
+  const settings = compose([
+    { id: "a", title: "Appearance", order: 10, useVisible: () => false, Component: () => <div>THEME UI</div> },
+    { id: "b", title: "General", order: 100, Component: () => <div>GENERAL UI</div> },
+  ]);
+  renderIndex(settings);
+  expect(screen.getByText("GENERAL UI")).toBeTruthy();
+  expect(screen.queryByText("THEME UI")).toBeNull();
+});
+
+test("/settings lands on the first section when it is visible", () => {
+  const settings = compose([
+    { id: "a", title: "Appearance", order: 10, Component: () => <div>THEME UI</div> },
+    { id: "b", title: "General", order: 100, Component: () => <div>GENERAL UI</div> },
+  ]);
+  renderIndex(settings);
+  expect(screen.getByText("THEME UI")).toBeTruthy();
+});
+
+test("/settings shows the placeholder when every section is hidden", () => {
+  const settings = compose([
+    { id: "a", title: "Appearance", useVisible: () => false },
+    { id: "b", title: "General", useVisible: () => false },
+  ]);
+  renderIndex(settings);
+  expect(screen.getByText("No settings available.")).toBeTruthy();
+});
+
+test("an app hides the frame-owned Appearance section end-to-end: absent from tree, /settings skips it", () => {
+  const appPlugin: FramePlugin = {
+    id: "app.theme-lock",
+    version: "0",
+    routes: [],
+    settings: [
+      { id: FRAME_APPEARANCE_SETTINGS_ID, title: "Appearance", useVisible: () => false },
+      { id: "app.general", title: "General", Component: () => <div>GENERAL UI</div> },
+    ],
+  };
+  // App plugin composes before settingsPlugin(): it hides frame.appearance while
+  // settingsPlugin still fills the section's Component.
+  const settings = composeSettings([appPlugin, settingsPlugin()]);
+  renderIndex(settings);
+  // Redirect skipped the hidden frame-owned Appearance (order 10) and landed on General.
+  expect(screen.getByText("GENERAL UI")).toBeTruthy();
+  // Appearance is hidden from the tree too (not rendered anywhere).
+  expect(screen.queryByText("Appearance")).toBeNull();
 });

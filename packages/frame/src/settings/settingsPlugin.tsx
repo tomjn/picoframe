@@ -4,6 +4,11 @@ import { NavLink } from "react-router";
 import { cn } from "../lib/cn";
 import { AppearanceSettings } from "./AppearanceSettings";
 
+/** Id of the built-in, frame-owned Appearance (theme) settings section. Declare a section
+ *  with this `id` and `useVisible: () => false` from any plugin you pass to `AppFrame` to
+ *  hide the theme UI (e.g. when the app forces a fixed theme). */
+export const FRAME_APPEARANCE_SETTINGS_ID = "frame.appearance";
+
 function SettingsFooterLink() {
   return (
     <NavLink
@@ -39,7 +44,7 @@ export function settingsPlugin(): FramePlugin {
     slots: [{ slot: "sidebar.footer", order: 100, Component: SettingsFooterLink }],
     settings: [
       {
-        id: "frame.appearance",
+        id: FRAME_APPEARANCE_SETTINGS_ID,
         title: "Appearance",
         icon: Palette,
         order: 10,

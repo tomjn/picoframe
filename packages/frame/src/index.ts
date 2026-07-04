@@ -33,6 +33,7 @@ export {
   type PersistentStorage,
   type SettingsStorage,
 } from "./settings/storage";
+export { FRAME_APPEARANCE_SETTINGS_ID } from "./settings/settingsPlugin";
 
 // Re-export the plugin authoring contract so consumers import from one place.
 export type {

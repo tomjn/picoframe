@@ -96,6 +96,20 @@ function SectionContent({ node }: { node: SettingsNode }) {
 }
 
 /**
+ * Redirect `/settings` to the first *visible* top-level section. A recursive delegation
+ * chain: each link is its own fiber, so `node.useVisible()` is a stable single hook call
+ * (never a hook-in-a-loop), and the chain resolves synchronously in one render pass — no
+ * empty flash. Falls through to the "no settings" placeholder when all are hidden.
+ */
+function FirstVisibleRedirect({ nodes }: { nodes: SettingsNode[] }) {
+  const [node, ...rest] = nodes;
+  if (!node) return <div className="p-8 text-muted-foreground">No settings available.</div>;
+  const visible = node.useVisible ? node.useVisible() : true;
+  if (visible) return <Navigate to={`/settings/${node.id}`} replace />;
+  return <FirstVisibleRedirect nodes={rest} />;
+}
+
+/**
  * Frame-owned settings page: the section tree on the left, the selected section on the
  * right. Every node is reachable at `/settings/<id>`, so any code can deep-link to it.
  */
@@ -103,14 +117,7 @@ export default function Settings() {
   const { settings } = useFrame();
   const { sectionId } = useParams();
 
-  if (!sectionId) {
-    const first = settings.nodes[0];
-    return first ? (
-      <Navigate to={`/settings/${first.id}`} replace />
-    ) : (
-      <div className="p-8 text-muted-foreground">No settings available.</div>
-    );
-  }
+  if (!sectionId) return <FirstVisibleRedirect nodes={settings.nodes} />;
 
   const selected = settings.byId.get(sectionId);
 
