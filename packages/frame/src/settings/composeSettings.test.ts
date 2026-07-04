@@ -76,3 +76,21 @@ test("byId exposes every node for deep-link lookup", () => {
   expect(byId.size).toBe(2);
   expect(byId.get("engine.graphics")?.title).toBe("Graphics");
 });
+
+test("useVisible from the first declarer is kept on the merged node", () => {
+  const gate = () => false;
+  const { byId } = composeSettings([
+    plugin("a", [{ id: "x", title: "First", useVisible: gate }]),
+    plugin("b", [{ id: "x", title: "Second" }]),
+  ]);
+  expect(byId.get("x")?.useVisible).toBe(gate);
+});
+
+test("a later same-id declaration fills useVisible when the first omitted it", () => {
+  const gate = () => false;
+  const { byId } = composeSettings([
+    plugin("a", [{ id: "x", title: "First" }]),
+    plugin("b", [{ id: "x", title: "Second", useVisible: gate }]),
+  ]);
+  expect(byId.get("x")?.useVisible).toBe(gate);
+});
