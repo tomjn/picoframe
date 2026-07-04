@@ -5,6 +5,12 @@ import { cn } from "../lib/cn";
 import type { SettingsNode } from "../settings/composeSettings";
 
 function NavNode({ node, activeId, nested = false }: { node: SettingsNode; activeId: string; nested?: boolean }) {
+  // A section can hide itself (and its rendered subtree) from the settings tree via a
+  // reactive `useVisible` hook — evaluated here, in the node's own fiber, so it stays
+  // hook-safe as sections mount/unmount. Soft: still reachable by direct link (see
+  // SectionContent). A given id must consistently define, or not define, `useVisible`.
+  const visible = node.useVisible ? node.useVisible() : true;
+  if (!visible) return null;
   const Icon = node.icon;
   return (
     <div>
