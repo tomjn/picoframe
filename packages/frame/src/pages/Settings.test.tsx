@@ -27,6 +27,19 @@ function renderAt(settings: ComposedSettings, sectionId: string) {
   );
 }
 
+function renderIndex(settings: ComposedSettings) {
+  return render(
+    <MemoryRouter initialEntries={["/settings"]}>
+      <FrameProvider value={{ settings } as unknown as FrameContextValue}>
+        <Routes>
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/:sectionId" element={<Settings />} />
+        </Routes>
+      </FrameProvider>
+    </MemoryRouter>,
+  );
+}
+
 test("hides a top-level section whose useVisible returns false from the tree", () => {
   const settings = compose([
     { id: "home", title: "Home", Component: () => <div>HOME PANEL</div> },
@@ -89,4 +102,32 @@ test("still renders a hidden section when navigated to directly (soft hide)", ()
   ]);
   renderAt(settings, "secret");
   expect(screen.getByText("SECRET BODY")).toBeTruthy();
+});
+
+test("/settings skips a hidden first section and lands on the next visible one", () => {
+  const settings = compose([
+    { id: "a", title: "Appearance", order: 10, useVisible: () => false, Component: () => <div>THEME UI</div> },
+    { id: "b", title: "General", order: 100, Component: () => <div>GENERAL UI</div> },
+  ]);
+  renderIndex(settings);
+  expect(screen.getByText("GENERAL UI")).toBeTruthy();
+  expect(screen.queryByText("THEME UI")).toBeNull();
+});
+
+test("/settings lands on the first section when it is visible", () => {
+  const settings = compose([
+    { id: "a", title: "Appearance", order: 10, Component: () => <div>THEME UI</div> },
+    { id: "b", title: "General", order: 100, Component: () => <div>GENERAL UI</div> },
+  ]);
+  renderIndex(settings);
+  expect(screen.getByText("THEME UI")).toBeTruthy();
+});
+
+test("/settings shows the placeholder when every section is hidden", () => {
+  const settings = compose([
+    { id: "a", title: "Appearance", useVisible: () => false },
+    { id: "b", title: "General", useVisible: () => false },
+  ]);
+  renderIndex(settings);
+  expect(screen.getByText("No settings available.")).toBeTruthy();
 });

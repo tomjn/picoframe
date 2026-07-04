@@ -116,8 +116,8 @@ export interface SettingsSection {
    * `false` to hide the section (and its rendered subtree) from the settings
    * navigation; default is visible. Purely presentational and independent of the
    * feature's nav item — the section stays reachable at `/settings/<id>` by direct
-   * link. Note: the `/settings` default redirect targets the first node structurally
-   * and is not visibility-filtered, so it may land on a hidden first section. A given
+   * link. The `/settings` default redirect skips hidden sections, landing on the
+   * first visible one. A given
    * section `id` must consistently define, or never define, `useVisible` (React's
    * rules of hooks).
    */
