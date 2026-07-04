@@ -10,6 +10,10 @@ fn main() {
     builder = builder.plugin(tauri_plugin_picoframe_hello::init());
     // picoframe:plugins-end
     builder
+        .setup(|app| {
+            picoframe_core::reveal_main_window(app.handle());
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running picoframe demo");
 }

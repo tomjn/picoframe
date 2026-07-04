@@ -53,6 +53,34 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .build()
 }
 
+/// Reveal the app's `main` window with a background colour matching the OS
+/// light/dark appearance, so no default-white webview frame flashes before the
+/// UI paints. The native window pane that appears first follows the OS theme, so
+/// matching the webview background to it keeps the two seamless.
+///
+/// The `main` window must be created hidden (`"visible": false` in
+/// `tauri.conf.json`): the webview paints white the instant it becomes visible,
+/// too early for any in-page script to prevent. Call this from the app's
+/// `.setup()` hook, where config windows already exist (they do not during
+/// plugin setup). A missing window or a failed colour/show call is ignored - the
+/// worst case is the unfixed flash, never a hidden window on the happy path.
+pub fn reveal_main_window<R: Runtime>(app: &AppHandle<R>) {
+    use tauri::{window::Color, Manager, Theme};
+
+    let Some(window) = app.get_webview_window("main") else {
+        return;
+    };
+
+    // Mirrors picoframe's `--background` tokens: dark is hsl(240 6% 7%), which is
+    // rgb(17, 17, 19); light is white.
+    let color = match window.theme() {
+        Ok(Theme::Dark) => Color(17, 17, 19, 255),
+        _ => Color(255, 255, 255, 255),
+    };
+    let _ = window.set_background_color(Some(color));
+    let _ = window.show();
+}
+
 /// The single disk store file picoframe apps share, in the app data dir. Both the JS
 /// side (`@picoframe/store`'s `createTauriStore`) and Rust plugins open this file, so
 /// no plugin needs to own "the" store. Namespace keys by convention, e.g. `"hello.draft"`.

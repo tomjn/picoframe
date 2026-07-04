@@ -9,6 +9,10 @@ fn main() {
     // picoframe:plugins-start
     // picoframe:plugins-end
     builder
+        .setup(|app| {
+            picoframe_core::reveal_main_window(app.handle());
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running {{APP_NAME}}");
 }
