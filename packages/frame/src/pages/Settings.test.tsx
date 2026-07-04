@@ -6,6 +6,7 @@ import { FrameProvider, type FrameContextValue } from "../context/frame";
 import { PersistentStoreProvider, useSetting } from "../settings/SettingsStoreProvider";
 import { memoryStorage } from "../settings/storage";
 import { type ComposedSettings, composeSettings } from "../settings/composeSettings";
+import { FRAME_APPEARANCE_SETTINGS_ID, settingsPlugin } from "../settings/settingsPlugin";
 import Settings from "./Settings";
 
 afterEach(cleanup);
@@ -130,4 +131,24 @@ test("/settings shows the placeholder when every section is hidden", () => {
   ]);
   renderIndex(settings);
   expect(screen.getByText("No settings available.")).toBeTruthy();
+});
+
+test("an app hides the frame-owned Appearance section end-to-end: absent from tree, /settings skips it", () => {
+  const appPlugin: FramePlugin = {
+    id: "app.theme-lock",
+    version: "0",
+    routes: [],
+    settings: [
+      { id: FRAME_APPEARANCE_SETTINGS_ID, title: "Appearance", useVisible: () => false },
+      { id: "app.general", title: "General", Component: () => <div>GENERAL UI</div> },
+    ],
+  };
+  // App plugin composes before settingsPlugin(): it hides frame.appearance while
+  // settingsPlugin still fills the section's Component.
+  const settings = composeSettings([appPlugin, settingsPlugin()]);
+  renderIndex(settings);
+  // Redirect skipped the hidden frame-owned Appearance (order 10) and landed on General.
+  expect(screen.getByText("GENERAL UI")).toBeTruthy();
+  // Appearance is hidden from the tree too (not rendered anywhere).
+  expect(screen.queryByText("Appearance")).toBeNull();
 });
