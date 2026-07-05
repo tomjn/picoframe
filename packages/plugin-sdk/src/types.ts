@@ -131,6 +131,8 @@ export type SlotId =
   | "sidebar.footer"
   | "statusbar"
   | "command-palette"
+  | "home.top"
+  | "home.bottom"
   | (string & {});
 
 export interface SlotContribution {

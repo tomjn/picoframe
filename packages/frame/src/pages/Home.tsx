@@ -5,6 +5,7 @@ import { useFrame } from "../context/frame";
 import { cn } from "../lib/cn";
 import { useResolvedNavItem } from "../nav/useResolvedNavItem";
 import { openExternal } from "../lib/openExternal";
+import { Slot } from "../slots/slots";
 
 /**
  * Default landing page contributed by the built-in `framePlugin`: a launcher that
@@ -12,6 +13,11 @@ import { openExternal } from "../lib/openExternal";
  * a card, preserving the sidebar's grouping so related tools stay together.
  * Domain-agnostic and presentable — apps get a useful home for free without
  * referencing the frame itself.
+ *
+ * Exposes two slots for plugins to inject into: `home.top` (above the heading,
+ * for a hero/banner) and `home.bottom` (below the card grid, for a footer).
+ * Both render on this built-in launcher only — a custom `home` override replaces
+ * the whole component and owns its own layout.
  */
 export default function Home() {
   const { nav, title } = useFrame();
@@ -23,6 +29,7 @@ export default function Home() {
 
   return (
     <div className="p-8">
+      <Slot id="home.top" />
       <h1 className="text-2xl font-semibold">{title}</h1>
 
       {groups.length === 0 ? (
@@ -51,6 +58,8 @@ export default function Home() {
           </div>
         </>
       )}
+
+      <Slot id="home.bottom" />
     </div>
   );
 }

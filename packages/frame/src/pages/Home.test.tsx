@@ -5,6 +5,7 @@ import type { NavGroup } from "@picoframe/plugin-sdk";
 import { FrameProvider, type FrameContextValue } from "../context/frame";
 import { PersistentStoreProvider, useSetting } from "../settings/SettingsStoreProvider";
 import { memoryStorage } from "../settings/storage";
+import { SlotProvider, composeSlots } from "../slots/slots";
 import Home from "./Home";
 
 afterEach(cleanup);
@@ -26,6 +27,28 @@ function renderHome(nav: NavGroup[]) {
     </MemoryRouter>,
   );
 }
+
+test("renders home.top above the heading and home.bottom below the grid", () => {
+  const nav: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
+  const slots = composeSlots([
+    { slot: "home.top", Component: () => <div data-testid="top">Top</div> },
+    { slot: "home.bottom", Component: () => <div data-testid="bottom">Bottom</div> },
+  ]);
+  const { container } = render(
+    <MemoryRouter>
+      <FrameProvider value={{ title: "App", nav } as unknown as FrameContextValue}>
+        <SlotProvider slots={slots}>
+          <Home />
+        </SlotProvider>
+      </FrameProvider>
+    </MemoryRouter>,
+  );
+  // Document order: top slot -> heading -> card -> bottom slot.
+  const order = Array.from(
+    container.querySelectorAll("[data-testid=top], h1, [data-nav-item], [data-testid=bottom]"),
+  ).map((el) => el.getAttribute("data-testid") ?? el.tagName.toLowerCase());
+  expect(order).toEqual(["top", "h1", "a", "bottom"]);
+});
 
 test("launcher hides a card whose useVisible returns false, keeps visible siblings", () => {
   renderHome([
