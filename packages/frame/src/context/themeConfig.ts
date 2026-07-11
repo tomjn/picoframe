@@ -44,6 +44,12 @@ export const ACCENTS = [
     swatch:
       "linear-gradient(90deg, hsl(350 70% 50%), hsl(48 70% 46%), hsl(150 55% 40%), hsl(200 70% 45%), hsl(320 60% 52%))",
   },
+  {
+    value: "opal",
+    label: "Opal",
+    swatch:
+      "linear-gradient(135deg, hsl(180 60% 86%), hsl(280 55% 89%), hsl(330 60% 89%), hsl(50 65% 87%))",
+  },
 ] as const satisfies readonly ThemeOption<string>[];
 
 export type Accent = (typeof ACCENTS)[number]["value"];

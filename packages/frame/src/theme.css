@@ -408,45 +408,68 @@
   --sidebar-accent-foreground: 330 80% 86%;
 }
 
-/* Rainbow accent (novelty): instead of a static gradient (which would only paint the
-   few solid-fill surfaces), every accent token derives its hue from a single animated
-   custom property, so buttons, active nav items, rings and tints all cycle through the
-   spectrum in unison. --pf-rainbow-hue is registered as an <angle> so keyframes can
-   interpolate it; without @property support it falls back to a static red (0deg).
-   Note: white text can't meet WCAG AA across every hue, so this is a decorative,
-   opt-in accent — the primary Button/toggle add a text-shadow to stay legible. */
-@property --pf-rainbow-hue {
+/* Animated-hue accents (novelty): instead of a static gradient (which would only paint
+   the few solid-fill surfaces), every accent token derives its hue from a single
+   animated custom property, so buttons, active nav items, rings and tints all shift in
+   unison. --pf-accent-hue is registered as an <angle> so keyframes can interpolate it;
+   without @property support it falls back to a static hue (0deg). Two accents share the
+   engine: "rainbow" maps the hue to a vivid mid-lightness primary (white text, so a
+   text-shadow aids legibility across the sweep), "opal" maps it to a pale, luminous
+   primary with dark text for a soft iridescent look. Both are decorative and opt-in. */
+@property --pf-accent-hue {
   syntax: "<angle>";
   inherits: true;
   initial-value: 0deg;
 }
-@keyframes pf-rainbow-cycle {
+@keyframes pf-hue-cycle {
   from {
-    --pf-rainbow-hue: 0deg;
+    --pf-accent-hue: 0deg;
   }
   to {
-    --pf-rainbow-hue: 360deg;
+    --pf-accent-hue: 360deg;
   }
 }
 [data-accent="rainbow"] {
-  --pf-rainbow-hue: 0deg;
-  --primary: var(--pf-rainbow-hue) 68% 48%;
+  --pf-accent-hue: 0deg;
+  --primary: var(--pf-accent-hue) 68% 48%;
   --primary-foreground: 0 0% 100%;
-  --ring: var(--pf-rainbow-hue) 70% 55%;
-  --accent: var(--pf-rainbow-hue) 70% 92%;
-  --accent-foreground: var(--pf-rainbow-hue) 55% 32%;
-  --sidebar-accent: var(--pf-rainbow-hue) 70% 92%;
-  --sidebar-accent-foreground: var(--pf-rainbow-hue) 55% 32%;
+  --ring: var(--pf-accent-hue) 70% 55%;
+  --accent: var(--pf-accent-hue) 70% 92%;
+  --accent-foreground: var(--pf-accent-hue) 55% 32%;
+  --sidebar-accent: var(--pf-accent-hue) 70% 92%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 55% 32%;
 }
 .dark[data-accent="rainbow"] {
-  --accent: var(--pf-rainbow-hue) 40% 24%;
-  --accent-foreground: var(--pf-rainbow-hue) 80% 85%;
-  --sidebar-accent: var(--pf-rainbow-hue) 40% 24%;
-  --sidebar-accent-foreground: var(--pf-rainbow-hue) 80% 85%;
+  --accent: var(--pf-accent-hue) 40% 24%;
+  --accent-foreground: var(--pf-accent-hue) 80% 85%;
+  --sidebar-accent: var(--pf-accent-hue) 40% 24%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 80% 85%;
+}
+[data-accent="opal"] {
+  --pf-accent-hue: 0deg;
+  --primary: var(--pf-accent-hue) 60% 78%;
+  --primary-foreground: var(--pf-accent-hue) 35% 25%;
+  --ring: var(--pf-accent-hue) 55% 68%;
+  --accent: var(--pf-accent-hue) 65% 93%;
+  --accent-foreground: var(--pf-accent-hue) 40% 32%;
+  --sidebar-accent: var(--pf-accent-hue) 65% 93%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 40% 32%;
+}
+.dark[data-accent="opal"] {
+  --primary: var(--pf-accent-hue) 50% 75%;
+  --primary-foreground: var(--pf-accent-hue) 40% 18%;
+  --ring: var(--pf-accent-hue) 45% 62%;
+  --accent: var(--pf-accent-hue) 30% 26%;
+  --accent-foreground: var(--pf-accent-hue) 70% 85%;
+  --sidebar-accent: var(--pf-accent-hue) 30% 26%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 70% 85%;
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-accent="rainbow"] {
-    animation: pf-rainbow-cycle 8s linear infinite;
+    animation: pf-hue-cycle 30s linear infinite;
+  }
+  [data-accent="opal"] {
+    animation: pf-hue-cycle 45s linear infinite;
   }
 }
 
