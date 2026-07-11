@@ -9,6 +9,7 @@ afterEach(() => {
   localStorage.clear();
   delete document.documentElement.dataset.base;
   delete document.documentElement.dataset.accent;
+  delete document.documentElement.dataset.accentAnim;
 });
 
 function renderSettings(config?: LayoutConfig) {
@@ -54,6 +55,14 @@ test("the default base (Zinc) carries no data-base attribute", () => {
   expect(document.documentElement.dataset.base).toBe("stone");
   fireEvent.click(screen.getByRole("radio", { name: "Zinc" }));
   expect(document.documentElement.dataset.base).toBeUndefined();
+});
+
+test("selecting an accent applies it and fires the animation cue", () => {
+  renderSettings();
+  fireEvent.click(screen.getByRole("radio", { name: "Blue" }));
+  expect(document.documentElement.dataset.accent).toBe("blue");
+  // the transient cue attribute is set synchronously on selection
+  expect(document.documentElement.dataset.accentAnim).toBe("");
 });
 
 test("migrateLegacyAccent rewrites a persisted 'zinc' accent to 'neutral'", () => {

@@ -410,6 +410,19 @@ body {
   overscroll-behavior: none;
 }
 
+/* Accent-change cue: while <html data-accent-anim> is set (~500ms after the user
+   picks an accent, see ThemeProvider), briefly cross-fade colour-bearing surfaces so
+   the new accent glides in rather than snapping. Robust by design — it transitions
+   the resolved colour values, so it needs no per-component hooks or class names, and
+   it self-limits when the attribute is removed. Motion-sensitive users opt out. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-accent-anim] * {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow, outline-color;
+    transition-duration: 450ms;
+    transition-timing-function: ease-out;
+  }
+}
+
 /* Side-drawer animations (used by the frame's DrawerHost via `animate-[pf-...]`).
    Kept here so they ship with the theme and need no animation plugin. */
 @keyframes pf-fade-in {

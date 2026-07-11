@@ -1,4 +1,4 @@
-import { type ReactNode, createContext, useContext, useEffect } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useRef } from "react";
 import { usePersistentState } from "../lib/usePersistentState";
 import type { Accent, Base } from "./themeConfig";
 
@@ -54,8 +54,31 @@ export function ThemeProvider({
   children: ReactNode;
 }) {
   const [mode, setMode] = usePersistentState<ThemeMode>("picoframe.theme", defaultMode);
-  const [accent, setAccent] = usePersistentState<Accent>("picoframe.accent", defaultAccent);
+  const [accent, setAccentState] = usePersistentState<Accent>("picoframe.accent", defaultAccent);
   const [base, setBase] = usePersistentState<Base>("picoframe.base", defaultBase);
+
+  // Applying an accent flips a transient `data-accent-anim` attribute for ~500ms;
+  // theme.css uses it to briefly cross-fade colour-bearing surfaces so the new accent
+  // glides in (gated behind prefers-reduced-motion). Wraps setAccent so the cue only
+  // fires on explicit user changes, never on initial hydration.
+  const accentAnimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const setAccent = useCallback(
+    (next: Accent) => {
+      setAccentState(next);
+      if (typeof document === "undefined") return;
+      const root = document.documentElement;
+      root.dataset.accentAnim = "";
+      if (accentAnimTimer.current) clearTimeout(accentAnimTimer.current);
+      accentAnimTimer.current = setTimeout(() => {
+        delete document.documentElement.dataset.accentAnim;
+        accentAnimTimer.current = null;
+      }, 500);
+    },
+    [setAccentState],
+  );
+  useEffect(() => () => {
+    if (accentAnimTimer.current) clearTimeout(accentAnimTimer.current);
+  }, []);
 
   const resolved: "light" | "dark" = mode === "system" ? (systemPrefersDark() ? "dark" : "light") : mode;
 
