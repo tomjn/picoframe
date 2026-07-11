@@ -226,6 +226,180 @@
   --sidebar-accent-foreground: 25 90% 82%;
 }
 
+/* Extended accents. Light-mode --primary lightness is chosen so --primary-foreground
+   clears WCAG AA (>=4.5:1): amber/yellow pair a dark foreground with their bright
+   primary; the cool accents use a 600/700-shade so white text passes. */
+[data-accent="red"]:not(.dark) {
+  --primary: 0 72% 51%;
+  --primary-foreground: 0 0% 98%;
+  --ring: 0 72% 51%;
+  --accent: 0 86% 94%;
+  --accent-foreground: 0 74% 34%;
+  --sidebar-accent: 0 86% 94%;
+  --sidebar-accent-foreground: 0 74% 34%;
+}
+.dark[data-accent="red"] {
+  --primary: 0 72% 56%;
+  --primary-foreground: 0 0% 98%;
+  --ring: 0 72% 56%;
+  --accent: 0 50% 24%;
+  --accent-foreground: 0 90% 86%;
+  --sidebar-accent: 0 50% 24%;
+  --sidebar-accent-foreground: 0 90% 86%;
+}
+
+[data-accent="amber"]:not(.dark) {
+  --primary: 38 92% 50%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 38 92% 50%;
+  --accent: 38 96% 90%;
+  --accent-foreground: 26 83% 30%;
+  --sidebar-accent: 38 96% 90%;
+  --sidebar-accent-foreground: 26 83% 30%;
+}
+.dark[data-accent="amber"] {
+  --primary: 38 92% 55%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 38 92% 55%;
+  --accent: 34 60% 22%;
+  --accent-foreground: 38 96% 82%;
+  --sidebar-accent: 34 60% 22%;
+  --sidebar-accent-foreground: 38 96% 82%;
+}
+
+[data-accent="yellow"]:not(.dark) {
+  --primary: 48 96% 53%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 48 96% 53%;
+  --accent: 48 96% 89%;
+  --accent-foreground: 32 81% 29%;
+  --sidebar-accent: 48 96% 89%;
+  --sidebar-accent-foreground: 32 81% 29%;
+}
+.dark[data-accent="yellow"] {
+  --primary: 48 96% 58%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 48 96% 58%;
+  --accent: 40 60% 22%;
+  --accent-foreground: 48 96% 82%;
+  --sidebar-accent: 40 60% 22%;
+  --sidebar-accent-foreground: 48 96% 82%;
+}
+
+[data-accent="teal"]:not(.dark) {
+  --primary: 173 80% 32%;
+  --primary-foreground: 166 76% 97%;
+  --ring: 173 80% 32%;
+  --accent: 168 70% 90%;
+  --accent-foreground: 173 80% 24%;
+  --sidebar-accent: 168 70% 90%;
+  --sidebar-accent-foreground: 173 80% 24%;
+}
+.dark[data-accent="teal"] {
+  --primary: 172 66% 46%;
+  --primary-foreground: 166 80% 10%;
+  --ring: 172 66% 46%;
+  --accent: 173 45% 18%;
+  --accent-foreground: 168 70% 82%;
+  --sidebar-accent: 173 45% 18%;
+  --sidebar-accent-foreground: 168 70% 82%;
+}
+
+[data-accent="cyan"]:not(.dark) {
+  --primary: 192 91% 34%;
+  --primary-foreground: 180 100% 96%;
+  --ring: 192 91% 34%;
+  --accent: 187 80% 90%;
+  --accent-foreground: 192 91% 26%;
+  --sidebar-accent: 187 80% 90%;
+  --sidebar-accent-foreground: 192 91% 26%;
+}
+.dark[data-accent="cyan"] {
+  --primary: 189 85% 48%;
+  --primary-foreground: 190 80% 10%;
+  --ring: 189 85% 48%;
+  --accent: 192 50% 20%;
+  --accent-foreground: 187 80% 82%;
+  --sidebar-accent: 192 50% 20%;
+  --sidebar-accent-foreground: 187 80% 82%;
+}
+
+[data-accent="sky"]:not(.dark) {
+  --primary: 200 90% 40%;
+  --primary-foreground: 204 100% 97%;
+  --ring: 200 90% 40%;
+  --accent: 200 90% 92%;
+  --accent-foreground: 200 90% 30%;
+  --sidebar-accent: 200 90% 92%;
+  --sidebar-accent-foreground: 200 90% 30%;
+}
+.dark[data-accent="sky"] {
+  --primary: 199 89% 55%;
+  --primary-foreground: 204 80% 10%;
+  --ring: 199 89% 55%;
+  --accent: 200 50% 22%;
+  --accent-foreground: 200 90% 84%;
+  --sidebar-accent: 200 50% 22%;
+  --sidebar-accent-foreground: 200 90% 84%;
+}
+
+[data-accent="indigo"]:not(.dark) {
+  --primary: 243 75% 59%;
+  --primary-foreground: 226 100% 97%;
+  --ring: 243 75% 59%;
+  --accent: 243 85% 94%;
+  --accent-foreground: 243 55% 42%;
+  --sidebar-accent: 243 85% 94%;
+  --sidebar-accent-foreground: 243 55% 42%;
+}
+.dark[data-accent="indigo"] {
+  --primary: 242 80% 66%;
+  --primary-foreground: 226 70% 12%;
+  --ring: 242 80% 66%;
+  --accent: 243 45% 26%;
+  --accent-foreground: 243 80% 87%;
+  --sidebar-accent: 243 45% 26%;
+  --sidebar-accent-foreground: 243 80% 87%;
+}
+
+[data-accent="purple"]:not(.dark) {
+  --primary: 271 76% 53%;
+  --primary-foreground: 270 100% 98%;
+  --ring: 271 76% 53%;
+  --accent: 271 85% 94%;
+  --accent-foreground: 271 60% 40%;
+  --sidebar-accent: 271 85% 94%;
+  --sidebar-accent-foreground: 271 60% 40%;
+}
+.dark[data-accent="purple"] {
+  --primary: 271 76% 62%;
+  --primary-foreground: 270 70% 12%;
+  --ring: 271 76% 62%;
+  --accent: 271 45% 26%;
+  --accent-foreground: 271 80% 87%;
+  --sidebar-accent: 271 45% 26%;
+  --sidebar-accent-foreground: 271 80% 87%;
+}
+
+[data-accent="pink"]:not(.dark) {
+  --primary: 330 75% 47%;
+  --primary-foreground: 322 100% 98%;
+  --ring: 330 75% 47%;
+  --accent: 330 85% 94%;
+  --accent-foreground: 330 70% 36%;
+  --sidebar-accent: 330 85% 94%;
+  --sidebar-accent-foreground: 330 70% 36%;
+}
+.dark[data-accent="pink"] {
+  --primary: 330 75% 58%;
+  --primary-foreground: 322 70% 12%;
+  --ring: 330 75% 58%;
+  --accent: 330 45% 24%;
+  --accent-foreground: 330 80% 86%;
+  --sidebar-accent: 330 45% 24%;
+  --sidebar-accent-foreground: 330 80% 86%;
+}
+
 /* Paint the document root with the theme background so an overscroll/rubber-band
    never reveals the browser's default white canvas, and stop the whole document
    from scroll-chaining when the inner content scroller hits its end. `color-scheme`

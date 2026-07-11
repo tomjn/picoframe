@@ -29,6 +29,15 @@ export const ACCENTS = [
   { value: "rose", label: "Rose", swatch: "hsl(347 77% 50%)" },
   { value: "violet", label: "Violet", swatch: "hsl(262 83% 58%)" },
   { value: "orange", label: "Orange", swatch: "hsl(25 95% 53%)" },
+  { value: "red", label: "Red", swatch: "hsl(0 72% 51%)" },
+  { value: "amber", label: "Amber", swatch: "hsl(38 92% 50%)" },
+  { value: "yellow", label: "Yellow", swatch: "hsl(48 96% 53%)" },
+  { value: "teal", label: "Teal", swatch: "hsl(173 80% 32%)" },
+  { value: "cyan", label: "Cyan", swatch: "hsl(192 91% 34%)" },
+  { value: "sky", label: "Sky", swatch: "hsl(200 90% 40%)" },
+  { value: "indigo", label: "Indigo", swatch: "hsl(243 75% 59%)" },
+  { value: "purple", label: "Purple", swatch: "hsl(271 76% 53%)" },
+  { value: "pink", label: "Pink", swatch: "hsl(330 75% 47%)" },
 ] as const satisfies readonly ThemeOption<string>[];
 
 export type Accent = (typeof ACCENTS)[number]["value"];
