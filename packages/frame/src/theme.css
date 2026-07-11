@@ -103,7 +103,7 @@
    rings, checked controls) plus the tinted highlight tokens --accent/-foreground
    (hover/active/selected surfaces app-wide — settings nav, dropdown items, the
    segmented control) and --sidebar-accent/-foreground (the main-sidebar active
-   item). The default "zinc" carries no attribute, so the neutral :root/.dark
+   item). The default "neutral" carries no attribute, so the neutral :root/.dark
    values above apply unchanged. Primary/ring use shadcn's canonical theme values;
    the --accent/--sidebar-accent tints stay near the neutral baseline lightness so
    hovers read as gently accented, not saturated (accent and sidebar-accent share

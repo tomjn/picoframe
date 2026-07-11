@@ -1,10 +1,22 @@
 import { type ReactNode, createContext, useContext, useEffect } from "react";
 import { usePersistentState } from "../lib/usePersistentState";
+import type { Accent } from "./themeConfig";
 
 export type ThemeMode = "light" | "dark" | "system";
 
-/** Accent colour axis, orthogonal to `ThemeMode`. `zinc` is the neutral default. */
-export type Accent = "zinc" | "blue" | "green" | "rose" | "violet" | "orange";
+export type { Accent } from "./themeConfig";
+
+// One-time migration: the neutral default accent was renamed "zinc" -> "neutral"
+// (freeing the shadcn base-ramp names). Rewrite any persisted legacy value at
+// import time — before ThemeProvider's usePersistentState reads it — so the very
+// first paint rehydrates correctly instead of applying a now-unknown accent.
+try {
+  if (typeof localStorage !== "undefined" && localStorage.getItem("picoframe.accent") === '"zinc"') {
+    localStorage.setItem("picoframe.accent", '"neutral"');
+  }
+} catch {
+  // ignore storage access failures (private mode, disabled storage)
+}
 
 interface ThemeValue {
   mode: ThemeMode;
@@ -23,7 +35,7 @@ function systemPrefersDark(): boolean {
 
 export function ThemeProvider({
   defaultMode = "system",
-  defaultAccent = "zinc",
+  defaultAccent = "neutral",
   children,
 }: {
   defaultMode?: ThemeMode;
@@ -43,7 +55,7 @@ export function ThemeProvider({
   useEffect(() => {
     const root = document.documentElement;
     // The default accent carries no attribute, so the base tokens apply unchanged.
-    if (accent === "zinc") delete root.dataset.accent;
+    if (accent === "neutral") delete root.dataset.accent;
     else root.dataset.accent = accent;
   }, [accent]);
 

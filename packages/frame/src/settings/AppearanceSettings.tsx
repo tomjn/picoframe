@@ -6,7 +6,8 @@ import {
   useLayoutConfig,
   useLayoutOption,
 } from "../context/layoutConfig";
-import { type Accent, type ThemeMode, useTheme } from "../context/theme";
+import { type ThemeMode, useTheme } from "../context/theme";
+import { ACCENTS } from "../context/themeConfig";
 import { cn } from "../lib/cn";
 
 /** A labeled on/off switch for one exposed layout option; renders nothing when locked. */
@@ -51,17 +52,6 @@ const OPTIONS: { mode: ThemeMode; label: string; Icon: ComponentType<{ size?: nu
   { mode: "system", label: "System", Icon: Monitor },
 ];
 
-// Swatch preview colours mirror each accent's light-mode --primary (see theme.css);
-// "zinc" is the neutral default.
-const ACCENTS: { accent: Accent; label: string; color: string }[] = [
-  { accent: "zinc", label: "Default", color: "hsl(240 6% 16%)" },
-  { accent: "blue", label: "Blue", color: "hsl(221 83% 53%)" },
-  { accent: "green", label: "Green", color: "hsl(142 76% 36%)" },
-  { accent: "rose", label: "Rose", color: "hsl(347 77% 50%)" },
-  { accent: "violet", label: "Violet", color: "hsl(262 83% 58%)" },
-  { accent: "orange", label: "Orange", color: "hsl(25 95% 53%)" },
-];
-
 /** Frame-owned Appearance settings: a Light/Dark/System theme control and an accent picker. */
 export function AppearanceSettings() {
   const { mode, setMode, accent, setAccent } = useTheme();
@@ -101,21 +91,21 @@ export function AppearanceSettings() {
       <div className="space-y-2">
         <div className="text-sm font-medium text-foreground">Accent color</div>
         <div role="radiogroup" aria-label="Accent color" className="flex flex-wrap gap-2">
-          {ACCENTS.map(({ accent: a, label, color }) => (
+          {ACCENTS.map(({ value, label, swatch }) => (
             <button
-              key={a}
+              key={value}
               type="button"
               role="radio"
-              aria-checked={accent === a}
+              aria-checked={accent === value}
               aria-label={label}
               title={label}
-              onClick={() => setAccent(a)}
+              onClick={() => setAccent(value)}
               className={cn(
                 "size-7 rounded-full border border-border transition-shadow",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                accent === a && "ring-2 ring-ring ring-offset-2 ring-offset-background",
+                accent === value && "ring-2 ring-ring ring-offset-2 ring-offset-background",
               )}
-              style={{ background: color }}
+              style={{ background: swatch }}
             />
           ))}
         </div>
