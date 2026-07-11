@@ -40,62 +40,104 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
+/* Tailwind v4 defaults an unqualified `border` utility to currentColor, so a bare
+   `border` (textarea, dropdown/popover surfaces, cards) paints in the text colour and
+   glares — bright in dark mode, hard in light. Restore the shadcn convention: default
+   every element's border colour to the subtle --border token. Components that want a
+   different border still override it with an explicit border-<token> utility. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: hsl(var(--border));
+  }
+}
+
+/* The neutral ramp is parameterised so a base preset can retint every neutral
+   token at once: --base-hue is the hue channel and --base-sat scales saturation
+   (0 = true grayscale). Defaults (240 / 1) resolve each token to its original
+   value, so the default "zinc" base is byte-for-byte unchanged. Only hue and
+   saturation vary across bases — lightness is fixed, so contrast is preserved.
+   Achromatic tokens (white surfaces, near-white foregrounds, destructive red)
+   deliberately keep literal values and are not retinted. */
 :root {
   color-scheme: light;
   --radius: 0.5rem;
+  --base-hue: 240;
+  --base-sat: 1;
   --background: 0 0% 100%;
-  --foreground: 240 10% 12%;
+  --foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 12%;
+  --card-foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 12%;
-  --primary: 240 6% 16%;
+  --popover-foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
+  --primary: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
   --primary-foreground: 0 0% 98%;
-  --secondary: 240 5% 96%;
-  --secondary-foreground: 240 6% 16%;
-  --muted: 240 5% 96%;
-  --muted-foreground: 240 4% 46%;
-  --accent: 240 5% 94%;
-  --accent-foreground: 240 6% 16%;
+  --secondary: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
+  --secondary-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
+  --muted: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
+  --muted-foreground: var(--base-hue) calc(var(--base-sat) * 4%) 46%;
+  --accent: var(--base-hue) calc(var(--base-sat) * 5%) 94%;
+  --accent-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 6% 90%;
-  --input: 240 6% 90%;
-  --ring: 240 5% 65%;
-  --sidebar: 240 5% 96%;
-  --sidebar-foreground: 240 6% 24%;
-  --sidebar-accent: 240 5% 90%;
-  --sidebar-accent-foreground: 240 6% 12%;
-  --sidebar-border: 240 6% 88%;
+  --border: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
+  --input: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
+  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 65%;
+  --sidebar: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
+  --sidebar-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 24%;
+  --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 5%) 90%;
+  --sidebar-accent-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 12%;
+  --sidebar-border: var(--base-hue) calc(var(--base-sat) * 6%) 88%;
 }
 
 .dark {
   color-scheme: dark;
-  --background: 240 6% 7%;
+  --background: var(--base-hue) calc(var(--base-sat) * 6%) 7%;
   --foreground: 0 0% 95%;
-  --card: 240 5% 10%;
+  --card: var(--base-hue) calc(var(--base-sat) * 5%) 10%;
   --card-foreground: 0 0% 95%;
-  --popover: 240 5% 10%;
+  --popover: var(--base-hue) calc(var(--base-sat) * 5%) 10%;
   --popover-foreground: 0 0% 95%;
   --primary: 0 0% 95%;
-  --primary-foreground: 240 6% 10%;
-  --secondary: 240 4% 16%;
+  --primary-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 10%;
+  --secondary: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
   --secondary-foreground: 0 0% 95%;
-  --muted: 240 4% 16%;
-  --muted-foreground: 240 5% 60%;
-  --accent: 240 4% 18%;
+  --muted: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
+  --muted-foreground: var(--base-hue) calc(var(--base-sat) * 5%) 60%;
+  --accent: var(--base-hue) calc(var(--base-sat) * 4%) 18%;
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62% 50%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 4% 18%;
-  --input: 240 4% 20%;
-  --ring: 240 5% 40%;
-  --sidebar: 240 6% 9%;
-  --sidebar-foreground: 240 5% 72%;
-  --sidebar-accent: 240 4% 16%;
+  --border: var(--base-hue) calc(var(--base-sat) * 4%) 18%;
+  --input: var(--base-hue) calc(var(--base-sat) * 4%) 20%;
+  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 40%;
+  --sidebar: var(--base-hue) calc(var(--base-sat) * 6%) 9%;
+  --sidebar-foreground: var(--base-hue) calc(var(--base-sat) * 5%) 72%;
+  --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
   --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-border: 240 4% 14%;
+  --sidebar-border: var(--base-hue) calc(var(--base-sat) * 4%) 14%;
 }
+
+/* Base neutral ramp presets — a third axis (orthogonal to accent and light/dark),
+   applied via a `data-base` attribute on <html> (see ThemeProvider). Each base only
+   shifts --base-hue/--base-sat (consumed by the :root/.dark tokens above), so it
+   recolours backgrounds, borders, muted and sidebar surfaces app-wide while leaving
+   an active accent's --primary/--ring/--accent untouched. These sit BEFORE the accent
+   blocks so an active accent wins the equal-specificity source-order tie for the few
+   tokens both could touch. The default "zinc" (hue 240) carries no attribute. */
+[data-base="slate"] { --base-hue: 215; --base-sat: 1.6; }
+[data-base="gray"] { --base-hue: 220; --base-sat: 0.5; }
+[data-base="stone"] { --base-hue: 30; --base-sat: 1.5; }
+[data-base="neutral"] { --base-hue: 0; --base-sat: 0; }
+[data-base="rose"] { --base-hue: 345; --base-sat: 2.4; }
+[data-base="red"] { --base-hue: 2; --base-sat: 2.4; }
+[data-base="amber"] { --base-hue: 40; --base-sat: 2.4; }
+[data-base="green"] { --base-hue: 150; --base-sat: 2.2; }
+[data-base="teal"] { --base-hue: 185; --base-sat: 2.2; }
+[data-base="blue"] { --base-hue: 214; --base-sat: 2.6; }
+[data-base="indigo"] { --base-hue: 250; --base-sat: 2.4; }
+[data-base="violet"] { --base-hue: 276; --base-sat: 2.4; }
 
 /* Accent colour presets — an axis orthogonal to light/dark, applied via a
    `data-accent` attribute on <html> (see ThemeProvider). Each accent redefines
@@ -103,7 +145,7 @@
    rings, checked controls) plus the tinted highlight tokens --accent/-foreground
    (hover/active/selected surfaces app-wide — settings nav, dropdown items, the
    segmented control) and --sidebar-accent/-foreground (the main-sidebar active
-   item). The default "zinc" carries no attribute, so the neutral :root/.dark
+   item). The default "neutral" carries no attribute, so the neutral :root/.dark
    values above apply unchanged. Primary/ring use shadcn's canonical theme values;
    the --accent/--sidebar-accent tints stay near the neutral baseline lightness so
    hovers read as gently accented, not saturated (accent and sidebar-accent share
@@ -205,6 +247,245 @@
   --sidebar-accent-foreground: 25 90% 82%;
 }
 
+/* Extended accents. Light-mode --primary lightness is chosen so --primary-foreground
+   clears WCAG AA (>=4.5:1): amber/yellow pair a dark foreground with their bright
+   primary; the cool accents use a 600/700-shade so white text passes. */
+[data-accent="red"]:not(.dark) {
+  --primary: 0 72% 51%;
+  --primary-foreground: 0 0% 98%;
+  --ring: 0 72% 51%;
+  --accent: 0 86% 94%;
+  --accent-foreground: 0 74% 34%;
+  --sidebar-accent: 0 86% 94%;
+  --sidebar-accent-foreground: 0 74% 34%;
+}
+.dark[data-accent="red"] {
+  --primary: 0 72% 56%;
+  --primary-foreground: 0 0% 98%;
+  --ring: 0 72% 56%;
+  --accent: 0 50% 24%;
+  --accent-foreground: 0 90% 86%;
+  --sidebar-accent: 0 50% 24%;
+  --sidebar-accent-foreground: 0 90% 86%;
+}
+
+[data-accent="amber"]:not(.dark) {
+  --primary: 38 92% 50%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 38 92% 50%;
+  --accent: 38 96% 90%;
+  --accent-foreground: 26 83% 30%;
+  --sidebar-accent: 38 96% 90%;
+  --sidebar-accent-foreground: 26 83% 30%;
+}
+.dark[data-accent="amber"] {
+  --primary: 38 92% 55%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 38 92% 55%;
+  --accent: 34 60% 22%;
+  --accent-foreground: 38 96% 82%;
+  --sidebar-accent: 34 60% 22%;
+  --sidebar-accent-foreground: 38 96% 82%;
+}
+
+[data-accent="yellow"]:not(.dark) {
+  --primary: 48 96% 53%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 48 96% 53%;
+  --accent: 48 96% 89%;
+  --accent-foreground: 32 81% 29%;
+  --sidebar-accent: 48 96% 89%;
+  --sidebar-accent-foreground: 32 81% 29%;
+}
+.dark[data-accent="yellow"] {
+  --primary: 48 96% 58%;
+  --primary-foreground: 26 83% 14%;
+  --ring: 48 96% 58%;
+  --accent: 40 60% 22%;
+  --accent-foreground: 48 96% 82%;
+  --sidebar-accent: 40 60% 22%;
+  --sidebar-accent-foreground: 48 96% 82%;
+}
+
+[data-accent="teal"]:not(.dark) {
+  --primary: 173 80% 32%;
+  --primary-foreground: 166 76% 97%;
+  --ring: 173 80% 32%;
+  --accent: 168 70% 90%;
+  --accent-foreground: 173 80% 24%;
+  --sidebar-accent: 168 70% 90%;
+  --sidebar-accent-foreground: 173 80% 24%;
+}
+.dark[data-accent="teal"] {
+  --primary: 172 66% 46%;
+  --primary-foreground: 166 80% 10%;
+  --ring: 172 66% 46%;
+  --accent: 173 45% 18%;
+  --accent-foreground: 168 70% 82%;
+  --sidebar-accent: 173 45% 18%;
+  --sidebar-accent-foreground: 168 70% 82%;
+}
+
+[data-accent="cyan"]:not(.dark) {
+  --primary: 192 91% 34%;
+  --primary-foreground: 180 100% 96%;
+  --ring: 192 91% 34%;
+  --accent: 187 80% 90%;
+  --accent-foreground: 192 91% 26%;
+  --sidebar-accent: 187 80% 90%;
+  --sidebar-accent-foreground: 192 91% 26%;
+}
+.dark[data-accent="cyan"] {
+  --primary: 189 85% 48%;
+  --primary-foreground: 190 80% 10%;
+  --ring: 189 85% 48%;
+  --accent: 192 50% 20%;
+  --accent-foreground: 187 80% 82%;
+  --sidebar-accent: 192 50% 20%;
+  --sidebar-accent-foreground: 187 80% 82%;
+}
+
+[data-accent="sky"]:not(.dark) {
+  --primary: 200 90% 40%;
+  --primary-foreground: 204 100% 97%;
+  --ring: 200 90% 40%;
+  --accent: 200 90% 92%;
+  --accent-foreground: 200 90% 30%;
+  --sidebar-accent: 200 90% 92%;
+  --sidebar-accent-foreground: 200 90% 30%;
+}
+.dark[data-accent="sky"] {
+  --primary: 199 89% 55%;
+  --primary-foreground: 204 80% 10%;
+  --ring: 199 89% 55%;
+  --accent: 200 50% 22%;
+  --accent-foreground: 200 90% 84%;
+  --sidebar-accent: 200 50% 22%;
+  --sidebar-accent-foreground: 200 90% 84%;
+}
+
+[data-accent="indigo"]:not(.dark) {
+  --primary: 243 75% 59%;
+  --primary-foreground: 226 100% 97%;
+  --ring: 243 75% 59%;
+  --accent: 243 85% 94%;
+  --accent-foreground: 243 55% 42%;
+  --sidebar-accent: 243 85% 94%;
+  --sidebar-accent-foreground: 243 55% 42%;
+}
+.dark[data-accent="indigo"] {
+  --primary: 242 80% 66%;
+  --primary-foreground: 226 70% 12%;
+  --ring: 242 80% 66%;
+  --accent: 243 45% 26%;
+  --accent-foreground: 243 80% 87%;
+  --sidebar-accent: 243 45% 26%;
+  --sidebar-accent-foreground: 243 80% 87%;
+}
+
+[data-accent="purple"]:not(.dark) {
+  --primary: 271 76% 53%;
+  --primary-foreground: 270 100% 98%;
+  --ring: 271 76% 53%;
+  --accent: 271 85% 94%;
+  --accent-foreground: 271 60% 40%;
+  --sidebar-accent: 271 85% 94%;
+  --sidebar-accent-foreground: 271 60% 40%;
+}
+.dark[data-accent="purple"] {
+  --primary: 271 76% 62%;
+  --primary-foreground: 270 70% 12%;
+  --ring: 271 76% 62%;
+  --accent: 271 45% 26%;
+  --accent-foreground: 271 80% 87%;
+  --sidebar-accent: 271 45% 26%;
+  --sidebar-accent-foreground: 271 80% 87%;
+}
+
+[data-accent="pink"]:not(.dark) {
+  --primary: 330 75% 47%;
+  --primary-foreground: 322 100% 98%;
+  --ring: 330 75% 47%;
+  --accent: 330 85% 94%;
+  --accent-foreground: 330 70% 36%;
+  --sidebar-accent: 330 85% 94%;
+  --sidebar-accent-foreground: 330 70% 36%;
+}
+.dark[data-accent="pink"] {
+  --primary: 330 75% 58%;
+  --primary-foreground: 322 70% 12%;
+  --ring: 330 75% 58%;
+  --accent: 330 45% 24%;
+  --accent-foreground: 330 80% 86%;
+  --sidebar-accent: 330 45% 24%;
+  --sidebar-accent-foreground: 330 80% 86%;
+}
+
+/* Animated-hue accents (novelty): instead of a static gradient (which would only paint
+   the few solid-fill surfaces), every accent token derives its hue from a single
+   animated custom property, so buttons, active nav items, rings and tints all shift in
+   unison. --pf-accent-hue is registered as an <angle> so keyframes can interpolate it;
+   without @property support it falls back to a static hue (0deg). Two accents share the
+   engine: "rainbow" maps the hue to a vivid mid-lightness primary (white text, so a
+   text-shadow aids legibility across the sweep), "opal" maps it to a pale, luminous
+   primary with dark text for a soft iridescent look. Both are decorative and opt-in. */
+@property --pf-accent-hue {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+@keyframes pf-hue-cycle {
+  from {
+    --pf-accent-hue: 0deg;
+  }
+  to {
+    --pf-accent-hue: 360deg;
+  }
+}
+[data-accent="rainbow"] {
+  --pf-accent-hue: 0deg;
+  --primary: var(--pf-accent-hue) 68% 48%;
+  --primary-foreground: 0 0% 100%;
+  --ring: var(--pf-accent-hue) 70% 55%;
+  --accent: var(--pf-accent-hue) 70% 92%;
+  --accent-foreground: var(--pf-accent-hue) 55% 32%;
+  --sidebar-accent: var(--pf-accent-hue) 70% 92%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 55% 32%;
+}
+.dark[data-accent="rainbow"] {
+  --accent: var(--pf-accent-hue) 40% 24%;
+  --accent-foreground: var(--pf-accent-hue) 80% 85%;
+  --sidebar-accent: var(--pf-accent-hue) 40% 24%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 80% 85%;
+}
+[data-accent="opal"] {
+  --pf-accent-hue: 0deg;
+  --primary: var(--pf-accent-hue) 60% 78%;
+  --primary-foreground: var(--pf-accent-hue) 35% 25%;
+  --ring: var(--pf-accent-hue) 55% 68%;
+  --accent: var(--pf-accent-hue) 65% 93%;
+  --accent-foreground: var(--pf-accent-hue) 40% 32%;
+  --sidebar-accent: var(--pf-accent-hue) 65% 93%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 40% 32%;
+}
+.dark[data-accent="opal"] {
+  --primary: var(--pf-accent-hue) 50% 75%;
+  --primary-foreground: var(--pf-accent-hue) 40% 18%;
+  --ring: var(--pf-accent-hue) 45% 62%;
+  --accent: var(--pf-accent-hue) 30% 26%;
+  --accent-foreground: var(--pf-accent-hue) 70% 85%;
+  --sidebar-accent: var(--pf-accent-hue) 30% 26%;
+  --sidebar-accent-foreground: var(--pf-accent-hue) 70% 85%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-accent="rainbow"] {
+    animation: pf-hue-cycle 30s linear infinite;
+  }
+  [data-accent="opal"] {
+    animation: pf-hue-cycle 45s linear infinite;
+  }
+}
+
 /* Paint the document root with the theme background so an overscroll/rubber-band
    never reveals the browser's default white canvas, and stop the whole document
    from scroll-chaining when the inner content scroller hits its end. `color-scheme`
@@ -213,6 +494,26 @@ html,
 body {
   background-color: hsl(var(--background));
   overscroll-behavior: none;
+}
+
+/* Accent-change cue: while <html data-accent-anim> is set (~500ms after the user
+   picks an accent, see ThemeProvider), briefly cross-fade colour-bearing surfaces so
+   the new accent glides in rather than snapping. Robust by design — it transitions
+   the resolved colour values, so it needs no per-component hooks or class names, and
+   it self-limits when the attribute is removed. Motion-sensitive users opt out. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-accent-anim] * {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow, outline-color;
+    transition-duration: 450ms;
+    transition-timing-function: ease-out;
+  }
+}
+
+/* Solid-fill accent surfaces (the primary Button, the settings toggle) carry a marker
+   class so the rainbow accent can add a text-shadow there — white text over the cycling
+   hue stays legible across the lighter parts of the sweep. Inert for solid accents. */
+[data-accent="rainbow"] .pf-primary-surface {
+  text-shadow: 0 1px 2px hsl(0 0% 0% / 0.35);
 }
 
 /* Side-drawer animations (used by the frame's DrawerHost via `animate-[pf-...]`).

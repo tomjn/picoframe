@@ -4,7 +4,7 @@ import { HashRouter, type RouteObject, useRoutes } from "react-router";
 import { FrameProvider } from "./context/frame";
 import { type LayoutConfig, LayoutConfigProvider } from "./context/layoutConfig";
 import { type HomeOverride, homePlugin } from "./home";
-import { ThemeProvider, type ThemeMode, type Accent } from "./context/theme";
+import { ThemeProvider, type ThemeMode, type Accent, type Base } from "./context/theme";
 import { DrawerProvider } from "./drawer/DrawerProvider";
 import { NavigationStackProvider } from "./history/navigation-stack";
 import { DefaultFallback } from "./layout/DefaultFallback";
@@ -28,7 +28,7 @@ export interface AppFrameProps {
    * redirects to the first sidebar route).
    */
   home?: HomeOverride | false;
-  theme?: { defaultMode?: ThemeMode; defaultAccent?: Accent };
+  theme?: { defaultMode?: ThemeMode; defaultAccent?: Accent; defaultBase?: Base };
   /**
    * Configure sidebar/breadcrumb layout behaviours. Each option is a bare value (locked)
    * or `{ default, userConfigurable: true }` (exposed as a user setting seeded to `default`).
@@ -101,7 +101,11 @@ export function AppFrame({
   }
 
   return (
-    <ThemeProvider defaultMode={theme?.defaultMode} defaultAccent={theme?.defaultAccent}>
+    <ThemeProvider
+      defaultMode={theme?.defaultMode}
+      defaultAccent={theme?.defaultAccent}
+      defaultBase={theme?.defaultBase}
+    >
       <HashRouter>
         <NavigationStackProvider>
           <SlotProvider slots={slots}>
