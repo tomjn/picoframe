@@ -40,6 +40,19 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
+/* Tailwind v4 defaults an unqualified `border` utility to currentColor, so a bare
+   `border` (textarea, dropdown/popover surfaces, cards) paints in the text colour and
+   glares — bright in dark mode, hard in light. Restore the shadcn convention: default
+   every element's border colour to the subtle --border token. Components that want a
+   different border still override it with an explicit border-<token> utility. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: hsl(var(--border));
+  }
+}
+
 /* The neutral ramp is parameterised so a base preset can retint every neutral
    token at once: --base-hue is the hue channel and --base-sat scales saturation
    (0 = true grayscale). Defaults (240 / 1) resolve each token to its original
