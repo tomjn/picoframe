@@ -32,3 +32,22 @@ export const ACCENTS = [
 ] as const satisfies readonly ThemeOption<string>[];
 
 export type Accent = (typeof ACCENTS)[number]["value"];
+
+/**
+ * Base neutral ramp axis (the gray-tint hue), orthogonal to accent and mode.
+ * Each base shifts `--base-hue` / `--base-sat` in `theme.css`, recolouring every
+ * neutral surface (background, border, muted, sidebar) while leaving an active
+ * accent's `--primary`/`--ring` untouched. `zinc` (hue 240) is the default and
+ * carries no `data-base` attribute. Note: the `neutral` base (grayscale) is a
+ * different thing from the `neutral` *accent* — separate axes, separate UI
+ * sections. Swatches are a representative mid-gray at each base's hue.
+ */
+export const BASES = [
+  { value: "zinc", label: "Zinc", swatch: "hsl(240 5% 55%)" },
+  { value: "slate", label: "Slate", swatch: "hsl(215 14% 55%)" },
+  { value: "gray", label: "Gray", swatch: "hsl(220 4% 55%)" },
+  { value: "stone", label: "Stone", swatch: "hsl(30 6% 55%)" },
+  { value: "neutral", label: "Neutral", swatch: "hsl(0 0% 55%)" },
+] as const satisfies readonly ThemeOption<string>[];
+
+export type Base = (typeof BASES)[number]["value"];

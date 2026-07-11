@@ -7,7 +7,7 @@ import {
   useLayoutOption,
 } from "../context/layoutConfig";
 import { type ThemeMode, useTheme } from "../context/theme";
-import { ACCENTS } from "../context/themeConfig";
+import { ACCENTS, BASES, type ThemeOption } from "../context/themeConfig";
 import { cn } from "../lib/cn";
 
 /** A labeled on/off switch for one exposed layout option; renders nothing when locked. */
@@ -52,9 +52,47 @@ const OPTIONS: { mode: ThemeMode; label: string; Icon: ComponentType<{ size?: nu
   { mode: "system", label: "System", Icon: Monitor },
 ];
 
+/** A labeled radiogroup of circular colour swatches (used for both base and accent). */
+function SwatchGroup<V extends string>({
+  label,
+  options,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  options: readonly ThemeOption<V>[];
+  selected: V;
+  onSelect: (value: V) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="text-sm font-medium text-foreground">{label}</div>
+      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
+        {options.map(({ value, label: optLabel, swatch }) => (
+          <button
+            key={value}
+            type="button"
+            role="radio"
+            aria-checked={selected === value}
+            aria-label={optLabel}
+            title={optLabel}
+            onClick={() => onSelect(value)}
+            className={cn(
+              "size-7 rounded-full border border-border transition-shadow",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              selected === value && "ring-2 ring-ring ring-offset-2 ring-offset-background",
+            )}
+            style={{ background: swatch }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Frame-owned Appearance settings: a Light/Dark/System theme control and an accent picker. */
 export function AppearanceSettings() {
-  const { mode, setMode, accent, setAccent } = useTheme();
+  const { mode, setMode, accent, setAccent, base, setBase } = useTheme();
   const layoutConfig = useLayoutConfig();
   const anyExposed = LAYOUT_OPTIONS.some((o) => layoutConfig[o.key].exposed);
   return (
@@ -88,28 +126,9 @@ export function AppearanceSettings() {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="text-sm font-medium text-foreground">Accent color</div>
-        <div role="radiogroup" aria-label="Accent color" className="flex flex-wrap gap-2">
-          {ACCENTS.map(({ value, label, swatch }) => (
-            <button
-              key={value}
-              type="button"
-              role="radio"
-              aria-checked={accent === value}
-              aria-label={label}
-              title={label}
-              onClick={() => setAccent(value)}
-              className={cn(
-                "size-7 rounded-full border border-border transition-shadow",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                accent === value && "ring-2 ring-ring ring-offset-2 ring-offset-background",
-              )}
-              style={{ background: swatch }}
-            />
-          ))}
-        </div>
-      </div>
+      <SwatchGroup label="Base color" options={BASES} selected={base} onSelect={setBase} />
+
+      <SwatchGroup label="Accent color" options={ACCENTS} selected={accent} onSelect={setAccent} />
 
       {anyExposed && (
         <div className="space-y-3">

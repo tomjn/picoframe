@@ -1,22 +1,29 @@
 import { type ReactNode, createContext, useContext, useEffect } from "react";
 import { usePersistentState } from "../lib/usePersistentState";
-import type { Accent } from "./themeConfig";
+import type { Accent, Base } from "./themeConfig";
 
 export type ThemeMode = "light" | "dark" | "system";
 
-export type { Accent } from "./themeConfig";
+export type { Accent, Base } from "./themeConfig";
 
-// One-time migration: the neutral default accent was renamed "zinc" -> "neutral"
-// (freeing the shadcn base-ramp names). Rewrite any persisted legacy value at
-// import time — before ThemeProvider's usePersistentState reads it — so the very
-// first paint rehydrates correctly instead of applying a now-unknown accent.
-try {
-  if (typeof localStorage !== "undefined" && localStorage.getItem("picoframe.accent") === '"zinc"') {
-    localStorage.setItem("picoframe.accent", '"neutral"');
+/**
+ * One-time migration: the neutral default accent was renamed "zinc" -> "neutral"
+ * (freeing the shadcn base-ramp names). Rewrite any persisted legacy value so it
+ * rehydrates correctly instead of applying a now-unknown accent. Called at import
+ * time below — before ThemeProvider's usePersistentState reads it — so the very
+ * first paint is already correct.
+ */
+export function migrateLegacyAccent(): void {
+  try {
+    if (typeof localStorage !== "undefined" && localStorage.getItem("picoframe.accent") === '"zinc"') {
+      localStorage.setItem("picoframe.accent", '"neutral"');
+    }
+  } catch {
+    // ignore storage access failures (private mode, disabled storage)
   }
-} catch {
-  // ignore storage access failures (private mode, disabled storage)
 }
+
+migrateLegacyAccent();
 
 interface ThemeValue {
   mode: ThemeMode;
@@ -25,6 +32,8 @@ interface ThemeValue {
   resolved: "light" | "dark";
   accent: Accent;
   setAccent: (accent: Accent) => void;
+  base: Base;
+  setBase: (base: Base) => void;
 }
 
 const ThemeContext = createContext<ThemeValue | null>(null);
@@ -36,14 +45,17 @@ function systemPrefersDark(): boolean {
 export function ThemeProvider({
   defaultMode = "system",
   defaultAccent = "neutral",
+  defaultBase = "zinc",
   children,
 }: {
   defaultMode?: ThemeMode;
   defaultAccent?: Accent;
+  defaultBase?: Base;
   children: ReactNode;
 }) {
   const [mode, setMode] = usePersistentState<ThemeMode>("picoframe.theme", defaultMode);
   const [accent, setAccent] = usePersistentState<Accent>("picoframe.accent", defaultAccent);
+  const [base, setBase] = usePersistentState<Base>("picoframe.base", defaultBase);
 
   const resolved: "light" | "dark" = mode === "system" ? (systemPrefersDark() ? "dark" : "light") : mode;
 
@@ -60,6 +72,14 @@ export function ThemeProvider({
   }, [accent]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    // The default base (zinc, hue 240) carries no attribute, matching the :root/.dark
+    // token defaults, so the neutral ramp applies unchanged.
+    if (base === "zinc") delete root.dataset.base;
+    else root.dataset.base = base;
+  }, [base]);
+
+  useEffect(() => {
     if (mode !== "system" || typeof matchMedia === "undefined") return;
     const mq = matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => document.documentElement.classList.toggle("dark", mq.matches);
@@ -68,7 +88,7 @@ export function ThemeProvider({
   }, [mode]);
 
   return (
-    <ThemeContext.Provider value={{ mode, setMode, resolved, accent, setAccent }}>
+    <ThemeContext.Provider value={{ mode, setMode, resolved, accent, setAccent, base, setBase }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -2,7 +2,7 @@ export { AppFrame, type AppFrameProps } from "./AppFrame";
 export type { HomeOverride } from "./home";
 export { framePlugin } from "./framePlugin";
 export { useFrame } from "./context/frame";
-export { ThemeProvider, useTheme, type ThemeMode, type Accent } from "./context/theme";
+export { ThemeProvider, useTheme, type ThemeMode, type Accent, type Base } from "./context/theme";
 export type { Configurable, LayoutConfig } from "./context/layoutConfig";
 export { useNavigationStack } from "./history/navigation-stack";
 export { Slot } from "./slots/slots";

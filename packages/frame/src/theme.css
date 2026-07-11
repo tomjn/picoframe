@@ -40,62 +40,83 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
+/* The neutral ramp is parameterised so a base preset can retint every neutral
+   token at once: --base-hue is the hue channel and --base-sat scales saturation
+   (0 = true grayscale). Defaults (240 / 1) resolve each token to its original
+   value, so the default "zinc" base is byte-for-byte unchanged. Only hue and
+   saturation vary across bases — lightness is fixed, so contrast is preserved.
+   Achromatic tokens (white surfaces, near-white foregrounds, destructive red)
+   deliberately keep literal values and are not retinted. */
 :root {
   color-scheme: light;
   --radius: 0.5rem;
+  --base-hue: 240;
+  --base-sat: 1;
   --background: 0 0% 100%;
-  --foreground: 240 10% 12%;
+  --foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 12%;
+  --card-foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 12%;
-  --primary: 240 6% 16%;
+  --popover-foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
+  --primary: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
   --primary-foreground: 0 0% 98%;
-  --secondary: 240 5% 96%;
-  --secondary-foreground: 240 6% 16%;
-  --muted: 240 5% 96%;
-  --muted-foreground: 240 4% 46%;
-  --accent: 240 5% 94%;
-  --accent-foreground: 240 6% 16%;
+  --secondary: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
+  --secondary-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
+  --muted: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
+  --muted-foreground: var(--base-hue) calc(var(--base-sat) * 4%) 46%;
+  --accent: var(--base-hue) calc(var(--base-sat) * 5%) 94%;
+  --accent-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 6% 90%;
-  --input: 240 6% 90%;
-  --ring: 240 5% 65%;
-  --sidebar: 240 5% 96%;
-  --sidebar-foreground: 240 6% 24%;
-  --sidebar-accent: 240 5% 90%;
-  --sidebar-accent-foreground: 240 6% 12%;
-  --sidebar-border: 240 6% 88%;
+  --border: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
+  --input: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
+  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 65%;
+  --sidebar: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
+  --sidebar-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 24%;
+  --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 5%) 90%;
+  --sidebar-accent-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 12%;
+  --sidebar-border: var(--base-hue) calc(var(--base-sat) * 6%) 88%;
 }
 
 .dark {
   color-scheme: dark;
-  --background: 240 6% 7%;
+  --background: var(--base-hue) calc(var(--base-sat) * 6%) 7%;
   --foreground: 0 0% 95%;
-  --card: 240 5% 10%;
+  --card: var(--base-hue) calc(var(--base-sat) * 5%) 10%;
   --card-foreground: 0 0% 95%;
-  --popover: 240 5% 10%;
+  --popover: var(--base-hue) calc(var(--base-sat) * 5%) 10%;
   --popover-foreground: 0 0% 95%;
   --primary: 0 0% 95%;
-  --primary-foreground: 240 6% 10%;
-  --secondary: 240 4% 16%;
+  --primary-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 10%;
+  --secondary: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
   --secondary-foreground: 0 0% 95%;
-  --muted: 240 4% 16%;
-  --muted-foreground: 240 5% 60%;
-  --accent: 240 4% 18%;
+  --muted: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
+  --muted-foreground: var(--base-hue) calc(var(--base-sat) * 5%) 60%;
+  --accent: var(--base-hue) calc(var(--base-sat) * 4%) 18%;
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62% 50%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 4% 18%;
-  --input: 240 4% 20%;
-  --ring: 240 5% 40%;
-  --sidebar: 240 6% 9%;
-  --sidebar-foreground: 240 5% 72%;
-  --sidebar-accent: 240 4% 16%;
+  --border: var(--base-hue) calc(var(--base-sat) * 4%) 18%;
+  --input: var(--base-hue) calc(var(--base-sat) * 4%) 20%;
+  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 40%;
+  --sidebar: var(--base-hue) calc(var(--base-sat) * 6%) 9%;
+  --sidebar-foreground: var(--base-hue) calc(var(--base-sat) * 5%) 72%;
+  --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
   --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-border: 240 4% 14%;
+  --sidebar-border: var(--base-hue) calc(var(--base-sat) * 4%) 14%;
 }
+
+/* Base neutral ramp presets — a third axis (orthogonal to accent and light/dark),
+   applied via a `data-base` attribute on <html> (see ThemeProvider). Each base only
+   shifts --base-hue/--base-sat (consumed by the :root/.dark tokens above), so it
+   recolours backgrounds, borders, muted and sidebar surfaces app-wide while leaving
+   an active accent's --primary/--ring/--accent untouched. These sit BEFORE the accent
+   blocks so an active accent wins the equal-specificity source-order tie for the few
+   tokens both could touch. The default "zinc" (hue 240) carries no attribute. */
+[data-base="slate"] { --base-hue: 215; --base-sat: 1.4; }
+[data-base="gray"] { --base-hue: 220; --base-sat: 0.6; }
+[data-base="stone"] { --base-hue: 30; --base-sat: 1; }
+[data-base="neutral"] { --base-hue: 0; --base-sat: 0; }
 
 /* Accent colour presets — an axis orthogonal to light/dark, applied via a
    `data-accent` attribute on <html> (see ThemeProvider). Each accent redefines

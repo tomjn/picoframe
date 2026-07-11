@@ -1,12 +1,14 @@
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { LayoutConfigProvider, type LayoutConfig } from "../context/layoutConfig";
-import { ThemeProvider } from "../context/theme";
+import { ThemeProvider, migrateLegacyAccent } from "../context/theme";
 import { AppearanceSettings } from "./AppearanceSettings";
 
 afterEach(() => {
   cleanup();
   localStorage.clear();
+  delete document.documentElement.dataset.base;
+  delete document.documentElement.dataset.accent;
 });
 
 function renderSettings(config?: LayoutConfig) {
@@ -36,4 +38,32 @@ test("seeds the switch from the exposed default", () => {
   renderSettings({ breadcrumb: { collapsed: { default: true } } });
   const sw = screen.getByRole("switch", { name: "Collapse breadcrumb" });
   expect(sw.getAttribute("aria-checked")).toBe("true");
+});
+
+test("selecting a base swatch sets data-base and persists it", () => {
+  renderSettings();
+  fireEvent.click(screen.getByRole("radio", { name: "Slate" }));
+  expect(document.documentElement.dataset.base).toBe("slate");
+  expect(localStorage.getItem("picoframe.base")).toBe('"slate"');
+});
+
+test("the default base (Zinc) carries no data-base attribute", () => {
+  renderSettings();
+  // start on a non-default base, then return to the default
+  fireEvent.click(screen.getByRole("radio", { name: "Stone" }));
+  expect(document.documentElement.dataset.base).toBe("stone");
+  fireEvent.click(screen.getByRole("radio", { name: "Zinc" }));
+  expect(document.documentElement.dataset.base).toBeUndefined();
+});
+
+test("migrateLegacyAccent rewrites a persisted 'zinc' accent to 'neutral'", () => {
+  localStorage.setItem("picoframe.accent", '"zinc"');
+  migrateLegacyAccent();
+  expect(localStorage.getItem("picoframe.accent")).toBe('"neutral"');
+});
+
+test("migrateLegacyAccent leaves a non-legacy accent untouched", () => {
+  localStorage.setItem("picoframe.accent", '"blue"');
+  migrateLegacyAccent();
+  expect(localStorage.getItem("picoframe.accent")).toBe('"blue"');
 });
