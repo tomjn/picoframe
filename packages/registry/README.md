@@ -5,9 +5,15 @@ primitives as source you copy into your own app — `shadcn add @picoframe/butto
 writes `button.tsx` into your project so you own and customize it. It is **not** an
 npm package you import from.
 
-Components: `button`, `dialog`, `tooltip`, `popover`, `collapsible`, `select`,
-`input`, `textarea`, `label`, `checkbox`, `radio-group`, `switch`, `slider`,
-`form` (plus the `utils` `cn` helper, pulled in automatically).
+Components: `accordion`, `alert`, `alert-dialog`, `aspect-ratio`, `avatar`,
+`badge`, `breadcrumb`, `button`, `calendar`, `card`, `carousel`, `chart`,
+`checkbox`, `collapsible`, `command`, `context-menu`, `dialog`, `drawer`,
+`dropdown-menu`, `form`, `hover-card`, `input`, `input-otp`, `label`, `menubar`,
+`navigation-menu`, `pagination`, `popover`, `progress`, `radio-group`,
+`resizable`, `scroll-area`, `select`, `separator`, `sheet`, `skeleton`,
+`slider`, `sonner`, `switch`, `table`, `tabs`, `textarea`, `toggle`,
+`toggle-group`, `tooltip` (plus the `utils` `cn` helper, pulled in
+automatically).
 
 These are the current Tailwind v4 / React 19 shadcn sources and consume the
 picoframe theme tokens (`bg-primary`, `border-input`, `bg-accent`, `ring-ring`,
@@ -46,11 +52,21 @@ npx shadcn@latest add https://raw.githubusercontent.com/tomjn/picoframe/main/pac
 `shadcn add` installs npm dependencies for you, but for reference each component
 declares:
 
-- Most UI components: `radix-ui` (`input` and `textarea` are plain elements
-  and need none)
-- `button`: also `class-variance-authority`
-- `dialog`, `select`, `checkbox`, `radio-group`: also `lucide-react`
+- Most UI components: `radix-ui` (plain-element components like `input`,
+  `textarea`, `skeleton`, `table`, `card`, `alert`, `badge` need none)
+- `button`, `toggle`, `badge`: also `class-variance-authority`
+- `dialog`, `select`, `checkbox`, `radio-group`, `calendar`, `chart`, `sonner`
+  and other icon-using components: also `lucide-react`
 - `form`: also `react-hook-form`
+- `chart`: also `recharts`
+- `calendar`: also `react-day-picker`, `date-fns`
+- `command`: also `cmdk`
+- `drawer`: also `vaul`
+- `carousel`: also `embla-carousel-react`
+- `input-otp`: also `input-otp`
+- `resizable`: also `react-resizable-panels`
+- `sonner`: also `sonner` and `@picoframe/frame` (its `Toaster` reads the active
+  light/dark appearance from the frame's `useTheme`)
 - `utils`: `clsx`, `tailwind-merge`
 
 ## Layout
