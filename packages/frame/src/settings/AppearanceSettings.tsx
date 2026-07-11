@@ -1,7 +1,49 @@
 import { Monitor, Moon, Sun } from "lucide-react";
 import type { ComponentType } from "react";
+import {
+  LAYOUT_OPTIONS,
+  type LayoutOptionKey,
+  useLayoutConfig,
+  useLayoutOption,
+} from "../context/layoutConfig";
 import { type Accent, type ThemeMode, useTheme } from "../context/theme";
 import { cn } from "../lib/cn";
+
+/** A labeled on/off switch for one exposed layout option; renders nothing when locked. */
+function LayoutOptionToggle({ optionKey, label, description }: { optionKey: LayoutOptionKey; label: string; description: string }) {
+  const [value, setValue] = useLayoutOption(optionKey);
+  if (!setValue) return null; // locked: no user control
+  const labelId = `layout-opt-${optionKey}`;
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="min-w-0">
+        <div id={labelId} className="text-sm text-foreground">
+          {label}
+        </div>
+        <div className="text-xs text-muted-foreground">{description}</div>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={value}
+        aria-labelledby={labelId}
+        onClick={() => setValue(!value)}
+        className={cn(
+          "relative inline-flex h-6 w-10 shrink-0 items-center rounded-full border border-border transition-colors",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          value ? "bg-primary" : "bg-muted",
+        )}
+      >
+        <span
+          className={cn(
+            "inline-block size-4 rounded-full bg-background transition-transform",
+            value ? "translate-x-[1.125rem]" : "translate-x-1",
+          )}
+        />
+      </button>
+    </div>
+  );
+}
 
 const OPTIONS: { mode: ThemeMode; label: string; Icon: ComponentType<{ size?: number }> }[] = [
   { mode: "light", label: "Light", Icon: Sun },
@@ -23,6 +65,8 @@ const ACCENTS: { accent: Accent; label: string; color: string }[] = [
 /** Frame-owned Appearance settings: a Light/Dark/System theme control and an accent picker. */
 export function AppearanceSettings() {
   const { mode, setMode, accent, setAccent } = useTheme();
+  const layoutConfig = useLayoutConfig();
+  const anyExposed = LAYOUT_OPTIONS.some((o) => layoutConfig[o.key].exposed);
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -76,6 +120,15 @@ export function AppearanceSettings() {
           ))}
         </div>
       </div>
+
+      {anyExposed && (
+        <div className="space-y-3">
+          <div className="text-sm font-medium text-foreground">Layout</div>
+          {LAYOUT_OPTIONS.map((o) => (
+            <LayoutOptionToggle key={o.key} optionKey={o.key} label={o.label} description={o.description} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

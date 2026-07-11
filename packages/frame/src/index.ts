@@ -3,6 +3,7 @@ export type { HomeOverride } from "./home";
 export { framePlugin } from "./framePlugin";
 export { useFrame } from "./context/frame";
 export { ThemeProvider, useTheme, type ThemeMode, type Accent } from "./context/theme";
+export type { Configurable, LayoutConfig } from "./context/layoutConfig";
 export { useNavigationStack } from "./history/navigation-stack";
 export { Slot } from "./slots/slots";
 export { NavGate } from "./nav/NavGate";

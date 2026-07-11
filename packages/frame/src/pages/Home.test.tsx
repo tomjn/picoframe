@@ -50,6 +50,21 @@ test("renders home.top above the heading and home.bottom below the grid", () => 
   expect(order).toEqual(["top", "h1", "a", "bottom"]);
 });
 
+test("launcher lays cards in a wrapping flex row, not a stretching grid", () => {
+  const { container } = renderHome([
+    { id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }, { id: "b", label: "Beta", to: "/b" }] },
+  ]);
+  const row = container.querySelector("[data-nav-item]")?.parentElement;
+  expect(row?.className).toContain("flex-wrap");
+  expect(row?.className).not.toContain("grid-cols");
+});
+
+test("cards carry a fixed width so they don't stretch to fill the row", () => {
+  renderHome([{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }]);
+  const card = screen.getByText("Alpha").closest("[data-nav-item]");
+  expect(card?.className).toContain("sm:w-64");
+});
+
 test("launcher hides a card whose useVisible returns false, keeps visible siblings", () => {
   renderHome([
     {

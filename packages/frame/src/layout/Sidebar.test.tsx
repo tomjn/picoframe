@@ -16,6 +16,36 @@ function renderSidebar(groups: NavGroup[]) {
   );
 }
 
+const oneItem: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
+
+test("collapsed rail still renders nav item icons", () => {
+  const { container } = render(
+    <MemoryRouter>
+      <Sidebar groups={oneItem} collapsed width={200} onResize={() => {}} />
+    </MemoryRouter>,
+  );
+  expect(container.querySelector("[data-nav-item]")).not.toBeNull();
+});
+
+test("hideWhenCollapsed drops nav content entirely and zeroes the width", () => {
+  const { container } = render(
+    <MemoryRouter>
+      <Sidebar groups={oneItem} collapsed width={200} onResize={() => {}} hideWhenCollapsed />
+    </MemoryRouter>,
+  );
+  expect(container.querySelector("[data-nav-item]")).toBeNull();
+  expect(container.querySelector("[data-slot=sidebar]")?.className).toContain("w-0");
+});
+
+test("hideWhenCollapsed has no effect while expanded", () => {
+  const { container } = render(
+    <MemoryRouter>
+      <Sidebar groups={oneItem} collapsed={false} width={200} onResize={() => {}} hideWhenCollapsed />
+    </MemoryRouter>,
+  );
+  expect(container.querySelector("[data-nav-item]")).not.toBeNull();
+});
+
 test("hides an item whose useVisible returns false, keeps visible siblings", () => {
   renderSidebar([
     {

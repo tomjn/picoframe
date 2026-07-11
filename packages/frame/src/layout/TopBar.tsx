@@ -35,7 +35,16 @@ function IconButton({
   );
 }
 
-export function TopBar({ title, onToggleSidebar }: { title: string; onToggleSidebar: () => void }) {
+export function TopBar({
+  title,
+  onToggleSidebar,
+  breadcrumbCollapsed = false,
+}: {
+  title: string;
+  onToggleSidebar: () => void;
+  /** Show only the current route header; reveal the full path on hover/focus. */
+  breadcrumbCollapsed?: boolean;
+}) {
   const navigate = useNavigate();
   const { canBack, canForward } = useNavigationStack();
   const { crumbs: resolvers } = useFrame();
@@ -70,6 +79,29 @@ export function TopBar({ title, onToggleSidebar }: { title: string; onToggleSide
     if (typeof root === "string") crumbs.push({ label: root });
   }
 
+  // Render one crumb as a link (navigable ancestor) or plain text. `muted` dims
+  // non-current crumbs; the current route header stays full-strength.
+  const renderCrumb = (c: { label: string; to?: string }, muted: boolean) =>
+    c.to ? (
+      <button
+        type="button"
+        onClick={() => c.to && navigate(c.to)}
+        className={cn(
+          "-mx-1 rounded-sm px-1 py-0.5 text-muted-foreground transition-colors",
+          "hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        )}
+      >
+        {c.label}
+      </button>
+    ) : (
+      <span className={muted ? "text-muted-foreground" : ""}>{c.label}</span>
+    );
+
+  // Collapse to just the current header only when there's a trail to hide.
+  const collapseCrumbs = breadcrumbCollapsed && crumbs.length > 1;
+  const ancestors = collapseCrumbs ? crumbs.slice(0, -1) : [];
+  const current = crumbs[crumbs.length - 1];
+
   return (
     <header
       data-tauri-drag-region
@@ -85,32 +117,38 @@ export function TopBar({ title, onToggleSidebar }: { title: string; onToggleSide
         <ChevronRight size={18} />
       </IconButton>
 
-      <div className="ml-1 flex items-center gap-1 text-sm font-medium">
-        {crumbs.length > 0 ? (
-          crumbs.map((c, i) => {
-            const to = c.to;
-            return (
-              <span key={`${c.label}-${i}`} className="flex items-center gap-1">
-                {i > 0 && <span className="text-muted-foreground">/</span>}
-                {to ? (
-                  <button
-                    type="button"
-                    onClick={() => navigate(to)}
-                    className={cn(
-                      "-mx-1 rounded-sm px-1 py-0.5 text-muted-foreground transition-colors",
-                      "hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    )}
-                  >
-                    {c.label}
-                  </button>
-                ) : (
-                  <span className={i === crumbs.length - 1 ? "" : "text-muted-foreground"}>{c.label}</span>
-                )}
-              </span>
-            );
-          })
-        ) : (
+      <div className="group ml-1 flex items-center gap-1 text-sm font-medium">
+        {crumbs.length === 0 ? (
           <span>{title}</span>
+        ) : collapseCrumbs ? (
+          <>
+            {/* Ancestors stay in the DOM (focusable → keyboard can reveal them) but the
+                grid 0fr→1fr trick collapses their width until hover/focus, animating open. */}
+            <div
+              data-crumb-ancestors
+              className={cn(
+                "grid grid-cols-[0fr] overflow-hidden transition-[grid-template-columns] duration-200",
+                "group-hover:grid-cols-[1fr] group-focus-within:grid-cols-[1fr]",
+              )}
+            >
+              <div className="flex min-w-0 items-center gap-1 overflow-hidden whitespace-nowrap">
+                {ancestors.map((c, i) => (
+                  <span key={`${c.label}-${i}`} className="flex items-center gap-1">
+                    {renderCrumb(c, true)}
+                    <span className="text-muted-foreground">/</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+            {renderCrumb(current, false)}
+          </>
+        ) : (
+          crumbs.map((c, i) => (
+            <span key={`${c.label}-${i}`} className="flex items-center gap-1">
+              {i > 0 && <span className="text-muted-foreground">/</span>}
+              {renderCrumb(c, i !== crumbs.length - 1)}
+            </span>
+          ))
         )}
       </div>
 
