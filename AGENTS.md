@@ -24,8 +24,11 @@ The **only** UI components it exports are **`Button` and `Input`**. That is inte
 ### 2. `@picoframe/<component>` — shadcn registry items you copy in
 
 `select`, `input`, `textarea`, `label`, `checkbox`, `radio-group`, `switch`, `slider`,
-`form`, `button`, `dialog`, `tooltip`, `popover`, `collapsible` are **shadcn
-source-registry items, NOT npm packages**. They are served as JSON over HTTP from
+`form`, `button`, `dialog`, `tooltip`, `popover`, `collapsible`, `accordion`, `alert`,
+`card`, `table`, `tabs`, `sheet`, `dropdown-menu`, `command`, `sonner`, `chart`,
+`calendar` and the rest of the shadcn primitives (see
+`packages/registry/README.md` for the full list) are **shadcn source-registry items,
+NOT npm packages**. They are served as JSON over HTTP from
 `packages/registry/public/r/` and copied into a consumer app:
 
 ```bash
