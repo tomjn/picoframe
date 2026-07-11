@@ -58,11 +58,19 @@ export type Accent = (typeof ACCENTS)[number]["value"];
  * sections. Swatches are a representative mid-gray at each base's hue.
  */
 export const BASES = [
-  { value: "zinc", label: "Zinc", swatch: "hsl(240 5% 55%)" },
-  { value: "slate", label: "Slate", swatch: "hsl(215 14% 55%)" },
+  { value: "zinc", label: "Zinc", swatch: "hsl(240 6% 55%)" },
+  { value: "slate", label: "Slate", swatch: "hsl(215 16% 55%)" },
   { value: "gray", label: "Gray", swatch: "hsl(220 4% 55%)" },
-  { value: "stone", label: "Stone", swatch: "hsl(30 6% 55%)" },
+  { value: "stone", label: "Stone", swatch: "hsl(30 10% 55%)" },
   { value: "neutral", label: "Neutral", swatch: "hsl(0 0% 55%)" },
+  { value: "rose", label: "Rose", swatch: "hsl(345 22% 58%)" },
+  { value: "red", label: "Red", swatch: "hsl(2 24% 58%)" },
+  { value: "amber", label: "Amber", swatch: "hsl(40 26% 55%)" },
+  { value: "green", label: "Green", swatch: "hsl(150 18% 52%)" },
+  { value: "teal", label: "Teal", swatch: "hsl(185 20% 52%)" },
+  { value: "blue", label: "Blue", swatch: "hsl(214 26% 58%)" },
+  { value: "indigo", label: "Indigo", swatch: "hsl(250 22% 60%)" },
+  { value: "violet", label: "Violet", swatch: "hsl(276 22% 60%)" },
 ] as const satisfies readonly ThemeOption<string>[];
 
 export type Base = (typeof BASES)[number]["value"];

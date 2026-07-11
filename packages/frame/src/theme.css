@@ -52,10 +52,6 @@
   --radius: 0.5rem;
   --base-hue: 240;
   --base-sat: 1;
-  /* Optional gradient fill for the primary/accent surface. `none` for every solid
-     accent; a gradient accent (see "rainbow") sets it and the .pf-primary-surface
-     class paints it over the solid --primary fallback. */
-  --primary-image: none;
   --background: 0 0% 100%;
   --foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
   --card: 0 0% 100%;
@@ -117,10 +113,18 @@
    an active accent's --primary/--ring/--accent untouched. These sit BEFORE the accent
    blocks so an active accent wins the equal-specificity source-order tie for the few
    tokens both could touch. The default "zinc" (hue 240) carries no attribute. */
-[data-base="slate"] { --base-hue: 215; --base-sat: 1.4; }
-[data-base="gray"] { --base-hue: 220; --base-sat: 0.6; }
-[data-base="stone"] { --base-hue: 30; --base-sat: 1; }
+[data-base="slate"] { --base-hue: 215; --base-sat: 1.6; }
+[data-base="gray"] { --base-hue: 220; --base-sat: 0.5; }
+[data-base="stone"] { --base-hue: 30; --base-sat: 1.5; }
 [data-base="neutral"] { --base-hue: 0; --base-sat: 0; }
+[data-base="rose"] { --base-hue: 345; --base-sat: 2.4; }
+[data-base="red"] { --base-hue: 2; --base-sat: 2.4; }
+[data-base="amber"] { --base-hue: 40; --base-sat: 2.4; }
+[data-base="green"] { --base-hue: 150; --base-sat: 2.2; }
+[data-base="teal"] { --base-hue: 185; --base-sat: 2.2; }
+[data-base="blue"] { --base-hue: 214; --base-sat: 2.6; }
+[data-base="indigo"] { --base-hue: 250; --base-sat: 2.4; }
+[data-base="violet"] { --base-hue: 276; --base-sat: 2.4; }
 
 /* Accent colour presets — an axis orthogonal to light/dark, applied via a
    `data-accent` attribute on <html> (see ThemeProvider). Each accent redefines
@@ -404,35 +408,46 @@
   --sidebar-accent-foreground: 330 80% 86%;
 }
 
-/* Gradient accent (novelty): a jewel-tone rainbow painted via --primary-image onto
-   .pf-primary-surface elements. --primary is a solid violet fallback (and the ring/
-   focus colour). Note: white text cannot meet WCAG AA across every hue of a full
-   rainbow, so this is an opt-in decorative accent, not an AA-guaranteed default; the
-   stops are darkened and .pf-primary-surface adds a text-shadow to aid legibility. */
+/* Rainbow accent (novelty): instead of a static gradient (which would only paint the
+   few solid-fill surfaces), every accent token derives its hue from a single animated
+   custom property, so buttons, active nav items, rings and tints all cycle through the
+   spectrum in unison. --pf-rainbow-hue is registered as an <angle> so keyframes can
+   interpolate it; without @property support it falls back to a static red (0deg).
+   Note: white text can't meet WCAG AA across every hue, so this is a decorative,
+   opt-in accent — the primary Button/toggle add a text-shadow to stay legible. */
+@property --pf-rainbow-hue {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+@keyframes pf-rainbow-cycle {
+  from {
+    --pf-rainbow-hue: 0deg;
+  }
+  to {
+    --pf-rainbow-hue: 360deg;
+  }
+}
 [data-accent="rainbow"] {
-  --primary: 280 65% 52%;
+  --pf-rainbow-hue: 0deg;
+  --primary: var(--pf-rainbow-hue) 68% 48%;
   --primary-foreground: 0 0% 100%;
-  --ring: 280 70% 58%;
-  --primary-image: linear-gradient(
-    90deg,
-    hsl(350 70% 50%),
-    hsl(28 75% 48%),
-    hsl(48 70% 46%),
-    hsl(150 55% 40%),
-    hsl(200 70% 45%),
-    hsl(262 60% 55%),
-    hsl(320 60% 52%)
-  );
-  --accent: 280 60% 94%;
-  --accent-foreground: 280 55% 38%;
-  --sidebar-accent: 280 60% 94%;
-  --sidebar-accent-foreground: 280 55% 38%;
+  --ring: var(--pf-rainbow-hue) 70% 55%;
+  --accent: var(--pf-rainbow-hue) 70% 92%;
+  --accent-foreground: var(--pf-rainbow-hue) 55% 32%;
+  --sidebar-accent: var(--pf-rainbow-hue) 70% 92%;
+  --sidebar-accent-foreground: var(--pf-rainbow-hue) 55% 32%;
 }
 .dark[data-accent="rainbow"] {
-  --accent: 280 40% 24%;
-  --accent-foreground: 280 70% 86%;
-  --sidebar-accent: 280 40% 24%;
-  --sidebar-accent-foreground: 280 70% 86%;
+  --accent: var(--pf-rainbow-hue) 40% 24%;
+  --accent-foreground: var(--pf-rainbow-hue) 80% 85%;
+  --sidebar-accent: var(--pf-rainbow-hue) 40% 24%;
+  --sidebar-accent-foreground: var(--pf-rainbow-hue) 80% 85%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-accent="rainbow"] {
+    animation: pf-rainbow-cycle 8s linear infinite;
+  }
 }
 
 /* Paint the document root with the theme background so an overscroll/rubber-band
@@ -458,27 +473,11 @@ body {
   }
 }
 
-/* Primary-fill surfaces (the primary Button, the settings toggle) paint the optional
-   --primary-image over their solid background. For solid accents the image is `none`,
-   so this is inert. Under the gradient accent the fill animates a slow horizontal
-   drift (reduced-motion users get a static gradient) and gains a text-shadow so the
-   foreground stays legible across the sweep. */
-.pf-primary-surface {
-  background-image: var(--primary-image);
-}
+/* Solid-fill accent surfaces (the primary Button, the settings toggle) carry a marker
+   class so the rainbow accent can add a text-shadow there — white text over the cycling
+   hue stays legible across the lighter parts of the sweep. Inert for solid accents. */
 [data-accent="rainbow"] .pf-primary-surface {
   text-shadow: 0 1px 2px hsl(0 0% 0% / 0.35);
-}
-@media (prefers-reduced-motion: no-preference) {
-  [data-accent="rainbow"] .pf-primary-surface {
-    background-size: 200% 100%;
-    animation: pf-accent-shift 6s linear infinite;
-  }
-}
-@keyframes pf-accent-shift {
-  to {
-    background-position: -200% 0;
-  }
 }
 
 /* Side-drawer animations (used by the frame's DrawerHost via `animate-[pf-...]`).

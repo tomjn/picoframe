@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { LayoutConfigProvider, type LayoutConfig } from "../context/layoutConfig";
 import { ThemeProvider, migrateLegacyAccent } from "../context/theme";
 import { AppearanceSettings } from "./AppearanceSettings";
@@ -59,7 +59,9 @@ test("the default base (Zinc) carries no data-base attribute", () => {
 
 test("selecting an accent applies it and fires the animation cue", () => {
   renderSettings();
-  fireEvent.click(screen.getByRole("radio", { name: "Blue" }));
+  // "Blue" exists as both a base and an accent, so scope to the accent group.
+  const accentGroup = screen.getByRole("radiogroup", { name: "Accent color" });
+  fireEvent.click(within(accentGroup).getByRole("radio", { name: "Blue" }));
   expect(document.documentElement.dataset.accent).toBe("blue");
   // the transient cue attribute is set synchronously on selection
   expect(document.documentElement.dataset.accentAnim).toBe("");
