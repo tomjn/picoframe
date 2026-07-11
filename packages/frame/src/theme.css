@@ -35,6 +35,11 @@
   --color-sidebar-accent: hsl(var(--sidebar-accent));
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -89,6 +94,14 @@
   --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 5%) 90%;
   --sidebar-accent-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 12%;
   --sidebar-border: var(--base-hue) calc(var(--base-sat) * 6%) 88%;
+  /* Categorical chart colours (used by the `chart` registry component). Like
+     --destructive these are deliberately literal, not retinted by --base-hue, so
+     data series stay distinguishable regardless of the active base ramp. */
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
 }
 
 .dark {
@@ -117,6 +130,11 @@
   --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
   --sidebar-accent-foreground: 0 0% 98%;
   --sidebar-border: var(--base-hue) calc(var(--base-sat) * 4%) 14%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
 }
 
 /* Base neutral ramp presets — a third axis (orthogonal to accent and light/dark),
