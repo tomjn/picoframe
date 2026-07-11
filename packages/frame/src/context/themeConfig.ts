@@ -38,6 +38,12 @@ export const ACCENTS = [
   { value: "indigo", label: "Indigo", swatch: "hsl(243 75% 59%)" },
   { value: "purple", label: "Purple", swatch: "hsl(271 76% 53%)" },
   { value: "pink", label: "Pink", swatch: "hsl(330 75% 47%)" },
+  {
+    value: "rainbow",
+    label: "Rainbow",
+    swatch:
+      "linear-gradient(90deg, hsl(350 70% 50%), hsl(48 70% 46%), hsl(150 55% 40%), hsl(200 70% 45%), hsl(320 60% 52%))",
+  },
 ] as const satisfies readonly ThemeOption<string>[];
 
 export type Accent = (typeof ACCENTS)[number]["value"];

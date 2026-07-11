@@ -52,6 +52,10 @@
   --radius: 0.5rem;
   --base-hue: 240;
   --base-sat: 1;
+  /* Optional gradient fill for the primary/accent surface. `none` for every solid
+     accent; a gradient accent (see "rainbow") sets it and the .pf-primary-surface
+     class paints it over the solid --primary fallback. */
+  --primary-image: none;
   --background: 0 0% 100%;
   --foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
   --card: 0 0% 100%;
@@ -400,6 +404,37 @@
   --sidebar-accent-foreground: 330 80% 86%;
 }
 
+/* Gradient accent (novelty): a jewel-tone rainbow painted via --primary-image onto
+   .pf-primary-surface elements. --primary is a solid violet fallback (and the ring/
+   focus colour). Note: white text cannot meet WCAG AA across every hue of a full
+   rainbow, so this is an opt-in decorative accent, not an AA-guaranteed default; the
+   stops are darkened and .pf-primary-surface adds a text-shadow to aid legibility. */
+[data-accent="rainbow"] {
+  --primary: 280 65% 52%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 280 70% 58%;
+  --primary-image: linear-gradient(
+    90deg,
+    hsl(350 70% 50%),
+    hsl(28 75% 48%),
+    hsl(48 70% 46%),
+    hsl(150 55% 40%),
+    hsl(200 70% 45%),
+    hsl(262 60% 55%),
+    hsl(320 60% 52%)
+  );
+  --accent: 280 60% 94%;
+  --accent-foreground: 280 55% 38%;
+  --sidebar-accent: 280 60% 94%;
+  --sidebar-accent-foreground: 280 55% 38%;
+}
+.dark[data-accent="rainbow"] {
+  --accent: 280 40% 24%;
+  --accent-foreground: 280 70% 86%;
+  --sidebar-accent: 280 40% 24%;
+  --sidebar-accent-foreground: 280 70% 86%;
+}
+
 /* Paint the document root with the theme background so an overscroll/rubber-band
    never reveals the browser's default white canvas, and stop the whole document
    from scroll-chaining when the inner content scroller hits its end. `color-scheme`
@@ -420,6 +455,29 @@ body {
     transition-property: background-color, border-color, color, fill, stroke, box-shadow, outline-color;
     transition-duration: 450ms;
     transition-timing-function: ease-out;
+  }
+}
+
+/* Primary-fill surfaces (the primary Button, the settings toggle) paint the optional
+   --primary-image over their solid background. For solid accents the image is `none`,
+   so this is inert. Under the gradient accent the fill animates a slow horizontal
+   drift (reduced-motion users get a static gradient) and gains a text-shadow so the
+   foreground stays legible across the sweep. */
+.pf-primary-surface {
+  background-image: var(--primary-image);
+}
+[data-accent="rainbow"] .pf-primary-surface {
+  text-shadow: 0 1px 2px hsl(0 0% 0% / 0.35);
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-accent="rainbow"] .pf-primary-surface {
+    background-size: 200% 100%;
+    animation: pf-accent-shift 6s linear infinite;
+  }
+}
+@keyframes pf-accent-shift {
+  to {
+    background-position: -200% 0;
   }
 }
 
