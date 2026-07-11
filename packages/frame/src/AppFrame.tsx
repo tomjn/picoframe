@@ -2,6 +2,7 @@ import type { FramePlugin } from "@picoframe/plugin-sdk";
 import { type ReactNode, useMemo } from "react";
 import { HashRouter, type RouteObject, useRoutes } from "react-router";
 import { FrameProvider } from "./context/frame";
+import { type LayoutConfig, LayoutConfigProvider } from "./context/layoutConfig";
 import { type HomeOverride, homePlugin } from "./home";
 import { ThemeProvider, type ThemeMode, type Accent } from "./context/theme";
 import { DrawerProvider } from "./drawer/DrawerProvider";
@@ -28,6 +29,11 @@ export interface AppFrameProps {
    */
   home?: HomeOverride | false;
   theme?: { defaultMode?: ThemeMode; defaultAccent?: Accent };
+  /**
+   * Configure sidebar/breadcrumb layout behaviours. Each option is a bare value (locked)
+   * or `{ default, userConfigurable: true }` (exposed as a user setting seeded to `default`).
+   */
+  layout?: LayoutConfig;
   /** Override the generic route-loading fallback. */
   fallback?: ReactNode;
   /**
@@ -50,6 +56,7 @@ export function AppFrame({
   title = "picoframe",
   home,
   theme,
+  layout,
   fallback,
   store,
   settingsStorage,
@@ -100,11 +107,13 @@ export function AppFrame({
           <SlotProvider slots={slots}>
             <PersistentStoreProvider storage={store ?? settingsStorage}>
               <DrawerProvider>
-                <FrameProvider
-                  value={{ title, nav, crumbs, settings, fallback: fallback ?? <DefaultFallback /> }}
-                >
-                  {routed}
-                </FrameProvider>
+                <LayoutConfigProvider config={layout}>
+                  <FrameProvider
+                    value={{ title, nav, crumbs, settings, fallback: fallback ?? <DefaultFallback /> }}
+                  >
+                    {routed}
+                  </FrameProvider>
+                </LayoutConfigProvider>
               </DrawerProvider>
             </PersistentStoreProvider>
           </SlotProvider>
