@@ -96,6 +96,27 @@ function NavGroupView({ group, collapsed }: { group: NavGroup; collapsed: boolea
   );
 }
 
+/** The scrollable nav groups + footer slot, shared by the persistent sidebar and the popover. */
+export function SidebarNav({ groups, collapsed }: { groups: NavGroup[]; collapsed: boolean }) {
+  return (
+    <>
+      <nav className="flex-1 space-y-3 overflow-y-auto p-2">
+        {/* Drop items opted out via `sidebar: false` (still shown on the home launcher),
+            and any group left empty as a result. */}
+        {groups
+          .map((g) => ({ ...g, items: g.items.filter((i) => i.sidebar !== false) }))
+          .filter((g) => g.items.length > 0)
+          .map((group) => (
+            <NavGroupView key={group.id} group={group} collapsed={collapsed} />
+          ))}
+      </nav>
+      <div className="border-t border-sidebar-border p-2">
+        <Slot id="sidebar.footer" />
+      </div>
+    </>
+  );
+}
+
 function ResizeHandle({ width, onResize }: { width: number; onResize: (px: number) => void }) {
   const [dragging, setDragging] = useState(false);
 
@@ -175,19 +196,7 @@ export function Sidebar({
     >
       {!fullyHidden && (
         <>
-          <nav className="flex-1 space-y-3 overflow-y-auto p-2">
-            {/* Drop items opted out via `sidebar: false` (still shown on the home launcher),
-                and any group left empty as a result. */}
-            {groups
-              .map((g) => ({ ...g, items: g.items.filter((i) => i.sidebar !== false) }))
-              .filter((g) => g.items.length > 0)
-              .map((group) => (
-                <NavGroupView key={group.id} group={group} collapsed={collapsed} />
-              ))}
-          </nav>
-          <div className="border-t border-sidebar-border p-2">
-            <Slot id="sidebar.footer" />
-          </div>
+          <SidebarNav groups={groups} collapsed={collapsed} />
           {!collapsed && <ResizeHandle width={clampWidth(width)} onResize={onResize} />}
         </>
       )}
