@@ -148,12 +148,19 @@ export function Sidebar({
   collapsed,
   width,
   onResize,
+  hideWhenCollapsed = false,
 }: {
   groups: NavGroup[];
   collapsed: boolean;
   width: number;
   onResize: (px: number) => void;
+  /** When collapsed, drop to zero width instead of leaving an icon rail. */
+  hideWhenCollapsed?: boolean;
 }) {
+  // Fully hidden: keep the <aside> for the width transition but render no content, so its
+  // links leave the tab order (avoids the invisible-but-tabbable a11y trap).
+  const fullyHidden = collapsed && hideWhenCollapsed;
+
   return (
     <aside
       data-slot="sidebar"
@@ -161,23 +168,29 @@ export function Sidebar({
       style={collapsed ? undefined : { width: clampWidth(width) }}
       className={cn(
         "group/sidebar relative flex h-full flex-col border-r border-sidebar-border bg-sidebar",
-        collapsed ? "w-14 transition-[width] duration-200" : "shrink-0",
+        !collapsed && "shrink-0",
+        collapsed && !fullyHidden && "w-14 transition-[width] duration-200",
+        fullyHidden && "w-0 overflow-hidden border-r-0 transition-[width] duration-200",
       )}
     >
-      <nav className="flex-1 space-y-3 overflow-y-auto p-2">
-        {/* Drop items opted out via `sidebar: false` (still shown on the home launcher),
-            and any group left empty as a result. */}
-        {groups
-          .map((g) => ({ ...g, items: g.items.filter((i) => i.sidebar !== false) }))
-          .filter((g) => g.items.length > 0)
-          .map((group) => (
-            <NavGroupView key={group.id} group={group} collapsed={collapsed} />
-          ))}
-      </nav>
-      <div className="border-t border-sidebar-border p-2">
-        <Slot id="sidebar.footer" />
-      </div>
-      {!collapsed && <ResizeHandle width={clampWidth(width)} onResize={onResize} />}
+      {!fullyHidden && (
+        <>
+          <nav className="flex-1 space-y-3 overflow-y-auto p-2">
+            {/* Drop items opted out via `sidebar: false` (still shown on the home launcher),
+                and any group left empty as a result. */}
+            {groups
+              .map((g) => ({ ...g, items: g.items.filter((i) => i.sidebar !== false) }))
+              .filter((g) => g.items.length > 0)
+              .map((group) => (
+                <NavGroupView key={group.id} group={group} collapsed={collapsed} />
+              ))}
+          </nav>
+          <div className="border-t border-sidebar-border p-2">
+            <Slot id="sidebar.footer" />
+          </div>
+          {!collapsed && <ResizeHandle width={clampWidth(width)} onResize={onResize} />}
+        </>
+      )}
     </aside>
   );
 }
