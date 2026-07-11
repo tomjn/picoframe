@@ -2,7 +2,6 @@ import { Link } from "react-router";
 import type { NavItem } from "@picoframe/plugin-sdk";
 import { ExternalLink } from "lucide-react";
 import { useFrame } from "../context/frame";
-import { cn } from "../lib/cn";
 import { useResolvedNavItem } from "../nav/useResolvedNavItem";
 import { openExternal } from "../lib/openExternal";
 import { Slot } from "../slots/slots";
@@ -48,7 +47,7 @@ export default function Home() {
                     {group.label}
                   </h2>
                 )}
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="flex flex-wrap gap-3">
                   {group.items.map((item) => (
                     <ToolCard key={item.id} item={item} />
                   ))}
@@ -71,8 +70,10 @@ function ToolCard({ item }: { item: NavItem }) {
   const { visible, label, icon: Icon, description } = useResolvedNavItem(item);
   if (!visible) return null;
 
+  // Full-width single column on phones; a fixed 16rem on larger screens so cards pack
+  // left and wrap instead of stretching to fill a grid cell.
   const cardClass =
-    "group flex items-center gap-3 rounded-lg border border-border bg-card p-4 text-left text-card-foreground transition-colors hover:border-ring hover:bg-accent";
+    "group flex w-full items-center gap-3 rounded-lg border border-border bg-card p-4 text-left text-card-foreground transition-colors hover:border-ring hover:bg-accent sm:w-64";
   const inner = (
     <>
       {Icon && (
@@ -97,7 +98,7 @@ function ToolCard({ item }: { item: NavItem }) {
         type="button"
         data-nav-item=""
         onClick={() => openExternal(href)}
-        className={cn(cardClass, "w-full")}
+        className={cardClass}
       >
         {inner}
       </button>
