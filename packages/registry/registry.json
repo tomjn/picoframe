@@ -806,6 +806,25 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "sonner",
+      "type": "registry:ui",
+      "title": "Sonner",
+      "description": "Toast notifications built on Sonner, wired to picoframe's theme.",
+      "dependencies": [
+        "sonner",
+        "@picoframe/frame"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/default/ui/sonner.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
