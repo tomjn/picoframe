@@ -1,3 +1,4 @@
+import type { IconComponent } from "@picoframe/plugin-sdk";
 import { type ReactNode, createContext, useContext, useMemo } from "react";
 import { usePersistentState } from "../lib/usePersistentState";
 
@@ -21,10 +22,18 @@ export interface LayoutConfig {
     hideWhenCollapsed?: Configurable<boolean>;
     /** No persistent sidebar; a menu button opens it as an overlay popover. */
     popover?: Configurable<boolean>;
+    /** In popover mode, the menu button's icon (defaults to a hamburger menu). */
+    menuIcon?: IconComponent;
+    /** In popover mode, the menu button's accessible label + tooltip (defaults to "Menu"). */
+    menuLabel?: string;
   };
   breadcrumb?: {
     /** Show only the current route header; reveal the full path on hover/focus. */
     collapsed?: Configurable<boolean>;
+  };
+  history?: {
+    /** Show the back/forward navigation buttons in the top bar (default true). */
+    buttons?: Configurable<boolean>;
   };
 }
 
@@ -32,9 +41,13 @@ export interface ResolvedLayoutConfig {
   hideWhenCollapsed: OptionDescriptor<boolean>;
   popover: OptionDescriptor<boolean>;
   breadcrumbCollapsed: OptionDescriptor<boolean>;
+  historyButtons: OptionDescriptor<boolean>;
+  /** Static (app-author, not user-configurable) popover menu button overrides. */
+  menuButton: { icon?: IconComponent; label?: string };
 }
 
-export type LayoutOptionKey = keyof ResolvedLayoutConfig;
+/** The user-toggleable boolean options — deliberately excludes the static `menuButton`. */
+export type LayoutOptionKey = "hideWhenCollapsed" | "popover" | "breadcrumbCollapsed" | "historyButtons";
 
 /** Resolve one `Configurable` into a descriptor. Bare value → locked; object → exposed. */
 export function resolveOption<T>(cfg: Configurable<T> | undefined, fallback: T): OptionDescriptor<T> {
@@ -62,6 +75,11 @@ export const LAYOUT_OPTIONS: { key: LayoutOptionKey; label: string; description:
     label: "Collapse breadcrumb",
     description: "Show only the current page; reveal the full path on hover.",
   },
+  {
+    key: "historyButtons",
+    label: "Back/forward buttons",
+    description: "Show the back and forward navigation buttons in the top bar.",
+  },
 ];
 
 const LayoutConfigContext = createContext<ResolvedLayoutConfig | null>(null);
@@ -78,6 +96,8 @@ export function LayoutConfigProvider({
       hideWhenCollapsed: resolveOption(config?.sidebar?.hideWhenCollapsed, false),
       popover: resolveOption(config?.sidebar?.popover, false),
       breadcrumbCollapsed: resolveOption(config?.breadcrumb?.collapsed, false),
+      historyButtons: resolveOption(config?.history?.buttons, true),
+      menuButton: { icon: config?.sidebar?.menuIcon, label: config?.sidebar?.menuLabel },
     }),
     [config],
   );

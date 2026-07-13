@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight, PanelLeft } from "lucide-react";
+import type { IconComponent } from "@picoframe/plugin-sdk";
+import { ChevronLeft, ChevronRight, Menu, PanelLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useFrame } from "../context/frame";
@@ -6,6 +7,7 @@ import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
 import { decodeSegment, isRoutePath, resolveCrumb, titleCase } from "../routing/crumbs";
 import { Slot } from "../slots/slots";
+import { SidebarPopover } from "./SidebarPopover";
 
 function IconButton({
   label,
@@ -39,15 +41,31 @@ export function TopBar({
   title,
   onToggleSidebar,
   breadcrumbCollapsed = false,
+  popover = false,
+  menuOpen = false,
+  onCloseMenu = () => {},
+  menuIcon,
+  menuLabel,
+  showHistoryButtons = true,
 }: {
   title: string;
   onToggleSidebar: () => void;
   /** Show only the current route header; reveal the full path on hover/focus. */
   breadcrumbCollapsed?: boolean;
+  /** In popover mode the menu button anchors the sidebar popover beneath it. */
+  popover?: boolean;
+  menuOpen?: boolean;
+  onCloseMenu?: () => void;
+  /** Popover-mode menu button icon (defaults to a hamburger menu). */
+  menuIcon?: IconComponent;
+  /** Popover-mode menu button accessible label + tooltip (defaults to "Menu"). */
+  menuLabel?: string;
+  /** Show the back/forward navigation buttons. */
+  showHistoryButtons?: boolean;
 }) {
   const navigate = useNavigate();
   const { canBack, canForward } = useNavigationStack();
-  const { crumbs: resolvers } = useFrame();
+  const { crumbs: resolvers, nav } = useFrame();
   const { pathname } = useLocation();
 
   // Build cumulative breadcrumbs from the path; honor static parent labels and
@@ -102,20 +120,32 @@ export function TopBar({
   const ancestors = collapseCrumbs ? crumbs.slice(0, -1) : [];
   const current = crumbs[crumbs.length - 1];
 
+  // In popover mode the toggle opens the menu, so the sidebar glyph/label give way to a
+  // (customizable) menu button; otherwise it collapses the persistent rail.
+  const ToggleIcon = popover ? (menuIcon ?? Menu) : PanelLeft;
+  const toggleLabel = popover ? (menuLabel ?? "Menu") : "Toggle sidebar";
+
   return (
     <header
       data-tauri-drag-region
       className="flex h-12 shrink-0 items-center gap-1 border-b border-border bg-background px-2"
     >
-      <IconButton label="Toggle sidebar" onClick={onToggleSidebar}>
-        <PanelLeft size={18} />
-      </IconButton>
-      <IconButton label="Back" disabled={!canBack} onClick={() => navigate(-1)}>
-        <ChevronLeft size={18} />
-      </IconButton>
-      <IconButton label="Forward" disabled={!canForward} onClick={() => navigate(1)}>
-        <ChevronRight size={18} />
-      </IconButton>
+      <div className="relative">
+        <IconButton label={toggleLabel} onClick={onToggleSidebar}>
+          <ToggleIcon size={18} />
+        </IconButton>
+        {popover && <SidebarPopover groups={nav} open={menuOpen} onClose={onCloseMenu} />}
+      </div>
+      {showHistoryButtons && (
+        <>
+          <IconButton label="Back" disabled={!canBack} onClick={() => navigate(-1)}>
+            <ChevronLeft size={18} />
+          </IconButton>
+          <IconButton label="Forward" disabled={!canForward} onClick={() => navigate(1)}>
+            <ChevronRight size={18} />
+          </IconButton>
+        </>
+      )}
 
       <div className="group ml-1 flex items-center gap-1 text-sm font-medium">
         {crumbs.length === 0 ? (

@@ -44,7 +44,7 @@ test("popover mode drops the persistent sidebar and opens the popover from the m
   expect(container.querySelector("[data-slot=sidebar]")).toBeNull();
   // Closed until the menu button is pressed.
   expect(container.querySelector("[data-slot=sidebar-popover]")).toBeNull();
-  fireEvent.click(screen.getByLabelText("Toggle sidebar"));
+  fireEvent.click(screen.getByLabelText("Menu"));
   expect(container.querySelector("[data-slot=sidebar-popover]")).not.toBeNull();
   expect(screen.getByText("Alpha")).toBeTruthy();
 });
