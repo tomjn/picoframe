@@ -22,6 +22,18 @@ test("renders the nav (with labels) when open", () => {
   expect(screen.getByText("Alpha")).toBeTruthy();
 });
 
+test("opens as an anchored dropdown, not a dimmed full-height drawer", () => {
+  const { container } = renderPopover(true, () => {});
+  const panel = container.querySelector("[data-slot=sidebar-popover]") as HTMLElement | null;
+  expect(panel).not.toBeNull();
+  // Anchored directly beneath its trigger, not pinned across the full viewport height.
+  expect(panel?.className).toContain("top-full");
+  expect(panel?.className).not.toContain("inset-y-0");
+  // Outside-click catcher must not dim the page.
+  const catcher = screen.getByLabelText("Close menu");
+  expect(catcher.className).not.toContain("bg-black");
+});
+
 test("renders nothing when closed", () => {
   renderPopover(false, () => {});
   expect(screen.queryByText("Alpha")).toBeNull();

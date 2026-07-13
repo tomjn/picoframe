@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight, PanelLeft } from "lucide-react";
+import type { IconComponent } from "@picoframe/plugin-sdk";
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, PanelLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useFrame } from "../context/frame";
@@ -6,6 +7,7 @@ import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
 import { decodeSegment, isRoutePath, resolveCrumb, titleCase } from "../routing/crumbs";
 import { Slot } from "../slots/slots";
+import { SidebarPopover } from "./SidebarPopover";
 
 function IconButton({
   label,
@@ -39,15 +41,43 @@ export function TopBar({
   title,
   onToggleSidebar,
   breadcrumbCollapsed = false,
+  breadcrumbHidden = false,
+  popover = false,
+  menuOpen = false,
+  onCloseMenu = () => {},
+  menuIcon,
+  menuIconOpen,
+  menuLabel,
+  menuLabelVisible = false,
+  menuLabelContent,
+  showHistoryButtons = true,
 }: {
   title: string;
   onToggleSidebar: () => void;
   /** Show only the current route header; reveal the full path on hover/focus. */
   breadcrumbCollapsed?: boolean;
+  /** Hide the breadcrumb region entirely. */
+  breadcrumbHidden?: boolean;
+  /** In popover mode the menu button anchors the sidebar popover beneath it. */
+  popover?: boolean;
+  menuOpen?: boolean;
+  onCloseMenu?: () => void;
+  /** Popover-mode menu button icon while closed (defaults to a hamburger menu). */
+  menuIcon?: IconComponent;
+  /** Popover-mode menu button icon while open (defaults to a chevron). */
+  menuIconOpen?: IconComponent;
+  /** Popover-mode menu button accessible label + tooltip (defaults to "Menu"). */
+  menuLabel?: string;
+  /** Render the menu label as visible text beside the icon (default false; icon-only). */
+  menuLabelVisible?: boolean;
+  /** Custom visible label content (image/logo/JSX); replaces the text when shown. */
+  menuLabelContent?: ReactNode;
+  /** Show the back/forward navigation buttons. */
+  showHistoryButtons?: boolean;
 }) {
   const navigate = useNavigate();
   const { canBack, canForward } = useNavigationStack();
-  const { crumbs: resolvers } = useFrame();
+  const { crumbs: resolvers, nav } = useFrame();
   const { pathname } = useLocation();
 
   // Build cumulative breadcrumbs from the path; honor static parent labels and
@@ -102,22 +132,55 @@ export function TopBar({
   const ancestors = collapseCrumbs ? crumbs.slice(0, -1) : [];
   const current = crumbs[crumbs.length - 1];
 
+  // In popover mode the toggle opens the menu, so the sidebar glyph gives way to a
+  // (customizable) menu button whose icon swaps between closed and open states; otherwise
+  // it collapses the persistent rail.
+  const closedIcon = menuIcon ?? Menu;
+  const openIcon = menuIconOpen ?? ChevronDown;
+  const ToggleIcon = popover ? (menuOpen ? openIcon : closedIcon) : PanelLeft;
+  const toggleLabel = popover ? (menuLabel ?? "Menu") : "Toggle sidebar";
+  const showMenuLabel = popover && menuLabelVisible;
+
   return (
     <header
       data-tauri-drag-region
-      className="flex h-12 shrink-0 items-center gap-1 border-b border-border bg-background px-2"
+      className="relative flex h-12 shrink-0 items-center gap-1 border-b border-border bg-background px-2"
     >
-      <IconButton label="Toggle sidebar" onClick={onToggleSidebar}>
-        <PanelLeft size={18} />
-      </IconButton>
-      <IconButton label="Back" disabled={!canBack} onClick={() => navigate(-1)}>
-        <ChevronLeft size={18} />
-      </IconButton>
-      <IconButton label="Forward" disabled={!canForward} onClick={() => navigate(1)}>
-        <ChevronRight size={18} />
-      </IconButton>
+      <div className="relative">
+        {showMenuLabel ? (
+          <button
+            type="button"
+            aria-label={toggleLabel}
+            title={toggleLabel}
+            onClick={onToggleSidebar}
+            className={cn(
+              "flex h-8 items-center gap-2 rounded-md px-2 text-muted-foreground transition-colors",
+              "hover:bg-accent hover:text-accent-foreground",
+            )}
+          >
+            <ToggleIcon size={18} />
+            {menuLabelContent ?? <span className="text-sm font-medium">{toggleLabel}</span>}
+          </button>
+        ) : (
+          <IconButton label={toggleLabel} onClick={onToggleSidebar}>
+            <ToggleIcon size={18} />
+          </IconButton>
+        )}
+        {popover && <SidebarPopover groups={nav} open={menuOpen} onClose={onCloseMenu} />}
+      </div>
+      {showHistoryButtons && (
+        <>
+          <IconButton label="Back" disabled={!canBack} onClick={() => navigate(-1)}>
+            <ChevronLeft size={18} />
+          </IconButton>
+          <IconButton label="Forward" disabled={!canForward} onClick={() => navigate(1)}>
+            <ChevronRight size={18} />
+          </IconButton>
+        </>
+      )}
 
-      <div className="group ml-1 flex items-center gap-1 text-sm font-medium">
+      {!breadcrumbHidden && (
+      <div data-slot="breadcrumbs" className="group ml-1 flex items-center gap-1 text-sm font-medium">
         {crumbs.length === 0 ? (
           <span>{title}</span>
         ) : collapseCrumbs ? (
@@ -151,9 +214,17 @@ export function TopBar({
           ))
         )}
       </div>
+      )}
 
       <div className="ml-2 flex items-center gap-1">
         <Slot id="topbar.left" />
+      </div>
+      {/* Absolutely centered so it stays centered regardless of the side clusters' widths. */}
+      <div
+        data-slot="topbar-center"
+        className="pointer-events-none absolute left-1/2 top-0 flex h-full -translate-x-1/2 items-center [&>*]:pointer-events-auto"
+      >
+        <Slot id="topbar.center" />
       </div>
       <div className="ml-auto flex items-center gap-1">
         <Slot id="topbar.right" />
