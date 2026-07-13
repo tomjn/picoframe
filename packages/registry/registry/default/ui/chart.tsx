@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils"
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
-const INITIAL_DIMENSION = { width: 320, height: 200 } as const
 type TooltipNameType = number | string
 
 export type ChartConfig = Record<
@@ -44,24 +43,52 @@ function ChartContainer({
   className,
   children,
   config,
-  initialDimension = INITIAL_DIMENSION,
   ...props
 }: React.ComponentProps<"div"> & {
   config: ChartConfig
-  children: React.ComponentProps<
-    typeof RechartsPrimitive.ResponsiveContainer
-  >["children"]
-  initialDimension?: {
-    width: number
-    height: number
-  }
+  children: React.ReactElement
 }) {
   const uniqueId = React.useId()
   const chartId = `chart-${id ?? uniqueId.replace(/:/g, "")}`
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const [size, setSize] = React.useState({ width: 0, height: 0 })
+
+  // We measure the container ourselves instead of using Recharts'
+  // ResponsiveContainer. Its internal ResizeObserver transiently reports
+  // negative/zero dimensions inside a Tauri WKWebView during Suspense
+  // transitions and tab switches, which spams "width(-1) and height(-1)"
+  // warnings and races layout. Here we ignore any non-positive reading and
+  // only render the chart once we have a real, positive size, passing that
+  // size to the chart explicitly.
+  React.useLayoutEffect(() => {
+    const element = containerRef.current
+    if (!element) {
+      return
+    }
+
+    const measure = () => {
+      const { width, height } = element.getBoundingClientRect()
+      if (width > 0 && height > 0) {
+        setSize((prev) =>
+          prev.width === width && prev.height === height
+            ? prev
+            : { width, height }
+        )
+      }
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  const hasSize = size.width > 0 && size.height > 0
 
   return (
     <ChartContext.Provider value={{ config }}>
       <div
+        ref={containerRef}
         data-slot="chart"
         data-chart={chartId}
         className={cn(
@@ -71,11 +98,12 @@ function ChartContainer({
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer
-          initialDimension={initialDimension}
-        >
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        {hasSize
+          ? React.cloneElement(children, {
+              width: size.width,
+              height: size.height,
+            })
+          : null}
       </div>
     </ChartContext.Provider>
   )
