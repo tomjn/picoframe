@@ -4,6 +4,40 @@
 @source "../../../packages/frame/src";
 @source "../../../plugins/hello/src";@import "@picoframe/frame/theme.css";
 
+/* App-local token overlay — worked example for the frame's "App-local token overlays"
+   guide (packages/frame/THEMING.md). These tokens are NOT part of theme.css; they live
+   here, in the app that owns them, layered on top without forking the frame.
+
+   Declared as bare HSL channels ("H S% L%", no hsl() wrapper) so they compose with the
+   frame's convention; the @theme block below registers them as colour utilities
+   (bg-status-critical, text-link, …). The dark overrides ride the frame's `dark`
+   custom variant, already defined by theme.css.
+
+   Accent/base behaviour, demonstrated deliberately two ways:
+   - Status hues are LITERAL and accent-independent — severity meaning must not shift when
+     the user changes accent or base, mirroring theme.css's own --destructive / --chart-*.
+     They vary only across light/dark for contrast.
+   - --link instead ALIASES --primary, so it tracks the active accent automatically:
+     var(--link) -> var(--primary) resolves against whatever accent is in scope, and no
+     .dark override is needed because --primary already flips per mode. */
+@theme {
+  --color-status-critical: hsl(var(--status-critical));
+  --color-status-warning: hsl(var(--status-warning));
+  --color-status-success: hsl(var(--status-success));
+  --color-link: hsl(var(--link));
+}
+:root {
+  --status-critical: 0 72% 45%;
+  --status-warning: 33 92% 38%;
+  --status-success: 142 71% 33%;
+  --link: var(--primary);
+}
+.dark {
+  --status-critical: 0 72% 58%;
+  --status-warning: 38 92% 56%;
+  --status-success: 142 66% 52%;
+}
+
 html,
 body,
 #root {

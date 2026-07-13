@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { plugins } from "./app.plugins";
 import { demoExtrasPlugin } from "./demo-extras";
 import { DEMO_LOGO, DemoLayoutControlsProvider, useDemoLayoutControls } from "./demo-layout-controls";
+import { themeOverlayPlugin } from "./theme-overlay";
 import "./index.css";
 
 const root = document.getElementById("root");
@@ -12,7 +13,7 @@ if (!root) throw new Error("missing #root element");
 
 // Hoisted so identity is stable: AppFrame memoizes routes/nav/settings on `plugins`, and a
 // new store per render would drop persisted state. Only `layout` recomputes per toggle.
-const allPlugins = [...plugins, demoExtrasPlugin];
+const allPlugins = [...plugins, demoExtrasPlugin, themeOverlayPlugin];
 const store = createTauriStore();
 
 /** Builds the layout config from the demo's runtime controls (see DemoLayoutControls). */
