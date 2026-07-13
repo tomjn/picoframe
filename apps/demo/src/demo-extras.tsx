@@ -1,6 +1,7 @@
 import { type FramePlugin, Button, Input, useDrawer, usePersistentValue, useSetting } from "@picoframe/frame";
-import { Cpu, Globe, PanelRight, SlidersHorizontal } from "lucide-react";
+import { Cpu, Globe, LayoutDashboard, PanelRight, SlidersHorizontal } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useDemoLayoutControls } from "./demo-layout-controls";
 
 /** Settings: General → display name (text), Appearance → compact mode (toggle). */
 function GeneralSettings() {
@@ -61,6 +62,43 @@ function DraftPage() {
         Persisted to disk via usePersistentValue; survives navigation and reload.
       </p>
     </div>
+  );
+}
+
+/** Demo-only toggles for the app-configured layout options (see demo-layout-controls). */
+function DemoLayoutSettings() {
+  const c = useDemoLayoutControls();
+  const row = (label: string, checked: boolean, onChange: (v: boolean) => void) => (
+    <label className="flex items-center gap-3 text-sm">
+      <input
+        type="checkbox"
+        className="size-4"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      {label}
+    </label>
+  );
+  return (
+    <div className="grid gap-3">
+      {row("Show menu label (popover mode)", c.menuLabelVisible, (v) => c.set({ menuLabelVisible: v }))}
+      {row("Use an image as the menu label", c.useImageLabel, (v) => c.set({ useImageLabel: v }))}
+      {row("Hide breadcrumb", c.breadcrumbHidden, (v) => c.set({ breadcrumbHidden: v }))}
+      <p className="text-xs text-muted-foreground">
+        App-configured layout options (not user settings); wired here only to exercise them.
+        Turn on "Sidebar as popover menu" in Appearance to see the menu button, then open it to
+        watch the icon swap hamburger → chevron.
+      </p>
+    </div>
+  );
+}
+
+/** Example content for the centered top-bar slot. */
+function CenterSlot() {
+  return (
+    <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+      Center slot
+    </span>
   );
 }
 
@@ -138,10 +176,14 @@ export const demoExtrasPlugin: FramePlugin = {
       ],
     },
   ],
-  slots: [{ slot: "topbar.right", order: 10, Component: DrawerTrigger }],
+  slots: [
+    { slot: "topbar.right", order: 10, Component: DrawerTrigger },
+    { slot: "topbar.center", order: 0, Component: CenterSlot },
+  ],
   settings: [
     { id: "general", title: "General", order: 0, icon: SlidersHorizontal, Component: GeneralSettings },
     { id: "general.appearance", parent: "general", title: "Appearance", Component: AppearanceSettings },
+    { id: "layout-demo", title: "Layout (demo)", order: 5, icon: LayoutDashboard, Component: DemoLayoutSettings },
     // Pure category (no Component) — renders links to its sub-sections.
     { id: "engine", title: "Engine", order: 10, icon: Cpu },
     {
