@@ -69,6 +69,19 @@ declares:
   light/dark appearance from the frame's `useTheme`)
 - `utils`: `clsx`, `tailwind-merge`
 
+## Chart sizing
+
+`chart` deliberately does **not** use Recharts' `ResponsiveContainer`. That
+container runs its own `ResizeObserver`, and inside a Tauri WKWebView it
+transiently reports `-1` width/height during Suspense transitions and tab
+switches - spamming `width(-1) and height(-1)` warnings and racing layout.
+
+Instead `ChartContainer` measures its own element with an explicit
+`ResizeObserver`, discards any non-positive reading, and only renders the chart
+once it has a real positive size - which it then passes to the chart as explicit
+`width`/`height`. The child must be a single Recharts chart element (e.g.
+`<LineChart>`); the container clones it to inject the measured dimensions.
+
 ## Layout
 
 ```
