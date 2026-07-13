@@ -127,6 +127,7 @@ export interface SettingsSection {
 /** Named injection points the frame shell exposes. String-widened for forward-compat. */
 export type SlotId =
   | "topbar.left"
+  | "topbar.center"
   | "topbar.right"
   | "sidebar.footer"
   | "statusbar"

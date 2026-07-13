@@ -22,14 +22,22 @@ export interface LayoutConfig {
     hideWhenCollapsed?: Configurable<boolean>;
     /** No persistent sidebar; a menu button opens it as an overlay popover. */
     popover?: Configurable<boolean>;
-    /** In popover mode, the menu button's icon (defaults to a hamburger menu). */
+    /** In popover mode, the menu button's icon while closed (defaults to a hamburger menu). */
     menuIcon?: IconComponent;
+    /** In popover mode, the menu button's icon while the popover is open (defaults to a chevron). */
+    menuIconOpen?: IconComponent;
     /** In popover mode, the menu button's accessible label + tooltip (defaults to "Menu"). */
     menuLabel?: string;
+    /** Render the menu label as visible text beside the icon (default false; icon-only). */
+    menuLabelVisible?: boolean;
+    /** Custom visible label content (e.g. an image/logo). Replaces the text when shown; `menuLabel` stays the accessible name. */
+    menuLabelContent?: ReactNode;
   };
   breadcrumb?: {
     /** Show only the current route header; reveal the full path on hover/focus. */
     collapsed?: Configurable<boolean>;
+    /** Hide the breadcrumb region entirely (app config; overrides `collapsed`). */
+    hidden?: boolean;
   };
   history?: {
     /** Show the back/forward navigation buttons in the top bar (default true). */
@@ -42,8 +50,16 @@ export interface ResolvedLayoutConfig {
   popover: OptionDescriptor<boolean>;
   breadcrumbCollapsed: OptionDescriptor<boolean>;
   historyButtons: OptionDescriptor<boolean>;
+  /** Hide the breadcrumb region entirely (static app config). */
+  breadcrumbHidden: boolean;
   /** Static (app-author, not user-configurable) popover menu button overrides. */
-  menuButton: { icon?: IconComponent; label?: string };
+  menuButton: {
+    icon?: IconComponent;
+    iconOpen?: IconComponent;
+    label?: string;
+    labelVisible?: boolean;
+    labelContent?: ReactNode;
+  };
 }
 
 /** The user-toggleable boolean options — deliberately excludes the static `menuButton`. */
@@ -97,7 +113,14 @@ export function LayoutConfigProvider({
       popover: resolveOption(config?.sidebar?.popover, false),
       breadcrumbCollapsed: resolveOption(config?.breadcrumb?.collapsed, false),
       historyButtons: resolveOption(config?.history?.buttons, true),
-      menuButton: { icon: config?.sidebar?.menuIcon, label: config?.sidebar?.menuLabel },
+      breadcrumbHidden: config?.breadcrumb?.hidden ?? false,
+      menuButton: {
+        icon: config?.sidebar?.menuIcon,
+        iconOpen: config?.sidebar?.menuIconOpen,
+        label: config?.sidebar?.menuLabel,
+        labelVisible: config?.sidebar?.menuLabelVisible,
+        labelContent: config?.sidebar?.menuLabelContent,
+      },
     }),
     [config],
   );

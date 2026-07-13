@@ -17,7 +17,7 @@ export function AppLayout() {
   const [hideWhenCollapsed] = useLayoutOption("hideWhenCollapsed");
   const [breadcrumbCollapsed] = useLayoutOption("breadcrumbCollapsed");
   const [historyButtons] = useLayoutOption("historyButtons");
-  const { menuButton } = useLayoutConfig();
+  const { menuButton, breadcrumbHidden } = useLayoutConfig();
   const [menuOpen, setMenuOpen] = useState(false);
   useMouseNavigation();
 
@@ -40,11 +40,15 @@ export function AppLayout() {
           title={title}
           onToggleSidebar={onToggleSidebar}
           breadcrumbCollapsed={breadcrumbCollapsed}
+          breadcrumbHidden={breadcrumbHidden}
           popover={popover}
           menuOpen={menuOpen}
           onCloseMenu={() => setMenuOpen(false)}
           menuIcon={menuButton.icon}
+          menuIconOpen={menuButton.iconOpen}
           menuLabel={menuButton.label}
+          menuLabelVisible={menuButton.labelVisible}
+          menuLabelContent={menuButton.labelContent}
           showHistoryButtons={historyButtons}
         />
         <main data-slot="content-scroll" className="min-h-0 flex-1 overflow-auto overscroll-none">

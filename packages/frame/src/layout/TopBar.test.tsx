@@ -11,7 +11,12 @@ afterEach(cleanup);
 const emptyResolvers: CrumbResolvers = { static: new Map(), patterns: [], routes: [] };
 const nav: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
 
-function renderTopBar(path: string, breadcrumbCollapsed = false, showHistoryButtons = true) {
+function renderTopBar(
+  path: string,
+  breadcrumbCollapsed = false,
+  showHistoryButtons = true,
+  breadcrumbHidden = false,
+) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <FrameProvider value={{ title: "App", nav, crumbs: emptyResolvers } as unknown as FrameContextValue}>
@@ -19,6 +24,7 @@ function renderTopBar(path: string, breadcrumbCollapsed = false, showHistoryButt
           title="App"
           onToggleSidebar={() => {}}
           breadcrumbCollapsed={breadcrumbCollapsed}
+          breadcrumbHidden={breadcrumbHidden}
           showHistoryButtons={showHistoryButtons}
         />
       </FrameProvider>
@@ -26,10 +32,15 @@ function renderTopBar(path: string, breadcrumbCollapsed = false, showHistoryButt
   );
 }
 
-function renderTopBarPopover(
-  menuOpen: boolean,
-  menu?: { menuIcon?: IconComponent; menuLabel?: string },
-) {
+interface MenuOpts {
+  menuIcon?: IconComponent;
+  menuIconOpen?: IconComponent;
+  menuLabel?: string;
+  menuLabelVisible?: boolean;
+  menuLabelContent?: React.ReactNode;
+}
+
+function renderTopBarPopover(menuOpen: boolean, menu?: MenuOpts) {
   return render(
     <MemoryRouter initialEntries={["/"]}>
       <FrameProvider value={{ title: "App", nav, crumbs: emptyResolvers } as unknown as FrameContextValue}>
@@ -40,7 +51,10 @@ function renderTopBarPopover(
           menuOpen={menuOpen}
           onCloseMenu={() => {}}
           menuIcon={menu?.menuIcon}
+          menuIconOpen={menu?.menuIconOpen}
           menuLabel={menu?.menuLabel}
+          menuLabelVisible={menu?.menuLabelVisible}
+          menuLabelContent={menu?.menuLabelContent}
         />
       </FrameProvider>
     </MemoryRouter>,
@@ -110,4 +124,61 @@ test("hides back/forward buttons when history buttons are disabled", () => {
   renderTopBar("/a/b", false, false);
   expect(screen.queryByLabelText("Back")).toBeNull();
   expect(screen.queryByLabelText("Forward")).toBeNull();
+});
+
+test("hides the breadcrumb entirely when breadcrumbHidden is set", () => {
+  const { container } = renderTopBar("/reports/archive", false, true, true);
+  expect(screen.queryByText("Reports")).toBeNull();
+  expect(screen.queryByText("Archive")).toBeNull();
+  expect(container.querySelector("[data-slot=breadcrumbs]")).toBeNull();
+});
+
+test("swaps to the open-state icon while the popover is open", () => {
+  const Closed: IconComponent = (p) => <svg data-testid="closed-icon" {...p} />;
+  const Open: IconComponent = (p) => <svg data-testid="open-icon" {...p} />;
+  renderTopBarPopover(false, { menuIcon: Closed, menuIconOpen: Open });
+  expect(screen.getByTestId("closed-icon")).toBeTruthy();
+  expect(screen.queryByTestId("open-icon")).toBeNull();
+  cleanup();
+  renderTopBarPopover(true, { menuIcon: Closed, menuIconOpen: Open });
+  expect(screen.getByTestId("open-icon")).toBeTruthy();
+  expect(screen.queryByTestId("closed-icon")).toBeNull();
+});
+
+test("open state falls back to a default icon (not the closed icon) when menuIconOpen is unset", () => {
+  const Closed: IconComponent = (p) => <svg data-testid="closed-icon" {...p} />;
+  renderTopBarPopover(true, { menuIcon: Closed });
+  // Open uses the chevron default, so the closed override must not be showing.
+  expect(screen.queryByTestId("closed-icon")).toBeNull();
+});
+
+test("shows the menu label text when menuLabelVisible, keeping it as the accessible name", () => {
+  renderTopBarPopover(false, { menuLabel: "Navigation", menuLabelVisible: true });
+  expect(screen.getByText("Navigation")).toBeTruthy();
+  expect(screen.getByLabelText("Navigation")).toBeTruthy();
+});
+
+test("keeps the label invisible (accessible name only) when menuLabelVisible is off", () => {
+  renderTopBarPopover(false, { menuLabel: "Navigation" });
+  expect(screen.queryByText("Navigation")).toBeNull();
+  expect(screen.getByLabelText("Navigation")).toBeTruthy();
+});
+
+test("renders a custom image/JSX label, still announcing the string accessible name", () => {
+  renderTopBarPopover(false, {
+    menuLabel: "Brand",
+    menuLabelVisible: true,
+    menuLabelContent: <img data-testid="label-img" alt="" src="x" />,
+  });
+  expect(screen.getByTestId("label-img")).toBeTruthy();
+  expect(screen.getByLabelText("Brand")).toBeTruthy();
+  // The custom content replaces the text label.
+  expect(screen.queryByText("Brand")).toBeNull();
+});
+
+test("renders a centered top-bar slot region", () => {
+  const { container } = renderTopBar("/");
+  const center = container.querySelector("[data-slot=topbar-center]");
+  expect(center).not.toBeNull();
+  expect(center?.className).toContain("-translate-x-1/2");
 });
