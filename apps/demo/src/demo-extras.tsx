@@ -151,12 +151,18 @@ function DrawerTrigger() {
 export const demoExtrasPlugin: FramePlugin = {
   id: "demo.extras",
   version: "0.0.0",
-  routes: [{ path: "notes", lazy: () => Promise.resolve({ default: DraftPage }), crumb: "Notes" }],
+  routes: [
+    { path: "notes", lazy: () => Promise.resolve({ default: DraftPage }), crumb: "Notes" },
+    { path: "drawer-lab", lazy: () => import("./demo-drawer-lab"), crumb: "Drawer lab" },
+  ],
   nav: [
     {
       id: "demo.main",
       order: 10,
-      items: [{ id: "demo.notes", label: "Notes", to: "/notes", order: 10 }],
+      items: [
+        { id: "demo.notes", label: "Notes", to: "/notes", order: 10 },
+        { id: "demo.drawer-lab", label: "Drawer lab", to: "/drawer-lab", icon: PanelRight, order: 20 },
+      ],
     },
     {
       id: "demo.resources",
