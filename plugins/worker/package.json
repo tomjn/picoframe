@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/plugin-worker",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Example long-lived sidecar plugin for picoframe (frontend half): calls a persistent Bun server and streams progress",
   "license": "MIT",
   "repository": {
