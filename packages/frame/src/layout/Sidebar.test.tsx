@@ -18,6 +18,20 @@ function renderSidebar(groups: NavGroup[]) {
 
 const oneItem: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
 
+/** Render the sidebar at a given URL and return the nav item link for `label`. */
+function renderAt(path: string, groups: NavGroup[], label: string) {
+  const { container } = render(
+    <MemoryRouter initialEntries={[path]}>
+      <Sidebar groups={groups} collapsed={false} width={200} onResize={() => {}} />
+    </MemoryRouter>,
+  );
+  const link = [...container.querySelectorAll("[data-nav-item]")].find((el) => el.textContent === label);
+  return link as HTMLElement | undefined;
+}
+
+// The active-state class only present when an item is highlighted.
+const ACTIVE = "font-medium";
+
 test("collapsed rail still renders nav item icons", () => {
   const { container } = render(
     <MemoryRouter>
@@ -130,6 +144,44 @@ test("adding a useVisible item to an existing group at runtime does not break ho
   );
   expect(screen.getByText("Alpha")).toBeTruthy();
   expect(screen.getByText("Beta")).toBeTruthy();
+});
+
+test("matches lights the item on an unrelated route, without matches it stays inactive", () => {
+  const withMatches: NavGroup[] = [
+    { id: "main", items: [{ id: "home", label: "Home", to: "/", end: true, matches: ["/catch-up"] }] },
+  ];
+  const withoutMatches: NavGroup[] = [
+    { id: "main", items: [{ id: "home", label: "Home", to: "/", end: true }] },
+  ];
+  expect(renderAt("/catch-up", withMatches, "Home")?.className).toContain(ACTIVE);
+  cleanup();
+  expect(renderAt("/catch-up", withoutMatches, "Home")?.className).not.toContain(ACTIVE);
+});
+
+test("matches patterns match sub-routes as a prefix", () => {
+  const groups: NavGroup[] = [
+    { id: "main", items: [{ id: "home", label: "Home", to: "/", end: true, matches: ["/catch-up"] }] },
+  ];
+  expect(renderAt("/catch-up/mentions", groups, "Home")?.className).toContain(ACTIVE);
+});
+
+test("activeWhen predicate forces the active state", () => {
+  const groups: NavGroup[] = [
+    {
+      id: "main",
+      items: [{ id: "home", label: "Home", to: "/", end: true, activeWhen: (p) => p.startsWith("/reports") }],
+    },
+  ];
+  expect(renderAt("/reports/q1", groups, "Home")?.className).toContain(ACTIVE);
+  cleanup();
+  expect(renderAt("/elsewhere", groups, "Home")?.className).not.toContain(ACTIVE);
+});
+
+test("the item's own route still lights it (default NavLink behaviour preserved)", () => {
+  const groups: NavGroup[] = [
+    { id: "main", items: [{ id: "a", label: "Alpha", to: "/a", matches: ["/other"] }] },
+  ];
+  expect(renderAt("/a", groups, "Alpha")?.className).toContain(ACTIVE);
 });
 
 const StarIcon = ({ className }: { size?: number; className?: string }) => (

@@ -21,7 +21,7 @@ createRoot(root).render(<AppFrame plugins={plugins} title="My app" />);
 | --- | --- |
 | `AppFrame` | The application shell component |
 | `framePlugin` | Built-in plugin (home route launcher) |
-| `useFrame`, `useNavigationStack`, `useDrawer` | Hooks |
+| `useFrame`, `useNavigationStack`, `useDrawer`, `useSidebarState` | Hooks |
 | `ThemeProvider`, `useTheme` | Theming |
 | `Slot` | Named slot for plugin contributions |
 | `cn` | Class-name merge helper |
@@ -122,6 +122,22 @@ useEffect(() => setBadge(credentialStale), [credentialStale]);
 The badge value is `true` (an attention dot), a number (a count bubble), any other node
 (rendered in the bubble), or `false`/`null` (nothing). It's a single shared slot — one
 app-level owner, last writer wins.
+
+## Sidebar collapse
+
+The frame owns the docked sidebar's collapse state. `useSidebarState()` exposes it so an
+app-level command surface (command palette, keyboard shortcut) can drive it:
+
+```tsx
+import { useSidebarState } from "@picoframe/frame";
+
+const { collapsed, setCollapsed, toggle } = useSidebarState();
+// wire `toggle` into a "Toggle sidebar" command
+```
+
+It is backed by the frame's shared persistent store, so this hook and the top-bar toggle
+stay in sync live. This controls the *docked* rail; in `popover` layout mode the sidebar is
+a separate overlay, so `toggle` has no visible effect there.
 
 ## Theming
 
