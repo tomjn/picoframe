@@ -4,7 +4,7 @@
 //! envelope the frontend's typed `defineCommand` bindings unwrap. This mirrors
 //! the engineer-assist `CliResult` pattern but trimmed to the essentials.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tauri::{
     plugin::{Builder, TauriPlugin},
@@ -14,13 +14,16 @@ use tauri::{
 #[cfg(target_os = "macos")]
 mod mouse_nav;
 
+pub mod sidecar;
+pub use sidecar::{Sidecar, SidecarOptions};
+
 /// Uniform result envelope returned by picoframe plugin commands.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CliResult {
     pub success: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default)]
     pub data: Option<Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default)]
     pub error: Option<String>,
 }
 
