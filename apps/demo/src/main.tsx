@@ -31,6 +31,7 @@ function DemoApp() {
         sidebar: {
           popover: { default: false, userConfigurable: true },
           hideWhenCollapsed: { default: false, userConfigurable: true },
+          hoverReveal: { default: false, userConfigurable: true },
           menuLabelVisible,
           menuLabelContent: useImageLabel ? (
             <img src={DEMO_LOGO} alt="" className="h-5 w-5 rounded" />
