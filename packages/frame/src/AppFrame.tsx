@@ -12,6 +12,7 @@ import { composeNav } from "./nav/composeNav";
 import { buildRoutes } from "./routing/buildRoutes";
 import { buildCrumbResolvers } from "./routing/crumbs";
 import { composeSettings } from "./settings/composeSettings";
+import { SettingsBadgeProvider } from "./settings/SettingsBadge";
 import { PersistentStoreProvider } from "./settings/SettingsStoreProvider";
 import { settingsPlugin } from "./settings/settingsPlugin";
 import type { PersistentStorage } from "./settings/storage";
@@ -122,7 +123,7 @@ export function AppFrame({
                   <FrameProvider
                     value={{ title, nav, crumbs, settings, fallback: fallback ?? <DefaultFallback /> }}
                   >
-                    {routed}
+                    <SettingsBadgeProvider>{routed}</SettingsBadgeProvider>
                   </FrameProvider>
                 </LayoutConfigProvider>
               </DrawerProvider>

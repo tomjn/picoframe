@@ -106,6 +106,23 @@ useSidecarProgress("picoframe://sidecar/worker"); // listens on ".../progress"
 
 This progress primitive lives in the frame (not the registry) because npm-published plugins can only import from `@picoframe/frame`.
 
+## Settings footer badge
+
+The frame's Settings footer link can carry an indicator so an app can surface "something in
+settings needs you" (e.g. a stale integration credential). `useSettingsBadge()` reads and sets
+it from anywhere inside `<AppFrame>`:
+
+```tsx
+import { useSettingsBadge } from "@picoframe/frame";
+
+const { setBadge } = useSettingsBadge();
+useEffect(() => setBadge(credentialStale), [credentialStale]);
+```
+
+The badge value is `true` (an attention dot), a number (a count bubble), any other node
+(rendered in the bubble), or `false`/`null` (nothing). It's a single shared slot — one
+app-level owner, last writer wins.
+
 ## Sidebar collapse
 
 The frame owns the docked sidebar's collapse state. `useSidebarState()` exposes it so an
