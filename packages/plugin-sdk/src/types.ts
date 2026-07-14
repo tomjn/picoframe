@@ -21,6 +21,21 @@ export interface NavItem {
   /** Exact-match the link (React Router NavLink `end`). */
   end?: boolean;
   /**
+   * Additional route patterns that force this item's active (highlighted) state, on top of
+   * the default NavLink match against `to`. Useful when an item is the conceptual home for
+   * sibling routes at unrelated paths (e.g. a Home item that should stay lit on `/catch-up`).
+   * Each pattern is matched as a prefix (React Router `matchPath`, `end: false`) and may carry
+   * `:params` or a `*` splat: `matches: ["/catch-up", "/inbox/*"]`. Purely presentational —
+   * it changes only the highlight, not routing or the link target.
+   */
+  matches?: string[];
+  /**
+   * Full control over the item's forced active state: a predicate of the current pathname,
+   * evaluated on every navigation. Return `true` to force the highlight. Combined (OR) with the
+   * default NavLink match and any `matches` patterns. Purely presentational, like `matches`.
+   */
+  activeWhen?: (pathname: string) => boolean;
+  /**
    * Show this item in the sidebar. Default `true`; set `false` for items that should
    * only appear on the home launcher (e.g. an external docs link you don't want
    * cluttering the sidebar).

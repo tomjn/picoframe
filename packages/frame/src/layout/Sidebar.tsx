@@ -5,7 +5,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   useState,
 } from "react";
-import { NavLink } from "react-router";
+import { NavLink, matchPath, useLocation } from "react-router";
 import { cn } from "../lib/cn";
 import { useResolvedNavItem } from "../nav/useResolvedNavItem";
 import { openExternal } from "../lib/openExternal";
@@ -30,7 +30,17 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
   // order. Resolved unconditionally before the early return below. `description` is
   // launcher-only and ignored here.
   const { visible, label, icon: Icon } = useResolvedNavItem(item);
+  // Read location so `matches` / `activeWhen` re-evaluate on every navigation. Hooks run
+  // before the early return; `visible` gates rendering, not the hook order.
+  const { pathname } = useLocation();
   if (!visible) return null;
+
+  // Force the highlight when an item is the conceptual home for routes at other paths.
+  // OR of the prefix-matched `matches` patterns and the `activeWhen` predicate; combined
+  // with NavLink's own `isActive` below.
+  const forcedActive =
+    (item.matches?.some((p) => matchPath({ path: p, end: false }, pathname) != null) ?? false) ||
+    (item.activeWhen?.(pathname) ?? false);
 
   const glyph = Icon ? (
     <Icon size={18} className="shrink-0" />
@@ -64,7 +74,7 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
       className={({ isActive }) =>
         cn(
           navItemBase,
-          isActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+          (isActive || forcedActive) && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
           collapsed && "justify-center",
         )
       }
