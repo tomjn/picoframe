@@ -13,7 +13,10 @@ import { DrawerProvider } from "../drawer/DrawerProvider";
 import type { CrumbResolvers } from "../routing/crumbs";
 import { AppLayout } from "./AppLayout";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  localStorage.clear();
+});
 
 const nav: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
 const emptyResolvers: CrumbResolvers = { static: new Map(), patterns: [], routes: [] };
@@ -50,4 +53,18 @@ test("popover mode drops the persistent sidebar and opens the popover from the m
   fireEvent.click(screen.getByLabelText("Menu"));
   expect(container.querySelector("[data-slot=sidebar-popover]")).not.toBeNull();
   expect(screen.getByText("Alpha")).toBeTruthy();
+});
+
+test("hover-reveal mode mounts the floating panel once the sidebar is collapsed", () => {
+  const { container } = renderLayout({ sidebar: { hoverReveal: true } });
+  // Expanded: the docked sidebar is shown and there's nothing to reveal yet.
+  expect(container.querySelector("[data-slot=sidebar-reveal-panel]")).toBeNull();
+  fireEvent.click(screen.getByLabelText("Toggle sidebar"));
+  expect(container.querySelector("[data-slot=sidebar-reveal-panel]")).not.toBeNull();
+});
+
+test("popover wins over hover-reveal: no floating panel, no docked sidebar", () => {
+  const { container } = renderLayout({ sidebar: { popover: true, hoverReveal: true } });
+  expect(container.querySelector("[data-slot=sidebar]")).toBeNull();
+  expect(container.querySelector("[data-slot=sidebar-reveal-panel]")).toBeNull();
 });

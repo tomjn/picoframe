@@ -22,6 +22,12 @@ export interface LayoutConfig {
     hideWhenCollapsed?: Configurable<boolean>;
     /** No persistent sidebar; a menu button opens it as an overlay popover. */
     popover?: Configurable<boolean>;
+    /**
+     * When collapsed, hide the sidebar fully and slide a floating panel out on hovering
+     * the left edge (or the toggle button, or activating the edge trigger by keyboard).
+     * Ignored when `popover` is on — that mode has no persistent sidebar to reveal from.
+     */
+    hoverReveal?: Configurable<boolean>;
     /** In popover mode, the menu button's icon while closed (defaults to a hamburger menu). */
     menuIcon?: IconComponent;
     /** In popover mode, the menu button's icon while the popover is open (defaults to a chevron). */
@@ -48,6 +54,7 @@ export interface LayoutConfig {
 export interface ResolvedLayoutConfig {
   hideWhenCollapsed: OptionDescriptor<boolean>;
   popover: OptionDescriptor<boolean>;
+  hoverReveal: OptionDescriptor<boolean>;
   breadcrumbCollapsed: OptionDescriptor<boolean>;
   historyButtons: OptionDescriptor<boolean>;
   /** Hide the breadcrumb region entirely (static app config). */
@@ -63,7 +70,12 @@ export interface ResolvedLayoutConfig {
 }
 
 /** The user-toggleable boolean options — deliberately excludes the static `menuButton`. */
-export type LayoutOptionKey = "hideWhenCollapsed" | "popover" | "breadcrumbCollapsed" | "historyButtons";
+export type LayoutOptionKey =
+  | "hideWhenCollapsed"
+  | "popover"
+  | "hoverReveal"
+  | "breadcrumbCollapsed"
+  | "historyButtons";
 
 /** Resolve one `Configurable` into a descriptor. Bare value → locked; object → exposed. */
 export function resolveOption<T>(cfg: Configurable<T> | undefined, fallback: T): OptionDescriptor<T> {
@@ -85,6 +97,11 @@ export const LAYOUT_OPTIONS: { key: LayoutOptionKey; label: string; description:
     key: "hideWhenCollapsed",
     label: "Hide sidebar when collapsed",
     description: "Collapsing the sidebar hides it fully instead of showing an icon rail.",
+  },
+  {
+    key: "hoverReveal",
+    label: "Hover-reveal sidebar",
+    description: "When collapsed, hide the sidebar and slide it out on hovering the left edge.",
   },
   {
     key: "breadcrumbCollapsed",
@@ -111,6 +128,7 @@ export function LayoutConfigProvider({
     () => ({
       hideWhenCollapsed: resolveOption(config?.sidebar?.hideWhenCollapsed, false),
       popover: resolveOption(config?.sidebar?.popover, false),
+      hoverReveal: resolveOption(config?.sidebar?.hoverReveal, false),
       breadcrumbCollapsed: resolveOption(config?.breadcrumb?.collapsed, false),
       historyButtons: resolveOption(config?.history?.buttons, true),
       breadcrumbHidden: config?.breadcrumb?.hidden ?? false,

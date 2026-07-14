@@ -7,6 +7,7 @@ import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
 import { decodeSegment, isRoutePath, resolveCrumb, titleCase } from "../routing/crumbs";
 import { Slot } from "../slots/slots";
+import type { HoverRevealHandlers } from "./HoverRevealSidebar";
 import { SidebarPopover } from "./SidebarPopover";
 
 function IconButton({
@@ -51,9 +52,12 @@ export function TopBar({
   menuLabelVisible = false,
   menuLabelContent,
   showHistoryButtons = true,
+  toggleHoverHandlers,
 }: {
   title: string;
   onToggleSidebar: () => void;
+  /** In hover-reveal mode, hovering the toggle button is a reveal trigger. */
+  toggleHoverHandlers?: HoverRevealHandlers;
   /** Show only the current route header; reveal the full path on hover/focus. */
   breadcrumbCollapsed?: boolean;
   /** Hide the breadcrumb region entirely. */
@@ -146,7 +150,7 @@ export function TopBar({
       data-tauri-drag-region
       className="relative flex h-12 shrink-0 items-center gap-1 border-b border-border bg-background px-2"
     >
-      <div className="relative">
+      <div className="relative" {...toggleHoverHandlers}>
         {showMenuLabel ? (
           <button
             type="button"
