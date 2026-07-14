@@ -3,13 +3,37 @@ import { Palette, Settings as SettingsIcon } from "lucide-react";
 import { NavLink } from "react-router";
 import { cn } from "../lib/cn";
 import { AppearanceSettings } from "./AppearanceSettings";
+import { type SettingsBadge, useSettingsBadge } from "./SettingsBadge";
 
 /** Id of the built-in, frame-owned Appearance (theme) settings section. Declare a section
  *  with this `id` and `useVisible: () => false` from any plugin you pass to `AppFrame` to
  *  hide the theme UI (e.g. when the app forces a fixed theme). */
 export const FRAME_APPEARANCE_SETTINGS_ID = "frame.appearance";
 
+/** Render the footer-link indicator: a dot for `true`, a bubble for a count/node, else nothing. */
+function BadgeIndicator({ badge }: { badge: SettingsBadge }) {
+  if (badge === true) {
+    return (
+      <span
+        data-settings-badge="dot"
+        aria-hidden
+        className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-sidebar"
+      />
+    );
+  }
+  if (badge === false || badge === null || badge === undefined) return null;
+  return (
+    <span
+      data-settings-badge="count"
+      className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium leading-none text-primary-foreground ring-2 ring-sidebar"
+    >
+      {badge}
+    </span>
+  );
+}
+
 function SettingsFooterLink() {
+  const { badge } = useSettingsBadge();
   return (
     <NavLink
       to="/settings"
@@ -21,7 +45,10 @@ function SettingsFooterLink() {
         )
       }
     >
-      <SettingsIcon size={18} className="shrink-0" />
+      <span className="relative shrink-0">
+        <SettingsIcon size={18} className="shrink-0" />
+        <BadgeIndicator badge={badge} />
+      </span>
       <span className="truncate group-data-[collapsed]/sidebar:hidden">Settings</span>
     </NavLink>
   );
