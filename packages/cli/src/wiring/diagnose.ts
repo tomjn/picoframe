@@ -4,7 +4,11 @@
  * call, the capability grant, and the frontend manifest entry. A triad mismatch
  * (e.g. manifest entry present but capability missing) is the #1 silent
  * "not allowed by ACL" failure mode, so `doctor` checks all four independently.
+ *
+ * Sidecar plugins (those in {@link SIDECARS}) add a fifth point: their `externalBin`
+ * entries must be declared in `tauri.conf.json`, or the bundled server binary won't ship.
  */
+import { SIDECARS } from "./sidecar";
 
 export interface WiringSources {
   cargoToml: string;
@@ -12,6 +16,8 @@ export interface WiringSources {
   manifest: string;
   /** Contents of every file in `src-tauri/capabilities/`. */
   capabilities: string[];
+  /** Contents of `src-tauri/tauri.conf.json` (for the sidecar `externalBin` check). */
+  tauriConf: string;
 }
 
 export interface PluginDiagnosis {
@@ -20,6 +26,10 @@ export interface PluginDiagnosis {
   builderCall: boolean;
   capability: boolean;
   manifest: boolean;
+  /** `true` when the plugin is not a sidecar, or its `externalBin` entries are all declared. */
+  sidecar: boolean;
+  /** Whether this plugin bundles a sidecar (drives whether `sidecar` is shown by `doctor`). */
+  hasSidecar: boolean;
   ok: boolean;
 }
 
@@ -43,6 +53,20 @@ export function diagnose(s: WiringSources): PluginDiagnosis[] {
     const capability = s.capabilities.some((c) =>
       new RegExp(`picoframe-${escape(name)}:default`).test(c),
     );
-    return { name, cargoDep, builderCall, capability, manifest, ok: cargoDep && builderCall && capability && manifest };
+    // Sidecar plugins must declare every `externalBin` entry in tauri.conf.json; non-sidecar
+    // plugins have nothing extra to check (`sidecar` stays true).
+    const entries = SIDECARS[name];
+    const hasSidecar = entries != null;
+    const sidecar = !hasSidecar || entries.every((e) => s.tauriConf.includes(`"${e}"`));
+    return {
+      name,
+      cargoDep,
+      builderCall,
+      capability,
+      manifest,
+      sidecar,
+      hasSidecar,
+      ok: cargoDep && builderCall && capability && manifest && sidecar,
+    };
   });
 }

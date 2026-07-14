@@ -1,18 +1,21 @@
 /**
- * Sidecar wiring. A few plugins (e.g. prdownloader) bundle an external binary as
- * a Tauri `externalBin`. That binary must be declared in the app's
- * `tauri.conf.json` `bundle.externalBin` array — the one wiring point beyond the
- * uniform five (npm dep, Cargo dep, builder call, manifest entry, capability).
+ * Sidecar wiring. Some plugins (e.g. `worker`) bundle a long-lived local server as a Tauri
+ * `externalBin`. That binary must be declared in the app's `tauri.conf.json`
+ * `bundle.externalBin` array — the one wiring point beyond the uniform five (npm dep, Cargo
+ * dep, builder call, manifest entry, capability).
  *
- * The binary file itself can't be produced by the CLI (it is built/fetched per
- * platform); `add` declares the config and prints a setup note instead.
+ * The binary file itself can't be produced by the CLI (it is built per platform, e.g. via the
+ * plugin's `build:sidecar` script); `add` declares the config and prints a setup note instead.
  */
 
 /**
- * Short plugin name -> `externalBin` config entries (target-triple stripped).
- * Empty until a first-party sidecar plugin lands; the wiring below stays ready.
+ * Short plugin name -> `externalBin` config entries (target-triple stripped). The `worker`
+ * plugin bundles a long-lived Bun server compiled to `binaries/picoframe-worker-sidecar`
+ * (Tauri appends the platform triple per build).
  */
-export const SIDECARS: Record<string, string[]> = {};
+export const SIDECARS: Record<string, string[]> = {
+  worker: ["binaries/picoframe-worker-sidecar"],
+};
 
 const BUNDLE_RE = /^(\s*)"bundle"\s*:\s*\{/;
 
