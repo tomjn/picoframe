@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-picoframe-worker"
-version = "0.0.1"
+version = "0.5.0"
 description = "Example long-lived sidecar plugin for picoframe (Rust half). ACL identifier: picoframe-worker"
 edition.workspace = true
 license.workspace = true
