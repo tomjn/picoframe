@@ -73,8 +73,11 @@ test("scaffold writes a real .gitignore (npm strips a literal .gitignore, so the
   expect(gi).toContain("src-tauri/target");
 });
 
-test("frame-only app.plugins.ts + add hello reproduces the demo byte-for-byte", () => {
-  const wired = insertPluginIntoManifest(read("src/app.plugins.ts"), hello);
+test("frame-only app.plugins.ts + add hello + worker reproduces the demo byte-for-byte", () => {
+  // The demo wires both first-party plugins; the manifest region is kept sorted, so adding
+  // hello then worker reproduces it regardless of order.
+  let wired = insertPluginIntoManifest(read("src/app.plugins.ts"), hello);
+  wired = insertPluginIntoManifest(wired, pluginNames("worker"));
   expect(wired).toBe(demo("src/app.plugins.ts"));
 });
 

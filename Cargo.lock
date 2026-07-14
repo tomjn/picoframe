@@ -2459,6 +2459,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-opener",
  "tauri-plugin-picoframe-hello",
+ "tauri-plugin-picoframe-worker",
  "tauri-plugin-store",
 ]
 

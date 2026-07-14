@@ -15,3 +15,4 @@ tauri-plugin-opener = { workspace = true }
 tauri-plugin-store = { workspace = true }
 picoframe-core = { workspace = true }
 tauri-plugin-picoframe-hello = { workspace = true }
+tauri-plugin-picoframe-worker = { workspace = true }
