@@ -8,12 +8,13 @@ import { usePersistentState } from "../lib/usePersistentState";
 import { HoverRevealSidebar, useHoverReveal } from "./HoverRevealSidebar";
 import { RouteHost } from "./RouteHost";
 import { Sidebar, SIDEBAR_DEFAULT_WIDTH } from "./Sidebar";
+import { useSidebarState } from "./useSidebarState";
 import { TopBar } from "./TopBar";
 
 /** The frame's single layout route: sidebar + top bar + routed content. */
 export function AppLayout() {
   const { nav, title } = useFrame();
-  const [collapsed, setCollapsed] = usePersistentState("picoframe.sidebar.collapsed", false);
+  const { collapsed, setCollapsed } = useSidebarState();
   const [width, setWidth] = usePersistentState("picoframe.sidebar.width", SIDEBAR_DEFAULT_WIDTH);
   const [popover] = useLayoutOption("popover");
   const [hideWhenCollapsed] = useLayoutOption("hideWhenCollapsed");
