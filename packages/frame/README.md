@@ -45,6 +45,14 @@ author owns the copied source. `Select`/`Checkbox`/`Textarea`/etc. will **never*
 exports of this package — use `shadcn add @picoframe/<name>`. See
 [`../registry/README.md`](../registry/README.md) and the repo `AGENTS.md`.
 
+## Theming
+
+The frame's design tokens ship as `@picoframe/frame/theme.css` (mode / accent / base axes).
+See [THEMING.md](THEMING.md) for the token model, a copy-pasteable **app-local token overlay**
+snippet (semantic status/link tokens layered on without forking the theme), guidance on when an
+overlay should track the accent/base, and how to consume `theme.css` standalone before adopting
+`AppFrame`.
+
 ## License
 
 MIT
