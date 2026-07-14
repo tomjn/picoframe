@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/frame",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "Reusable Tauri v2 app-frame React shell: sidebar, top bar, hash routing, nav and slot composition, theme",
   "license": "MIT",
   "repository": {
@@ -30,6 +30,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "radix-ui": "^1.6.0",
+    "sonner": "^2.0.0",
     "tailwind-merge": "^3.6.0",
     "lucide-react": "^1.16.0"
   },

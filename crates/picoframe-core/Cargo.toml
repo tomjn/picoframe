@@ -1,6 +1,6 @@
 [package]
 name = "picoframe-core"
-version = "0.0.4"
+version = "0.1.0"
 description = "Core types and the base frame plugin for picoframe Tauri apps"
 edition.workspace = true
 license.workspace = true
@@ -11,6 +11,10 @@ tauri = { workspace = true }
 tauri-plugin-store = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+# Sidecar lifecycle: a blocking loopback-HTTP client (no TLS — 127.0.0.1 only) for the
+# health/command/SSE calls, plus OS randomness for the per-spawn shared-secret token.
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json"] }
+getrandom = "0.2"
 
 # macOS-only: native NSEvent monitor that emits `mouse-nav` for the X1/X2 mouse
 # buttons, which WKWebView does not deliver to the DOM (unlike Windows/Linux).

@@ -7,6 +7,7 @@
       "@picoframe/frame": ["./packages/frame/src/index.ts"],
       "@picoframe/store": ["./packages/store/src/index.ts"],
       "@picoframe/plugin-hello": ["./plugins/hello/src/index.ts"],
+      "@picoframe/plugin-worker": ["./plugins/worker/src/index.ts"],
       "@/*": ["./apps/demo/src/*"]
     }
   },
@@ -16,6 +17,7 @@
     "packages/store/src",
     "packages/cli/src",
     "plugins/hello/src",
+    "plugins/worker/src",
     "apps/demo/src",
     "apps/demo/vite.config.ts"
   ]

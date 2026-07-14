@@ -12,10 +12,12 @@ import { depLine, insertCargoDependency } from "./cargo";
 import { arrayEntry, importLine, insertPluginIntoManifest } from "./manifest";
 import { insertNpmDependency } from "./npm-deps";
 import { insertPluginIntoBuilder, pluginLine } from "./rust-builder";
+import { SIDECARS, insertExternalBin } from "./sidecar";
 
 const repoRoot = `${import.meta.dir}/../../../..`;
 const demo = (rel: string) => readFileSync(`${repoRoot}/apps/demo/${rel}`, "utf8");
 const names = pluginNames("hello");
+const worker = pluginNames("worker");
 
 test("main.rs: add hello reproduces the demo builder", () => {
   const after = demo("src-tauri/src/main.rs");
@@ -24,11 +26,23 @@ test("main.rs: add hello reproduces the demo builder", () => {
   expect(insertPluginIntoBuilder(before, names.crateName)).toBe(after);
 });
 
-test("Cargo.toml: add hello reproduces the demo dependency", () => {
+test("Cargo.toml: add hello + worker reproduces the demo dependencies", () => {
+  // Cargo deps append in insertion order (no sort), so reverse both and re-add in order.
   const after = demo("src-tauri/Cargo.toml");
-  const before = after.replace(`\n${depLine(names.crateName)}`, "");
+  const before = after
+    .replace(`\n${depLine(names.crateName)}`, "")
+    .replace(`\n${depLine(worker.crateName)}`, "");
   expect(before).not.toBe(after);
-  expect(insertCargoDependency(before, names.crateName)).toBe(after);
+  const wired = insertCargoDependency(insertCargoDependency(before, names.crateName), worker.crateName);
+  expect(wired).toBe(after);
+});
+
+test("tauri.conf.json: add worker declares the demo's sidecar externalBin", () => {
+  const after = demo("src-tauri/tauri.conf.json");
+  expect(after).toContain('"externalBin"');
+  // Already-declared is idempotent; and the declaration matches the SIDECARS registry.
+  expect(insertExternalBin(after, SIDECARS.worker)).toBe(after);
+  expect(after).toContain('"binaries/picoframe-worker-sidecar"');
 });
 
 test("package.json: add hello reproduces the demo dependency", () => {
@@ -47,6 +61,10 @@ test("app.plugins.ts: add hello reproduces the demo manifest", () => {
 
 test("capability: serialized hello grant equals the demo file", () => {
   expect(serializeCapability(buildCapability(names))).toBe(demo("src-tauri/capabilities/hello.json"));
+});
+
+test("capability: serialized worker grant equals the demo file", () => {
+  expect(serializeCapability(buildCapability(worker))).toBe(demo("src-tauri/capabilities/worker.json"));
 });
 
 test("all wiring is idempotent against the already-wired demo", () => {

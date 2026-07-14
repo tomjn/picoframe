@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "bun run --cwd ../../plugins/worker build:sidecar",
     "dev": "vite",
+    "prebuild": "bun run --cwd ../../plugins/worker build:sidecar",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
@@ -12,6 +14,7 @@
   "dependencies": {
     "@picoframe/frame": "workspace:*",
     "@picoframe/plugin-hello": "workspace:*",
+    "@picoframe/plugin-worker": "workspace:*",
     "@picoframe/plugin-sdk": "workspace:*",
     "@picoframe/store": "workspace:*",
     "@tauri-apps/api": "^2.11.0",

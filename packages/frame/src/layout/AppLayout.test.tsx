@@ -7,6 +7,7 @@ import { MemoryRouter } from "react-router";
 mock.module("@tauri-apps/api/event", () => ({ listen: () => Promise.resolve(() => {}) }));
 import type { NavGroup } from "@picoframe/plugin-sdk";
 import { FrameProvider, type FrameContextValue } from "../context/frame";
+import { ThemeProvider } from "../context/theme";
 import { LayoutConfigProvider, type LayoutConfig } from "../context/layoutConfig";
 import { DrawerProvider } from "../drawer/DrawerProvider";
 import type { CrumbResolvers } from "../routing/crumbs";
@@ -20,15 +21,17 @@ const emptyResolvers: CrumbResolvers = { static: new Map(), patterns: [], routes
 function renderLayout(config?: LayoutConfig) {
   return render(
     <MemoryRouter initialEntries={["/"]}>
-      <DrawerProvider>
-        <LayoutConfigProvider config={config}>
-          <FrameProvider
-            value={{ title: "App", nav, crumbs: emptyResolvers, fallback: null } as unknown as FrameContextValue}
-          >
-            <AppLayout />
-          </FrameProvider>
-        </LayoutConfigProvider>
-      </DrawerProvider>
+      <ThemeProvider>
+        <DrawerProvider>
+          <LayoutConfigProvider config={config}>
+            <FrameProvider
+              value={{ title: "App", nav, crumbs: emptyResolvers, fallback: null } as unknown as FrameContextValue}
+            >
+              <AppLayout />
+            </FrameProvider>
+          </LayoutConfigProvider>
+        </DrawerProvider>
+      </ThemeProvider>
     </MemoryRouter>,
   );
 }

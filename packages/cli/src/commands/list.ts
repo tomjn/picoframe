@@ -1,7 +1,7 @@
 /**
  * `picoframe list` — first-party plugins and whether each is wired into this app.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { FIRST_PARTY, pluginNames } from "../naming";
 import { diagnose } from "../wiring/diagnose";
 import { appPaths, assertApp, readCapabilities } from "./app";
@@ -14,6 +14,7 @@ export function list(appDir: string): void {
     mainRs: readFileSync(p.mainRs, "utf8"),
     manifest: readFileSync(p.manifest, "utf8"),
     capabilities: readCapabilities(p),
+    tauriConf: existsSync(p.tauriConf) ? readFileSync(p.tauriConf, "utf8") : "",
   });
   const byName = new Map(results.map((d) => [d.name, d]));
 

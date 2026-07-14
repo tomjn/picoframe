@@ -2,7 +2,7 @@
  * `picoframe doctor` — verify the per-plugin wiring invariant across the app.
  * Exits non-zero if any referenced plugin is only partially wired.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { diagnose, type PluginDiagnosis } from "../wiring/diagnose";
 import { appPaths, assertApp, readCapabilities } from "./app";
 
@@ -14,8 +14,10 @@ function reportLine(d: PluginDiagnosis): string {
     `builder:${tick(d.builderCall)}`,
     `capability:${tick(d.capability)}`,
     `manifest:${tick(d.manifest)}`,
-  ].join("  ");
-  return `${d.ok ? "PASS" : "FAIL"}  ${d.name.padEnd(14)} ${parts}`;
+  ];
+  // Only sidecar plugins have an externalBin to verify; hide the column for the rest.
+  if (d.hasSidecar) parts.push(`sidecar:${tick(d.sidecar)}`);
+  return `${d.ok ? "PASS" : "FAIL"}  ${d.name.padEnd(14)} ${parts.join("  ")}`;
 }
 
 export function doctor(appDir: string): number {
@@ -26,6 +28,7 @@ export function doctor(appDir: string): number {
     mainRs: readFileSync(p.mainRs, "utf8"),
     manifest: readFileSync(p.manifest, "utf8"),
     capabilities: readCapabilities(p),
+    tauriConf: existsSync(p.tauriConf) ? readFileSync(p.tauriConf, "utf8") : "",
   });
 
   if (results.length === 0) {

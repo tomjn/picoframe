@@ -8,6 +8,7 @@ fn main() {
         .plugin(tauri_plugin_store::Builder::default().build());
     // picoframe:plugins-start
     builder = builder.plugin(tauri_plugin_picoframe_hello::init());
+    builder = builder.plugin(tauri_plugin_picoframe_worker::init());
     // picoframe:plugins-end
     builder
         .setup(|app| {

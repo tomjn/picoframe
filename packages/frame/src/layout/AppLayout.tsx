@@ -3,6 +3,7 @@ import { useMouseNavigation } from "../history/useMouseNavigation";
 import { useFrame } from "../context/frame";
 import { useLayoutConfig, useLayoutOption } from "../context/layoutConfig";
 import { DrawerHost } from "../drawer/DrawerHost";
+import { Toaster } from "../toast/Toaster";
 import { usePersistentState } from "../lib/usePersistentState";
 import { RouteHost } from "./RouteHost";
 import { Sidebar, SIDEBAR_DEFAULT_WIDTH } from "./Sidebar";
@@ -56,6 +57,7 @@ export function AppLayout() {
         </main>
       </div>
       <DrawerHost />
+      <Toaster position="bottom-right" closeButton />
     </div>
   );
 }

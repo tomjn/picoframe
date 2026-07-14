@@ -89,6 +89,23 @@ Set a **provider-level default** for every drawer via `<AppFrame drawer={{ conta
 The dialog focus trap fights the browser's native `<select>` popup, so a native `<select>` inside a
 drawer misbehaves. Use the registry `select` component (`npx shadcn add @picoframe/select`) instead.
 
+## Toasts & sidecar progress
+
+The frame mounts a theme-aware toast surface (`Toaster`, built on [sonner](https://sonner.emilkowal.ski/)) automatically, and re-exports `toast` so a plugin can raise notifications without importing sonner or a registry component:
+
+```tsx
+import { toast } from "@picoframe/frame";
+toast.success("Saved");
+```
+
+For plugins backed by a [sidecar](../../docs/sidecar.md) (a long-lived local server), `useSidecarProgress` drives a single self-updating toast from the sidecar's streamed progress:
+
+```tsx
+useSidecarProgress("picoframe://sidecar/worker"); // listens on ".../progress"
+```
+
+This progress primitive lives in the frame (not the registry) because npm-published plugins can only import from `@picoframe/frame`.
+
 ## Theming
 
 The frame's design tokens ship as `@picoframe/frame/theme.css` (mode / accent / base axes).

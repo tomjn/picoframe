@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-worker-status"
+description = "Enables the worker_status command without any pre-configured scope."
+commands.allow = ["worker_status"]
+
+[[permission]]
+identifier = "deny-worker-status"
+description = "Denies the worker_status command without any pre-configured scope."
+commands.deny = ["worker_status"]

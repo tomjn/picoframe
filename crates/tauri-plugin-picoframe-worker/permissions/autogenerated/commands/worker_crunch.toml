@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-worker-crunch"
+description = "Enables the worker_crunch command without any pre-configured scope."
+commands.allow = ["worker_crunch"]
+
+[[permission]]
+identifier = "deny-worker-crunch"
+description = "Denies the worker_crunch command without any pre-configured scope."
+commands.deny = ["worker_crunch"]
