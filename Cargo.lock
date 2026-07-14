@@ -2437,7 +2437,7 @@ dependencies = [
 
 [[package]]
 name = "picoframe-core"
-version = "0.0.4"
+version = "0.1.0"
 dependencies = [
  "block2",
  "getrandom 0.2.17",

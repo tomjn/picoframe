@@ -22,12 +22,14 @@ packages/
   cli/          @picoframe/cli          Wires plugins into an app: create / add / list / doctor
   registry/     @picoframe/registry     shadcn source registry (owned, copy-in primitives)
 plugins/
-  hello/        @picoframe/plugin-hello Example plugin: nav group, lazy routes, top-bar slot, typed IPC
+  hello/        @picoframe/plugin-hello  Example plugin: nav group, lazy routes, top-bar slot, typed IPC
+  worker/       @picoframe/plugin-worker Example sidecar plugin: a long-lived Bun server with streaming progress
 apps/
-  demo/         @picoframe/demo         Reference app composing the frame + hello plugin
+  demo/         @picoframe/demo          Reference app composing the frame + hello + worker plugins
 crates/
-  picoframe-core/                       Shared Rust core (e.g. native mouse-nav)
-  tauri-plugin-picoframe-hello/         Backend half of the hello plugin
+  picoframe-core/                        Shared Rust core (native mouse-nav, sidecar lifecycle)
+  tauri-plugin-picoframe-hello/          Backend half of the hello plugin
+  tauri-plugin-picoframe-worker/         Backend half of the worker sidecar plugin
 ```
 
 ## Plugin naming
@@ -51,6 +53,10 @@ bun run test             # run the Bun test suite
 bun run typecheck        # type-check the whole workspace (no build required)
 cargo build              # build the Rust crates + demo backend
 ```
+
+## Sidecars (long-lived local servers)
+
+A plugin with heavy non-Rust logic can run it as a **persistent localhost server** (e.g. a Bun process) spawned once at startup, instead of a per-call subprocess — no cold start, and long jobs stream progress to the UI. `picoframe_core::sidecar` owns the lifecycle (spawn, port/token handshake, health, SSE→event bridge, restart, orphan-proof kill); the `worker` plugin is a worked example. See [`docs/sidecar.md`](docs/sidecar.md).
 
 ## Components (`@picoframe/registry`)
 
