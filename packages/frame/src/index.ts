@@ -18,6 +18,14 @@ export { cn } from "./lib/cn";
 export { Button, buttonVariants, type ButtonProps } from "./components/button";
 export { Input } from "./components/input";
 
+// Toasts + sidecar progress: a frame-owned toast surface (mounted automatically by the frame
+// layout) and a hook that drives a self-updating toast from a sidecar's progress event
+// stream. `toast` is re-exported from sonner so plugins can raise toasts without depending on
+// sonner directly (they can only import from `@picoframe/frame`).
+export { Toaster } from "./toast/Toaster";
+export { useSidecarProgress, type SidecarProgressOptions } from "./toast/useSidecarProgress";
+export { toast } from "sonner";
+
 // Side/bottom drawer: open a single, frame-managed drawer from anywhere. Portals into
 // `document.body` by default, or a caller-supplied `container` (side sheet or bottom sheet).
 export {
