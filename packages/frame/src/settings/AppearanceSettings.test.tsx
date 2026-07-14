@@ -35,6 +35,11 @@ test("renders a switch for an exposed option and flips it on click", () => {
   expect(sw.getAttribute("aria-checked")).toBe("true");
 });
 
+test("renders a switch for the exposed hover-reveal option", () => {
+  renderSettings({ sidebar: { hoverReveal: { default: false } } });
+  expect(screen.getByRole("switch", { name: "Hover-reveal sidebar" })).toBeTruthy();
+});
+
 test("seeds the switch from the exposed default", () => {
   renderSettings({ breadcrumb: { collapsed: { default: true } } });
   const sw = screen.getByRole("switch", { name: "Collapse breadcrumb" });
