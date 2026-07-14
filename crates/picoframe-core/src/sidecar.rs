@@ -89,8 +89,11 @@ impl Sidecar {
     /// start the background event-stream bridge and crash supervisor. Returns an error if the
     /// process cannot be spawned or never becomes healthy.
     pub fn spawn<R: Runtime>(app: &AppHandle<R>, opts: SidecarOptions) -> Result<Sidecar, String> {
+        // A connect timeout (fail fast if the server is down) but NO total-request timeout: the
+        // `/events` SSE stream is long-lived and a `/command` job may run for minutes. Fast
+        // calls set their own per-request timeout instead (see `healthy`).
         let http = reqwest::blocking::Client::builder()
-            .timeout(Duration::from_secs(30))
+            .connect_timeout(Duration::from_secs(5))
             .build()
             .map_err(|e| format!("build http client: {e}"))?;
 
@@ -217,13 +220,8 @@ impl Drop for Inner {
 /// the connection drops (server restart, network error) so the caller can reconnect.
 fn stream_events<R: Runtime>(sidecar: &Sidecar, app: &AppHandle<R>, event_prefix: &str) {
     let url = format!("{}/events", sidecar.base_url());
-    let resp = sidecar
-        .0
-        .http
-        .get(&url)
-        .bearer_auth(sidecar.token())
-        .timeout(Duration::from_secs(0)) // no read timeout — a long-lived stream
-        .send();
+    // No per-request timeout — this is a long-lived stream (the client has no total timeout).
+    let resp = sidecar.0.http.get(&url).bearer_auth(sidecar.token()).send();
     let Ok(resp) = resp else { return };
     if !resp.status().is_success() {
         return;
