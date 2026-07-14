@@ -18,8 +18,16 @@ export { cn } from "./lib/cn";
 export { Button, buttonVariants, type ButtonProps } from "./components/button";
 export { Input } from "./components/input";
 
-// Side drawer: open a single, frame-managed modal drawer from anywhere.
-export { useDrawer, type DrawerController, type DrawerOptions } from "./drawer/DrawerProvider";
+// Side/bottom drawer: open a single, frame-managed drawer from anywhere. Portals into
+// `document.body` by default, or a caller-supplied `container` (side sheet or bottom sheet).
+export {
+  useDrawer,
+  type DrawerController,
+  type DrawerOptions,
+  type DrawerContainer,
+  type DrawerDirection,
+  type DrawerSize,
+} from "./drawer/DrawerProvider";
 
 // Persistence: read/write persisted values, and supply a custom storage backend.
 // `useSetting` is the settings-flavoured alias of `usePersistentValue`.

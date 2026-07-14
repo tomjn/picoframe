@@ -5,7 +5,7 @@ import { FrameProvider } from "./context/frame";
 import { type LayoutConfig, LayoutConfigProvider } from "./context/layoutConfig";
 import { type HomeOverride, homePlugin } from "./home";
 import { ThemeProvider, type ThemeMode, type Accent, type Base } from "./context/theme";
-import { DrawerProvider } from "./drawer/DrawerProvider";
+import { type DrawerContainer, DrawerProvider } from "./drawer/DrawerProvider";
 import { NavigationStackProvider } from "./history/navigation-stack";
 import { DefaultFallback } from "./layout/DefaultFallback";
 import { composeNav } from "./nav/composeNav";
@@ -37,6 +37,12 @@ export interface AppFrameProps {
   /** Override the generic route-loading fallback. */
   fallback?: ReactNode;
   /**
+   * Drawer defaults. `container` sets a provider-level portal target for every drawer
+   * (overridable per-open via `useDrawer().open({ container })`); omit to portal into
+   * `document.body`.
+   */
+  drawer?: { container?: DrawerContainer };
+  /**
    * Backend for persisting values (`useSetting` / `usePersistentValue`). Defaults to
    * `localStorage`; supply a disk-backed adapter (e.g. `createTauriStore()` from
    * `@picoframe/store`) to persist to disk and share state with the Rust side.
@@ -58,6 +64,7 @@ export function AppFrame({
   theme,
   layout,
   fallback,
+  drawer,
   store,
   settingsStorage,
 }: AppFrameProps) {
@@ -110,7 +117,7 @@ export function AppFrame({
         <NavigationStackProvider>
           <SlotProvider slots={slots}>
             <PersistentStoreProvider storage={store ?? settingsStorage}>
-              <DrawerProvider>
+              <DrawerProvider container={drawer?.container}>
                 <LayoutConfigProvider config={layout}>
                   <FrameProvider
                     value={{ title, nav, crumbs, settings, fallback: fallback ?? <DefaultFallback /> }}

@@ -21,7 +21,7 @@ createRoot(root).render(<AppFrame plugins={plugins} title="My app" />);
 | --- | --- |
 | `AppFrame` | The application shell component |
 | `framePlugin` | Built-in plugin (home route launcher) |
-| `useFrame`, `useNavigationStack` | Hooks |
+| `useFrame`, `useNavigationStack`, `useDrawer` | Hooks |
 | `ThemeProvider`, `useTheme` | Theming |
 | `Slot` | Named slot for plugin contributions |
 | `cn` | Class-name merge helper |
@@ -44,6 +44,50 @@ files). Every other component is app-level and lives in the registry, where the 
 author owns the copied source. `Select`/`Checkbox`/`Textarea`/etc. will **never** be
 exports of this package — use `shadcn add @picoframe/<name>`. See
 [`../registry/README.md`](../registry/README.md) and the repo `AGENTS.md`.
+
+## Drawer
+
+One frame-managed drawer, opened from anywhere via `useDrawer()`. `open()` replaces the current
+content; `close()` dismisses it. Esc and a backdrop click close it too.
+
+```tsx
+const { open } = useDrawer();
+open({ title: "Details", content: <Details /> });
+```
+
+`open()` options:
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `content` | — | The drawer body (required). |
+| `direction` | `"right"` | `"left"` / `"right"` side sheet, or `"bottom"` bottom sheet. |
+| `size` | `"md"` | `"sm"` / `"md"` / `"lg"` / `"full"` — a width (side) or height (bottom). |
+| `width` / `height` | — | Explicit CSS size overriding `size` for that axis. |
+| `container` | provider default → `document.body` | Portal target (see below). |
+| `title`, `description` | — | Accessible name/description; omit to keep them screen-reader-only. |
+
+### Container targeting
+
+By default the drawer portals to `document.body` and covers the whole window (modal: scroll-locked,
+focus-trapped). Pass a `container` — an `HTMLElement`, a `() => HTMLElement | null` (resolved lazily,
+for targets that mount after the provider), or `null` — to portal into a bounded region instead. When
+contained, the drawer switches to `absolute` positioning and a **non-modal** dialog, so its overlay is
+scoped to that element and the rest of the app (e.g. the sidebar) stays interactive.
+
+The container must be `position: relative` (and typically `overflow: hidden`, so the panel and scrim
+respect its rounded corners):
+
+```tsx
+open({ direction: "bottom", size: "lg", container: () => panelRef.current, content: <Panel /> });
+```
+
+Set a **provider-level default** for every drawer via `<AppFrame drawer={{ container }} />`; a per-open
+`container` overrides it. See the demo's "Drawer lab" page for a worked example.
+
+### Native `<select>` caveat
+
+The dialog focus trap fights the browser's native `<select>` popup, so a native `<select>` inside a
+drawer misbehaves. Use the registry `select` component (`npx shadcn add @picoframe/select`) instead.
 
 ## Theming
 
