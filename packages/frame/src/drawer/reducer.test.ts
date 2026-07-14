@@ -26,3 +26,18 @@ test("open replaces the previous options", () => {
   const next = drawerReducer(open, { type: "open", options: other });
   expect(next.options).toBe(other);
 });
+
+test("open carries direction, size and container through untouched", () => {
+  const el = document.createElement("div");
+  const withOpts = {
+    content: "x",
+    direction: "bottom",
+    size: "lg",
+    container: el,
+  } as const;
+  const next = drawerReducer(initialDrawerState, { type: "open", options: withOpts });
+  expect(next.options).toBe(withOpts);
+  expect(next.options?.direction).toBe("bottom");
+  expect(next.options?.size).toBe("lg");
+  expect(next.options?.container).toBe(el);
+});

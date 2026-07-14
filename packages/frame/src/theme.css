@@ -560,3 +560,11 @@ body {
   from { transform: translateX(0); }
   to { transform: translateX(-100%); }
 }
+@keyframes pf-drawer-in-bottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes pf-drawer-out-bottom {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
