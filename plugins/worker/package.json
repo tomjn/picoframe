@@ -1,0 +1,38 @@
+{
+  "name": "@picoframe/plugin-worker",
+  "version": "0.0.1",
+  "description": "Example long-lived sidecar plugin for picoframe (frontend half): calls a persistent Bun server and streams progress",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomjn/picoframe.git",
+    "directory": "plugins/worker"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "sidecar"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:sidecar": "bun run scripts/build-sidecar.ts"
+  },
+  "dependencies": {
+    "lucide-react": "^1.16.0"
+  },
+  "peerDependencies": {
+    "@picoframe/frame": "*",
+    "@picoframe/plugin-sdk": "*",
+    "@tauri-apps/api": "^2.11.0",
+    "react": "^19.0.0",
+    "react-router": "^7.6.0"
+  }
+}
