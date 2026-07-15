@@ -32,6 +32,7 @@ export function composeSettings(plugins: FramePlugin[]): ComposedSettings {
         existing.order ??= s.order;
         existing.description ??= s.description;
         existing.icon ??= s.icon;
+        existing.width ??= s.width;
         existing.parent ??= s.parent;
         existing.Component ??= s.Component;
         existing.useVisible ??= s.useVisible;

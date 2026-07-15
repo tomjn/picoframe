@@ -41,6 +41,18 @@ function renderIndex(settings: ComposedSettings) {
   );
 }
 
+test("section width maps to the content constraint; md stays the default", () => {
+  const settings = compose([
+    { id: "form", title: "Form Section", Component: () => <div>FORM</div> },
+    { id: "dense", title: "Dense Section", width: "full", Component: () => <div>DENSE</div> },
+  ]);
+  const { container: a } = renderAt(settings, "form");
+  expect(a.querySelector(".mx-auto")?.className).toContain("max-w-2xl");
+  cleanup();
+  const { container: b } = renderAt(settings, "dense");
+  expect(b.querySelector(".mx-auto")?.className).toContain("max-w-none");
+});
+
 test("hides a top-level section whose useVisible returns false from the tree", () => {
   const settings = compose([
     { id: "home", title: "Home", Component: () => <div>HOME PANEL</div> },
