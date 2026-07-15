@@ -40,13 +40,15 @@ test("scaffold substitutes the app name and identifier", () => {
 
 test("scaffold uses published deps, not workspace inheritance, and omits hello", () => {
   const pkg = read("package.json");
-  expect(pkg).toContain(`"@picoframe/frame": "^0.5.0"`);
-  expect(pkg).toContain(`"@picoframe/plugin-sdk": "^0.5.0"`);
+  // Assert a real published semver range, not a pinned literal — the template's
+  // versions bump at every release and a hard-coded value goes stale (it did at 0.5.1).
+  expect(pkg).toMatch(/"@picoframe\/frame": "\^\d+\.\d+\.\d+"/);
+  expect(pkg).toMatch(/"@picoframe\/plugin-sdk": "\^\d+\.\d+\.\d+"/);
   expect(pkg).not.toContain("workspace:*");
   expect(pkg).not.toContain("plugin-hello");
 
   const cargo = read("src-tauri/Cargo.toml");
-  expect(cargo).toContain(`picoframe-core = "0.5.0"`);
+  expect(cargo).toMatch(/picoframe-core = "\d+\.\d+\.\d+"/);
   expect(cargo).not.toContain("workspace = true");
   expect(cargo).not.toContain("hello");
 });
