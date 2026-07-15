@@ -59,6 +59,21 @@ test("same-id sections merge, first declarer wins and later fills unset fields",
   expect(node?.description).toBe("desc");
 });
 
+test("width merges like other optional fields — first declarer wins, later fills unset", () => {
+  const { byId } = composeSettings([
+    plugin("a", [
+      { id: "x", title: "X", width: "lg" },
+      { id: "y", title: "Y" },
+    ]),
+    plugin("b", [
+      { id: "x", title: "X", width: "full" },
+      { id: "y", title: "Y", width: "full" },
+    ]),
+  ]);
+  expect(byId.get("x")?.width).toBe("lg");
+  expect(byId.get("y")?.width).toBe("full");
+});
+
 test("orphan parent is treated as top-level", () => {
   const { nodes } = composeSettings([
     plugin("p", [{ id: "lonely", title: "Lonely", parent: "missing" }]),

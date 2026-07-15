@@ -121,6 +121,14 @@ export interface SettingsSection {
   order?: number;
   description?: string;
   icon?: IconComponent;
+  /**
+   * Content width of the rendered section. `md` (default) suits label/control
+   * forms; data-dense sections (tables, per-item cards, wide read-only values)
+   * can opt into `lg` or `full`. Note the content pane constrains the
+   * *container*, so section components should prefer container queries over
+   * viewport breakpoints for internal responsive layout.
+   */
+  width?: "md" | "lg" | "full";
   /** Nest under another section/category id. Omit for a top-level category. */
   parent?: string;
   /** Renders the section's controls. Optional for pure grouping/category nodes. */

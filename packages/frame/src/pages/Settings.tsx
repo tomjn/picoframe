@@ -74,10 +74,17 @@ function SectionCard({ node }: { node: SettingsNode }) {
   );
 }
 
+/** Section `width` → content constraint. `md` preserves the historical default. */
+const WIDTH_CLASS = {
+  md: "max-w-2xl",
+  lg: "max-w-4xl",
+  full: "max-w-none",
+} as const;
+
 function SectionContent({ node }: { node: SettingsNode }) {
   const Component = node.Component;
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className={cn("mx-auto", WIDTH_CLASS[node.width ?? "md"])}>
       <h1 className="text-2xl font-semibold text-foreground">{node.title}</h1>
       {node.description ? <p className="mt-1 text-muted-foreground">{node.description}</p> : null}
       <div className="mt-6">
