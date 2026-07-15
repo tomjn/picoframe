@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/frame",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Reusable Tauri v2 app-frame React shell: sidebar, top bar, hash routing, nav and slot composition, theme",
   "license": "MIT",
   "repository": {
@@ -18,7 +18,10 @@
     },
     "./theme.css": "./src/theme.css"
   },
-  "files": ["dist", "src/theme.css"],
+  "files": [
+    "dist",
+    "src/theme.css"
+  ],
   "publishConfig": {
     "access": "public"
   },
