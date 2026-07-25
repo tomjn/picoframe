@@ -1,6 +1,14 @@
 import { type DrawerDirection, type DrawerSize, Button, useDrawer } from "@picoframe/frame";
 import { PanelBottom, PanelLeft, PanelRight } from "lucide-react";
+import { DropdownMenu, Popover } from "radix-ui";
 import { useRef, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DIRECTIONS: { value: DrawerDirection; label: string; icon: typeof PanelRight }[] = [
   { value: "right", label: "Right", icon: PanelRight },
@@ -22,6 +30,36 @@ function DrawerContents({ direction, size }: { direction: DrawerDirection; size:
         Inside a drawer, use the registry <code>select</code> component rather than a native{" "}
         <code>&lt;select&gt;</code>: the dialog focus trap fights the browser's native popup.
       </p>
+      {/* Portalled popup layers. Dismissing one without choosing an item must close only
+          that popup, never the drawer underneath it. See the file comment. */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="Pick one" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="a">Alpha</SelectItem>
+            <SelectItem value="b">Bravo</SelectItem>
+          </SelectContent>
+        </Select>
+        <Popover.Root>
+          <Popover.Trigger className="rounded border px-3 py-2">Popover</Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content className="z-50 rounded border bg-background p-3 shadow-lg">
+              Popover body
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger className="rounded border px-3 py-2">Menu</DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content className="z-50 rounded border bg-background p-1 shadow-lg">
+              <DropdownMenu.Item className="px-3 py-1 outline-none">Item one</DropdownMenu.Item>
+              <DropdownMenu.Item className="px-3 py-1 outline-none">Item two</DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+      </div>
       <Button variant="outline" size="sm" onClick={close}>
         Close
       </Button>
@@ -34,6 +72,10 @@ function DrawerContents({ direction, size }: { direction: DrawerDirection; size:
  * whole window) plus the right/left/bottom directions and sm/md/lg/full sizes. The box below
  * is `relative` + `overflow-hidden` so the absolutely-positioned drawer and its scrim are
  * clipped to it and respect its rounded corners.
+ *
+ * Both open buttons are here because contained and full-window drawers take different Radix
+ * dialog paths (non-modal vs modal), and the Select/Popover/Menu inside the drawer cover the
+ * portalled-popup case: dismissing a popup with no selection used to take the drawer with it.
  */
 export default function DrawerLab() {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -96,6 +138,20 @@ export default function DrawerLab() {
           }
         >
           Open in box
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() =>
+            open({
+              title: "Full-window drawer",
+              description: `${direction} · ${size}`,
+              direction,
+              size,
+              content: <DrawerContents direction={direction} size={size} />,
+            })
+          }
+        >
+          Open full window
         </Button>
       </div>
 
