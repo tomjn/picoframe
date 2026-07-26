@@ -1,5 +1,14 @@
-import { type FramePlugin, Button, Input, useDrawer, usePersistentValue, useSetting } from "@picoframe/frame";
-import { Cpu, Globe, LayoutDashboard, PanelRight, SlidersHorizontal } from "lucide-react";
+import {
+  type FramePlugin,
+  Button,
+  Input,
+  useDrawer,
+  useHideSidebar,
+  usePersistentValue,
+  useSetting,
+} from "@picoframe/frame";
+import { Cpu, Globe, LayoutDashboard, Maximize, PanelRight, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useDemoLayoutControls } from "./demo-layout-controls";
 
@@ -93,6 +102,30 @@ function DemoLayoutSettings() {
   );
 }
 
+/**
+ * A page that takes the full width. Calling the hook unconditionally hides the rail for the
+ * whole page. The toggle shows the conditional form, where the page keeps the sidebar until
+ * it enters its own full-screen mode. Either way the nav stays behind the menu button.
+ */
+function FocusPage() {
+  const [zen, setZen] = useState(false);
+  useHideSidebar(zen);
+  return (
+    <div className="grid max-w-lg gap-4 p-6">
+      <h1 className="text-lg font-semibold">Focus mode</h1>
+      <p className="text-sm text-muted-foreground">
+        useHideSidebar() drops the docked rail while this page is mounted. The top bar's menu
+        button still opens the full nav, and leaving the page restores the rail at its previous
+        width and collapse state.
+      </p>
+      <Button variant="outline" size="sm" className="justify-self-start" onClick={() => setZen((v) => !v)}>
+        <Maximize size={16} />
+        {zen ? "Leave zen mode" : "Enter zen mode"}
+      </Button>
+    </div>
+  );
+}
+
 /** Example content for the centered top-bar slot. */
 function CenterSlot() {
   return (
@@ -154,6 +187,7 @@ export const demoExtrasPlugin: FramePlugin = {
   routes: [
     { path: "notes", lazy: () => Promise.resolve({ default: DraftPage }), crumb: "Notes" },
     { path: "drawer-lab", lazy: () => import("./demo-drawer-lab"), crumb: "Drawer lab" },
+    { path: "focus", lazy: () => Promise.resolve({ default: FocusPage }), crumb: "Focus mode" },
   ],
   nav: [
     {
@@ -162,6 +196,7 @@ export const demoExtrasPlugin: FramePlugin = {
       items: [
         { id: "demo.notes", label: "Notes", to: "/notes", order: 10 },
         { id: "demo.drawer-lab", label: "Drawer lab", to: "/drawer-lab", icon: PanelRight, order: 20 },
+        { id: "demo.focus", label: "Focus mode", to: "/focus", icon: Maximize, order: 30 },
       ],
     },
     {
