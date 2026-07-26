@@ -87,7 +87,11 @@ Whether an overlay should react to `data-accent` / `data-base` depends on the to
   tracks `data-accent` automatically and needs no per-accent overrides or `.dark` value
   (`--primary` already flips per mode).
 - **Follow the base ramp** by building a token from `--base-hue` / `--base-sat`, exactly as the
-  neutral tokens do: `--surface-alt: var(--base-hue) calc(var(--base-sat) * 5%) 92%`.
+  neutral tokens do: `--surface-alt: var(--base-hue) calc(var(--base-sat) * 5%) 92%`. Use
+  `--base-sat-text` instead for anything that renders as text. The vivid bases (crimson through
+  fuchsia) push `--base-sat` past 5 to make surfaces read as a real colour, and text built on
+  that knob would come out tinted to the point of distraction:
+  `--muted-label: var(--base-hue) calc(var(--base-sat-text) * 4%) 46%`.
 
 See [`apps/demo`](../../apps/demo/src/theme-overlay.tsx) (and its `index.css`) for a live
 worked example — a "Theme overlay" view whose status pills hold their meaning across accents

@@ -53,6 +53,15 @@ test("selecting a base swatch sets data-base and persists it", () => {
   expect(localStorage.getItem("picoframe.base")).toBe('"slate"');
 });
 
+test("selecting a vivid base swatch sets data-base and persists it", () => {
+  renderSettings();
+  // "Purple" exists as both a base and an accent, so scope to the base group.
+  const baseGroup = screen.getByRole("radiogroup", { name: "Base color" });
+  fireEvent.click(within(baseGroup).getByRole("radio", { name: "Purple" }));
+  expect(document.documentElement.dataset.base).toBe("purple");
+  expect(localStorage.getItem("picoframe.base")).toBe('"purple"');
+});
+
 test("the default base (Zinc) carries no data-base attribute", () => {
   renderSettings();
   // start on a non-default base, then return to the default

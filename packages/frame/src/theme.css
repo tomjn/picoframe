@@ -59,40 +59,47 @@
 }
 
 /* The neutral ramp is parameterised so a base preset can retint every neutral
-   token at once: --base-hue is the hue channel and --base-sat scales saturation
-   (0 = true grayscale). Defaults (240 / 1) resolve each token to its original
-   value, so the default "zinc" base is byte-for-byte unchanged. Only hue and
-   saturation vary across bases — lightness is fixed, so contrast is preserved.
-   Achromatic tokens (white surfaces, near-white foregrounds, destructive red)
-   deliberately keep literal values and are not retinted. */
+   token at once: --base-hue is the hue channel, --base-sat scales saturation on
+   surfaces and --base-sat-text does the same for foregrounds (0 = true grayscale).
+   The two saturation knobs exist because surfaces and text want opposite
+   treatments: a surface needs a heavy tint to be legible as a colour at all, while
+   text needs almost none to still read as text. Foregrounds also carry the largest
+   coefficient (10%), so a single shared knob at the vivid tier's level would turn
+   body copy plum. --base-sat-text defaults to --base-sat, so a base that sets only
+   --base-sat behaves exactly as it did before the split. Defaults (240 / 1) resolve
+   each token to its original value, so the default "zinc" base is byte-for-byte
+   unchanged. Only hue and saturation vary across bases, lightness is fixed, so
+   contrast is preserved. Achromatic tokens (white surfaces, near-white foregrounds,
+   destructive red) deliberately keep literal values and are not retinted. */
 :root {
   color-scheme: light;
   --radius: 0.5rem;
   --base-hue: 240;
   --base-sat: 1;
+  --base-sat-text: var(--base-sat);
   --background: 0 0% 100%;
-  --foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
+  --foreground: var(--base-hue) calc(var(--base-sat-text) * 10%) 12%;
   --card: 0 0% 100%;
-  --card-foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
+  --card-foreground: var(--base-hue) calc(var(--base-sat-text) * 10%) 12%;
   --popover: 0 0% 100%;
-  --popover-foreground: var(--base-hue) calc(var(--base-sat) * 10%) 12%;
+  --popover-foreground: var(--base-hue) calc(var(--base-sat-text) * 10%) 12%;
   --primary: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
   --primary-foreground: 0 0% 98%;
   --secondary: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
-  --secondary-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
+  --secondary-foreground: var(--base-hue) calc(var(--base-sat-text) * 6%) 16%;
   --muted: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
-  --muted-foreground: var(--base-hue) calc(var(--base-sat) * 4%) 46%;
+  --muted-foreground: var(--base-hue) calc(var(--base-sat-text) * 4%) 46%;
   --accent: var(--base-hue) calc(var(--base-sat) * 5%) 94%;
-  --accent-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 16%;
+  --accent-foreground: var(--base-hue) calc(var(--base-sat-text) * 6%) 16%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 98%;
   --border: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
   --input: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
   --ring: var(--base-hue) calc(var(--base-sat) * 5%) 65%;
   --sidebar: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
-  --sidebar-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 24%;
+  --sidebar-foreground: var(--base-hue) calc(var(--base-sat-text) * 6%) 24%;
   --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 5%) 90%;
-  --sidebar-accent-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 12%;
+  --sidebar-accent-foreground: var(--base-hue) calc(var(--base-sat-text) * 6%) 12%;
   --sidebar-border: var(--base-hue) calc(var(--base-sat) * 6%) 88%;
   /* Categorical chart colours (used by the `chart` registry component). Like
      --destructive these are deliberately literal, not retinted by --base-hue, so
@@ -113,11 +120,11 @@
   --popover: var(--base-hue) calc(var(--base-sat) * 5%) 10%;
   --popover-foreground: 0 0% 95%;
   --primary: 0 0% 95%;
-  --primary-foreground: var(--base-hue) calc(var(--base-sat) * 6%) 10%;
+  --primary-foreground: var(--base-hue) calc(var(--base-sat-text) * 6%) 10%;
   --secondary: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
   --secondary-foreground: 0 0% 95%;
   --muted: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
-  --muted-foreground: var(--base-hue) calc(var(--base-sat) * 5%) 60%;
+  --muted-foreground: var(--base-hue) calc(var(--base-sat-text) * 5%) 60%;
   --accent: var(--base-hue) calc(var(--base-sat) * 4%) 18%;
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62% 50%;
@@ -126,7 +133,7 @@
   --input: var(--base-hue) calc(var(--base-sat) * 4%) 20%;
   --ring: var(--base-hue) calc(var(--base-sat) * 5%) 40%;
   --sidebar: var(--base-hue) calc(var(--base-sat) * 6%) 9%;
-  --sidebar-foreground: var(--base-hue) calc(var(--base-sat) * 5%) 72%;
+  --sidebar-foreground: var(--base-hue) calc(var(--base-sat-text) * 5%) 72%;
   --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
   --sidebar-accent-foreground: 0 0% 98%;
   --sidebar-border: var(--base-hue) calc(var(--base-sat) * 4%) 14%;
@@ -137,13 +144,21 @@
   --chart-5: 340 75% 55%;
 }
 
-/* Base neutral ramp presets — a third axis (orthogonal to accent and light/dark),
+/* Base neutral ramp presets, a third axis (orthogonal to accent and light/dark),
    applied via a `data-base` attribute on <html> (see ThemeProvider). Each base only
-   shifts --base-hue/--base-sat (consumed by the :root/.dark tokens above), so it
-   recolours backgrounds, borders, muted and sidebar surfaces app-wide while leaving
-   an active accent's --primary/--ring/--accent untouched. These sit BEFORE the accent
-   blocks so an active accent wins the equal-specificity source-order tie for the few
-   tokens both could touch. The default "zinc" (hue 240) carries no attribute. */
+   shifts --base-hue/--base-sat/--base-sat-text (consumed by the :root/.dark tokens
+   above), so it recolours backgrounds, borders, muted and sidebar surfaces app-wide
+   while leaving an active accent's --primary/--ring/--accent untouched. These sit
+   BEFORE the accent blocks so an active accent wins the equal-specificity
+   source-order tie for the few tokens both could touch. The default "zinc" (hue 240)
+   carries no attribute.
+
+   Two tiers. The subtle tier below stays under --base-sat 2.6 and reads as a tinted
+   gray, where the hue is a hint rather than a colour. The vivid tier that follows
+   pushes surface saturation past 5 so the tone is unmistakable at a glance, which is
+   what a build channel marker (a purple nightly, say) needs. Vivid bases pin
+   --base-sat-text near the subtle tier's level so only the surfaces go bold and body
+   text stays near-black. */
 [data-base="slate"] { --base-hue: 215; --base-sat: 1.6; }
 [data-base="gray"] { --base-hue: 220; --base-sat: 0.5; }
 [data-base="stone"] { --base-hue: 30; --base-sat: 1.5; }
@@ -156,6 +171,25 @@
 [data-base="blue"] { --base-hue: 214; --base-sat: 2.6; }
 [data-base="indigo"] { --base-hue: 250; --base-sat: 2.4; }
 [data-base="violet"] { --base-hue: 276; --base-sat: 2.4; }
+
+/* Vivid tier. Saturation varies by hue because equal HSL saturation is not equal
+   perceptual punch: yellow-green carries further than blue-purple at the same
+   number. */
+[data-base="purple"] { --base-hue: 280; --base-sat: 7; --base-sat-text: 2; }
+[data-base="sky"] { --base-hue: 208; --base-sat: 6; --base-sat-text: 2; }
+/* Navy runs hotter than the rest of the tier because blue carries little
+   luminance: draining red and green is what makes it read dark, and only a high
+   saturation does that. Same fixed lightness as every other base. */
+[data-base="navy"] { --base-hue: 225; --base-sat: 11; --base-sat-text: 2; }
+[data-base="fuchsia"] { --base-hue: 330; --base-sat: 6; --base-sat-text: 2; }
+[data-base="orange"] { --base-hue: 25; --base-sat: 6; --base-sat-text: 2; }
+[data-base="lime"] { --base-hue: 95; --base-sat: 5.5; --base-sat-text: 2; }
+[data-base="emerald"] { --base-hue: 160; --base-sat: 6.5; --base-sat-text: 2; }
+[data-base="yellow"] { --base-hue: 50; --base-sat: 6; --base-sat-text: 2; }
+/* Crimson sits at 350 rather than a truer red so it keeps some separation from
+   --destructive (hue 0), which is literal and never retinted. The two still share
+   a family, so error states read less sharply on this base than on any other. */
+[data-base="crimson"] { --base-hue: 350; --base-sat: 6.5; --base-sat-text: 2; }
 
 /* Accent colour presets — an axis orthogonal to light/dark, applied via a
    `data-accent` attribute on <html> (see ThemeProvider). Each accent redefines

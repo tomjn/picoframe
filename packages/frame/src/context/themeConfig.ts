@@ -61,7 +61,14 @@ export type Accent = (typeof ACCENTS)[number]["value"];
  * accent's `--primary`/`--ring` untouched. `zinc` (hue 240) is the default and
  * carries no `data-base` attribute. Note: the `neutral` base (grayscale) is a
  * different thing from the `neutral` *accent* — separate axes, separate UI
- * sections. Swatches are a representative mid-gray at each base's hue.
+ * sections.
+ *
+ * Two tiers, in one list. The subtle tier (`zinc` through `violet`) reads as a
+ * tinted gray, so its swatch is a representative mid-gray at the base's hue. The
+ * vivid tier (`purple` onwards) pushes surface saturation far enough to read as a
+ * colour, for cases like marking a nightly build, so its swatch is a saturated
+ * mid-tone instead. A mid-gray would misrepresent it, and the difference in the
+ * swatch row is how a user tells the two tiers apart.
  */
 export const BASES = [
   { value: "zinc", label: "Zinc", swatch: "hsl(240 6% 55%)" },
@@ -77,6 +84,15 @@ export const BASES = [
   { value: "blue", label: "Blue", swatch: "hsl(214 26% 58%)" },
   { value: "indigo", label: "Indigo", swatch: "hsl(250 22% 60%)" },
   { value: "violet", label: "Violet", swatch: "hsl(276 22% 60%)" },
+  { value: "purple", label: "Purple", swatch: "hsl(280 45% 55%)" },
+  { value: "sky", label: "Sky", swatch: "hsl(208 55% 50%)" },
+  { value: "navy", label: "Navy", swatch: "hsl(225 60% 38%)" },
+  { value: "fuchsia", label: "Fuchsia", swatch: "hsl(330 45% 55%)" },
+  { value: "orange", label: "Orange", swatch: "hsl(25 50% 52%)" },
+  { value: "lime", label: "Lime", swatch: "hsl(95 38% 45%)" },
+  { value: "emerald", label: "Emerald", swatch: "hsl(160 45% 40%)" },
+  { value: "yellow", label: "Yellow", swatch: "hsl(50 60% 48%)" },
+  { value: "crimson", label: "Crimson", swatch: "hsl(350 55% 48%)" },
 ] as const satisfies readonly ThemeOption<string>[];
 
 export type Base = (typeof BASES)[number]["value"];
