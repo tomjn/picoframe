@@ -44,6 +44,7 @@ export function TopBar({
   breadcrumbCollapsed = false,
   breadcrumbHidden = false,
   popover = false,
+  menuFullscreen = false,
   menuOpen = false,
   onCloseMenu = () => {},
   menuIcon,
@@ -64,6 +65,8 @@ export function TopBar({
   breadcrumbHidden?: boolean;
   /** In popover mode the menu button anchors the sidebar popover beneath it. */
   popover?: boolean;
+  /** Open the popover as a fullscreen panel below the top bar (the narrow-window mode). */
+  menuFullscreen?: boolean;
   menuOpen?: boolean;
   onCloseMenu?: () => void;
   /** Popover-mode menu button icon while closed (defaults to a hamburger menu). */
@@ -121,14 +124,14 @@ export function TopBar({
         type="button"
         onClick={() => c.to && navigate(c.to)}
         className={cn(
-          "-mx-1 rounded-sm px-1 py-0.5 text-muted-foreground transition-colors",
+          "-mx-1 min-w-0 truncate rounded-sm px-1 py-0.5 text-muted-foreground transition-colors",
           "hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         )}
       >
         {c.label}
       </button>
     ) : (
-      <span className={muted ? "text-muted-foreground" : ""}>{c.label}</span>
+      <span className={cn("min-w-0 truncate", muted && "text-muted-foreground")}>{c.label}</span>
     );
 
   // Collapse to just the current header only when there's a trail to hide.
@@ -170,7 +173,9 @@ export function TopBar({
             <ToggleIcon size={18} />
           </IconButton>
         )}
-        {popover && <SidebarPopover groups={nav} open={menuOpen} onClose={onCloseMenu} />}
+        {popover && (
+          <SidebarPopover groups={nav} open={menuOpen} onClose={onCloseMenu} fullscreen={menuFullscreen} />
+        )}
       </div>
       {showHistoryButtons && (
         <>
@@ -183,8 +188,13 @@ export function TopBar({
         </>
       )}
 
+      {/* `min-w-0` lets the trail shrink on a narrow window instead of pushing the right-hand
+          slot cluster off the bar. Individual crumbs truncate rather than wrap. */}
       {!breadcrumbHidden && (
-      <div data-slot="breadcrumbs" className="group ml-1 flex items-center gap-1 text-sm font-medium">
+      <div
+        data-slot="breadcrumbs"
+        className="group ml-1 flex min-w-0 items-center gap-1 overflow-hidden text-sm font-medium"
+      >
         {crumbs.length === 0 ? (
           <span>{title}</span>
         ) : collapseCrumbs ? (
@@ -211,8 +221,8 @@ export function TopBar({
           </>
         ) : (
           crumbs.map((c, i) => (
-            <span key={`${c.label}-${i}`} className="flex items-center gap-1">
-              {i > 0 && <span className="text-muted-foreground">/</span>}
+            <span key={`${c.label}-${i}`} className="flex min-w-0 items-center gap-1">
+              {i > 0 && <span className="shrink-0 text-muted-foreground">/</span>}
               {renderCrumb(c, i !== crumbs.length - 1)}
             </span>
           ))

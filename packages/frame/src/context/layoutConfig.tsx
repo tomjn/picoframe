@@ -1,5 +1,6 @@
 import type { IconComponent } from "@picoframe/plugin-sdk";
 import { type ReactNode, createContext, useContext, useMemo } from "react";
+import { SIDEBAR_NARROW_BREAKPOINT } from "../lib/useNarrowViewport";
 import { usePersistentState } from "../lib/usePersistentState";
 
 /**
@@ -28,6 +29,19 @@ export interface LayoutConfig {
      * Ignored when `popover` is on — that mode has no persistent sidebar to reveal from.
      */
     hoverReveal?: Configurable<boolean>;
+    /**
+     * Below {@link narrowBreakpoint}, drop the docked sidebar and open the nav from the top
+     * bar's menu button as a fullscreen panel. Takes over from the docked and hover-reveal
+     * modes only while the window is narrow, and never touches the persisted collapse state,
+     * so widening restores whatever was there before.
+     */
+    collapseWhenNarrow?: Configurable<boolean>;
+    /**
+     * Viewport width (px) `collapseWhenNarrow` switches at, defaulting to 640. Static app
+     * config: an app whose content needs more room can raise it so the sidebar gives way
+     * sooner. Ignored while `collapseWhenNarrow` is off.
+     */
+    narrowBreakpoint?: number;
     /** In popover mode, the menu button's icon while closed (defaults to a hamburger menu). */
     menuIcon?: IconComponent;
     /** In popover mode, the menu button's icon while the popover is open (defaults to a chevron). */
@@ -55,10 +69,13 @@ export interface ResolvedLayoutConfig {
   hideWhenCollapsed: OptionDescriptor<boolean>;
   popover: OptionDescriptor<boolean>;
   hoverReveal: OptionDescriptor<boolean>;
+  collapseWhenNarrow: OptionDescriptor<boolean>;
   breadcrumbCollapsed: OptionDescriptor<boolean>;
   historyButtons: OptionDescriptor<boolean>;
   /** Hide the breadcrumb region entirely (static app config). */
   breadcrumbHidden: boolean;
+  /** Width (px) `collapseWhenNarrow` switches at (static app config). */
+  narrowBreakpoint: number;
   /** Static (app-author, not user-configurable) popover menu button overrides. */
   menuButton: {
     icon?: IconComponent;
@@ -74,6 +91,7 @@ export type LayoutOptionKey =
   | "hideWhenCollapsed"
   | "popover"
   | "hoverReveal"
+  | "collapseWhenNarrow"
   | "breadcrumbCollapsed"
   | "historyButtons";
 
@@ -104,6 +122,11 @@ export const LAYOUT_OPTIONS: { key: LayoutOptionKey; label: string; description:
     description: "When collapsed, hide the sidebar and slide it out on hovering the left edge.",
   },
   {
+    key: "collapseWhenNarrow",
+    label: "Collapse sidebar on narrow windows",
+    description: "On a narrow window, the sidebar becomes a menu button and opens fullscreen.",
+  },
+  {
     key: "breadcrumbCollapsed",
     label: "Collapse breadcrumb",
     description: "Show only the current page; reveal the full path on hover.",
@@ -129,9 +152,11 @@ export function LayoutConfigProvider({
       hideWhenCollapsed: resolveOption(config?.sidebar?.hideWhenCollapsed, false),
       popover: resolveOption(config?.sidebar?.popover, false),
       hoverReveal: resolveOption(config?.sidebar?.hoverReveal, false),
+      collapseWhenNarrow: resolveOption(config?.sidebar?.collapseWhenNarrow, false),
       breadcrumbCollapsed: resolveOption(config?.breadcrumb?.collapsed, false),
       historyButtons: resolveOption(config?.history?.buttons, true),
       breadcrumbHidden: config?.breadcrumb?.hidden ?? false,
+      narrowBreakpoint: config?.sidebar?.narrowBreakpoint ?? SIDEBAR_NARROW_BREAKPOINT,
       menuButton: {
         icon: config?.sidebar?.menuIcon,
         iconOpen: config?.sidebar?.menuIconOpen,

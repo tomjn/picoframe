@@ -139,6 +139,26 @@ It is backed by the frame's shared persistent store, so this hook and the top-ba
 stay in sync live. This controls the *docked* rail; in `popover` layout mode the sidebar is
 a separate overlay, so `toggle` has no visible effect there.
 
+The `sidebar.collapseWhenNarrow` layout option adds a width-driven variant of the same
+overlay. Below the breakpoint the docked rail gives way to the top bar's menu button, which
+opens the nav fullscreen beneath the top bar. It leaves the persisted collapse state alone, so
+widening the window restores the rail exactly as the user left it.
+
+The breakpoint defaults to 640px. An app whose content needs more room can raise it:
+
+```tsx
+<AppFrame
+  layout={{
+    sidebar: {
+      collapseWhenNarrow: { default: true, userConfigurable: true },
+      narrowBreakpoint: 900,
+    },
+  }}
+/>
+```
+
+`narrowBreakpoint` is app-author config only, so it is not exposed as a user setting.
+
 ## Theming
 
 The frame's design tokens ship as `@picoframe/frame/theme.css` (mode / accent / base axes).

@@ -8,11 +8,11 @@ afterEach(cleanup);
 
 const oneItem: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
 
-function renderPopover(open: boolean, onClose: () => void, extra?: React.ReactNode) {
+function renderPopover(open: boolean, onClose: () => void, extra?: React.ReactNode, fullscreen = false) {
   return render(
     <MemoryRouter initialEntries={["/"]}>
       {extra}
-      <SidebarPopover groups={oneItem} open={open} onClose={onClose} />
+      <SidebarPopover groups={oneItem} open={open} onClose={onClose} fullscreen={fullscreen} />
     </MemoryRouter>,
   );
 }
@@ -32,6 +32,17 @@ test("opens as an anchored dropdown, not a dimmed full-height drawer", () => {
   // Outside-click catcher must not dim the page.
   const catcher = screen.getByLabelText("Close menu");
   expect(catcher.className).not.toContain("bg-black");
+});
+
+test("fullscreen fills the viewport below the top bar instead of anchoring", () => {
+  const { container } = renderPopover(true, () => {}, undefined, true);
+  const panel = container.querySelector("[data-slot=sidebar-popover]") as HTMLElement | null;
+  // Pinned under the 48px top bar (h-12), so the menu button stays clickable.
+  expect(panel?.className).toContain("top-12");
+  expect(panel?.className).toContain("bottom-0");
+  // None of the anchored card's sizing survives.
+  expect(panel?.className).not.toContain("w-64");
+  expect(panel?.className).not.toContain("top-full");
 });
 
 test("renders nothing when closed", () => {
