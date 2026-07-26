@@ -6,6 +6,7 @@ export { ThemeProvider, useTheme, type ThemeMode, type Accent, type Base } from 
 export type { Configurable, LayoutConfig } from "./context/layoutConfig";
 export { useNavigationStack } from "./history/navigation-stack";
 export { useSidebarState, SIDEBAR_COLLAPSED_KEY, type SidebarState } from "./layout/useSidebarState";
+export { useHideSidebar } from "./layout/hideSidebar";
 export { Slot } from "./slots/slots";
 export { NavGate } from "./nav/NavGate";
 export { cn } from "./lib/cn";

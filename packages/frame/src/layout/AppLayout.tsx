@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMouseNavigation } from "../history/useMouseNavigation";
 import { useFrame } from "../context/frame";
 import { useLayoutConfig, useLayoutOption } from "../context/layoutConfig";
@@ -6,6 +6,7 @@ import { DrawerHost } from "../drawer/DrawerHost";
 import { Toaster } from "../toast/Toaster";
 import { useNarrowViewport } from "../lib/useNarrowViewport";
 import { usePersistentState } from "../lib/usePersistentState";
+import { HideSidebarProvider, type HideSidebarRegistry } from "./hideSidebar";
 import { HoverRevealSidebar, useHoverReveal } from "./HoverRevealSidebar";
 import { RouteHost } from "./RouteHost";
 import { Sidebar, SIDEBAR_DEFAULT_WIDTH } from "./Sidebar";
@@ -27,11 +28,26 @@ export function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   useMouseNavigation();
 
+  // A count, not a flag, so overlapping `useHideSidebar` callers (and React StrictMode's
+  // double-invoked effects) compose: the rail returns only once the last request is withdrawn.
+  const [hideRequests, setHideRequests] = useState(0);
+  const hideRegistry = useMemo<HideSidebarRegistry>(
+    () => ({
+      register: () => {
+        setHideRequests((n) => n + 1);
+        return () => setHideRequests((n) => n - 1);
+      },
+    }),
+    [],
+  );
+
   // A narrow window borrows the popover presentation for as long as it stays narrow. It
   // never writes the persisted collapse state, so widening restores the docked rail exactly
   // as the user left it.
   const narrow = useNarrowViewport(narrowBreakpoint) && collapseWhenNarrow;
-  const popoverMode = popover || narrow;
+  // A page asking for the full width borrows the same presentation: no docked rail, but the
+  // menu button keeps the nav one click away, and the persisted collapse state is untouched.
+  const popoverMode = popover || narrow || hideRequests > 0;
 
   // Popover has no persistent sidebar, so there's nothing to hover-reveal. It wins.
   const hoverRevealActive = hoverReveal && !popoverMode;
@@ -88,7 +104,11 @@ export function AppLayout() {
           showHistoryButtons={historyButtons}
         />
         <main data-slot="content-scroll" className="min-h-0 flex-1 overflow-auto overscroll-none">
-          <RouteHost />
+          {/* Scoped to the routed page: `useHideSidebar` is a page-level opt-out, not
+              something the surrounding shell (top bar slots, drawer) reaches for. */}
+          <HideSidebarProvider value={hideRegistry}>
+            <RouteHost />
+          </HideSidebarProvider>
         </main>
       </div>
       <DrawerHost />

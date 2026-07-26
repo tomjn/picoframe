@@ -21,7 +21,7 @@ createRoot(root).render(<AppFrame plugins={plugins} title="My app" />);
 | --- | --- |
 | `AppFrame` | The application shell component |
 | `framePlugin` | Built-in plugin (home route launcher) |
-| `useFrame`, `useNavigationStack`, `useDrawer`, `useSidebarState` | Hooks |
+| `useFrame`, `useNavigationStack`, `useDrawer`, `useSidebarState`, `useHideSidebar` | Hooks |
 | `ThemeProvider`, `useTheme` | Theming |
 | `Slot` | Named slot for plugin contributions |
 | `cn` | Class-name merge helper |
@@ -158,6 +158,34 @@ The breakpoint defaults to 640px. An app whose content needs more room can raise
 ```
 
 `narrowBreakpoint` is app-author config only, so it is not exposed as a user setting.
+
+## Hiding the sidebar on one page
+
+A page that wants the full width (a focus editor, a wizard, a canvas) calls `useHideSidebar()`.
+The docked rail goes for as long as that component is mounted:
+
+```tsx
+import { useHideSidebar } from "@picoframe/frame";
+
+function CanvasPage() {
+  useHideSidebar();
+  return <Canvas />;
+}
+```
+
+Pass a boolean to make it conditional on page state, so a page can drop the sidebar only in
+its own full-screen mode:
+
+```tsx
+const [zen, setZen] = useState(false);
+useHideSidebar(zen);
+```
+
+The nav is never lost. The frame falls back to its `popover` presentation, so the top bar's
+menu button still opens the full nav as an overlay. Like `collapseWhenNarrow`, it leaves the
+persisted collapse state and width alone, so navigating away restores the rail exactly as the
+user had it. Requests from several mounted components compose: the rail comes back when the
+last one unmounts or turns its request off.
 
 ## Theming
 
