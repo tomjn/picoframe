@@ -38,6 +38,7 @@ function DemoApp() {
             <img src={DEMO_LOGO} alt="" className="h-5 w-5 rounded" />
           ) : undefined,
         },
+        topBar: { floating: { default: false, userConfigurable: true } },
         breadcrumb: {
           collapsed: { default: false, userConfigurable: true },
           hidden: breadcrumbHidden,
