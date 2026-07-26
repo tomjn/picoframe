@@ -176,6 +176,51 @@ test("renders a custom image/JSX label, still announcing the string accessible n
   expect(screen.queryByText("Brand")).toBeNull();
 });
 
+function renderFloatingTopBar() {
+  return render(
+    <MemoryRouter initialEntries={["/reports"]}>
+      <FrameProvider value={{ title: "App", nav, crumbs: emptyResolvers } as unknown as FrameContextValue}>
+        <TopBar title="App" onToggleSidebar={() => {}} floating />
+      </FrameProvider>
+    </MemoryRouter>,
+  );
+}
+
+test("docked bar keeps its own background and carries no floating marker", () => {
+  const { container } = renderTopBar("/reports");
+  const header = container.querySelector("header") as HTMLElement;
+  expect(header.className).toContain("bg-background");
+  expect(header.className).toContain("border-b");
+  expect(header.dataset.floating).toBeUndefined();
+});
+
+test("floating bar drops its background, leaves the flow, and marks itself for slot styling", () => {
+  const { container } = renderFloatingTopBar();
+  const header = container.querySelector("header") as HTMLElement;
+  expect(header.dataset.floating).toBe("true");
+  expect(header.className).toContain("absolute");
+  expect(header.className).not.toContain("bg-background");
+  expect(header.className).not.toContain("border-b");
+});
+
+test("floating bar lets clicks through to the content, except on its own clusters", () => {
+  const { container } = renderFloatingTopBar();
+  const header = container.querySelector("header") as HTMLElement;
+  // The bar spans the full width over the content, so only the clusters may take a hit.
+  expect(header.className).toContain("pointer-events-none");
+  const cluster = screen.getByLabelText("Toggle sidebar").closest(".pointer-events-auto");
+  expect(cluster).not.toBeNull();
+  const crumbs = container.querySelector("[data-slot=breadcrumbs]") as HTMLElement;
+  expect(crumbs.className).toContain("pointer-events-auto");
+});
+
+test("floating clusters carry their own pill background", () => {
+  const { container } = renderFloatingTopBar();
+  const crumbs = container.querySelector("[data-slot=breadcrumbs]") as HTMLElement;
+  expect(crumbs.className).toContain("rounded-full");
+  expect(crumbs.className).toContain("bg-background/80");
+});
+
 test("renders a centered top-bar slot region", () => {
   const { container } = renderTopBar("/");
   const center = container.querySelector("[data-slot=topbar-center]");

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { useMouseNavigation } from "../history/useMouseNavigation";
 import { useFrame } from "../context/frame";
 import { useLayoutConfig, useLayoutOption } from "../context/layoutConfig";
 import { DrawerHost } from "../drawer/DrawerHost";
 import { Toaster } from "../toast/Toaster";
+import { cn } from "../lib/cn";
 import { useNarrowViewport } from "../lib/useNarrowViewport";
 import { usePersistentState } from "../lib/usePersistentState";
 import { HideSidebarProvider, type HideSidebarRegistry } from "./hideSidebar";
@@ -24,6 +25,7 @@ export function AppLayout() {
   const [collapseWhenNarrow] = useLayoutOption("collapseWhenNarrow");
   const [breadcrumbCollapsed] = useLayoutOption("breadcrumbCollapsed");
   const [historyButtons] = useLayoutOption("historyButtons");
+  const [floatingTopBar] = useLayoutOption("floatingTopBar");
   const { menuButton, breadcrumbHidden, narrowBreakpoint } = useLayoutConfig();
   const [menuOpen, setMenuOpen] = useState(false);
   useMouseNavigation();
@@ -84,7 +86,13 @@ export function AppLayout() {
           onClose={reveal.close}
         />
       )}
-      <div className="flex min-w-0 flex-1 flex-col">
+      {/* The inset is published as a variable, and reads 0px when the bar is docked, so a page
+          can pull itself back under a floating bar with `-mt-[var(--pf-topbar-inset)]` and stay
+          inert in every other mode. */}
+      <div
+        className={cn("flex min-w-0 flex-1 flex-col", floatingTopBar && "relative")}
+        style={{ "--pf-topbar-inset": floatingTopBar ? "3rem" : "0px" } as CSSProperties}
+      >
         <TopBar
           title={title}
           onToggleSidebar={onToggleSidebar}
@@ -102,8 +110,12 @@ export function AppLayout() {
           menuLabelVisible={menuButton.labelVisible}
           menuLabelContent={menuButton.labelContent}
           showHistoryButtons={historyButtons}
+          floating={floatingTopBar}
         />
-        <main data-slot="content-scroll" className="min-h-0 flex-1 overflow-auto overscroll-none">
+        <main
+          data-slot="content-scroll"
+          className="min-h-0 flex-1 overflow-auto overscroll-none pt-[var(--pf-topbar-inset)]"
+        >
           {/* Scoped to the routed page: `useHideSidebar` is a page-level opt-out, not
               something the surrounding shell (top bar slots, drawer) reaches for. */}
           <HideSidebarProvider value={hideRegistry}>

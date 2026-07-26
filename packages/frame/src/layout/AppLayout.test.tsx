@@ -123,6 +123,23 @@ test("explicit popover mode stays an anchored card on a wide window", () => {
   expect(panel?.dataset.fullscreen).toBeUndefined();
 });
 
+test("a floating top bar insets the scroll area so content starts below it", () => {
+  const { container } = renderLayout({ topBar: { floating: true } });
+  const main = container.querySelector("[data-slot=content-scroll]") as HTMLElement;
+  expect(main.className).toContain("pt-[var(--pf-topbar-inset)]");
+  const column = main.parentElement as HTMLElement;
+  expect(column.style.getPropertyValue("--pf-topbar-inset")).toBe("3rem");
+  // The out-of-flow bar needs a positioned ancestor that isn't the whole window.
+  expect(column.className).toContain("relative");
+});
+
+test("a docked top bar zeroes the inset, so a page's own override is inert", () => {
+  const { container } = renderLayout();
+  const main = container.querySelector("[data-slot=content-scroll]") as HTMLElement;
+  const column = main.parentElement as HTMLElement;
+  expect(column.style.getPropertyValue("--pf-topbar-inset")).toBe("0px");
+});
+
 test("popover wins over hover-reveal: no floating panel, no docked sidebar", () => {
   const { container } = renderLayout({ sidebar: { popover: true, hoverReveal: true } });
   expect(container.querySelector("[data-slot=sidebar]")).toBeNull();

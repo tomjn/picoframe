@@ -53,6 +53,15 @@ export interface LayoutConfig {
     /** Custom visible label content (e.g. an image/logo). Replaces the text when shown; `menuLabel` stays the accessible name. */
     menuLabelContent?: ReactNode;
   };
+  topBar?: {
+    /**
+     * Drop the top bar's own background and float it over the content, which scrolls
+     * beneath it. Frame-owned controls (menu, history, breadcrumb) get their own pill
+     * backgrounds. Slot content is the app's to style, off the `data-floating` marker
+     * on the header (target it with `group-data-[floating]/topbar:` classes).
+     */
+    floating?: Configurable<boolean>;
+  };
   breadcrumb?: {
     /** Show only the current route header; reveal the full path on hover/focus. */
     collapsed?: Configurable<boolean>;
@@ -70,6 +79,7 @@ export interface ResolvedLayoutConfig {
   popover: OptionDescriptor<boolean>;
   hoverReveal: OptionDescriptor<boolean>;
   collapseWhenNarrow: OptionDescriptor<boolean>;
+  floatingTopBar: OptionDescriptor<boolean>;
   breadcrumbCollapsed: OptionDescriptor<boolean>;
   historyButtons: OptionDescriptor<boolean>;
   /** Hide the breadcrumb region entirely (static app config). */
@@ -92,6 +102,7 @@ export type LayoutOptionKey =
   | "popover"
   | "hoverReveal"
   | "collapseWhenNarrow"
+  | "floatingTopBar"
   | "breadcrumbCollapsed"
   | "historyButtons";
 
@@ -127,6 +138,11 @@ export const LAYOUT_OPTIONS: { key: LayoutOptionKey; label: string; description:
     description: "On a narrow window, the sidebar becomes a menu button and opens fullscreen.",
   },
   {
+    key: "floatingTopBar",
+    label: "Floating top bar",
+    description: "The top bar loses its background and sits over the content as it scrolls.",
+  },
+  {
     key: "breadcrumbCollapsed",
     label: "Collapse breadcrumb",
     description: "Show only the current page; reveal the full path on hover.",
@@ -153,6 +169,7 @@ export function LayoutConfigProvider({
       popover: resolveOption(config?.sidebar?.popover, false),
       hoverReveal: resolveOption(config?.sidebar?.hoverReveal, false),
       collapseWhenNarrow: resolveOption(config?.sidebar?.collapseWhenNarrow, false),
+      floatingTopBar: resolveOption(config?.topBar?.floating, false),
       breadcrumbCollapsed: resolveOption(config?.breadcrumb?.collapsed, false),
       historyButtons: resolveOption(config?.history?.buttons, true),
       breadcrumbHidden: config?.breadcrumb?.hidden ?? false,

@@ -53,6 +53,7 @@ export function TopBar({
   menuLabelVisible = false,
   menuLabelContent,
   showHistoryButtons = true,
+  floating = false,
   toggleHoverHandlers,
 }: {
   title: string;
@@ -81,6 +82,8 @@ export function TopBar({
   menuLabelContent?: ReactNode;
   /** Show the back/forward navigation buttons. */
   showHistoryButtons?: boolean;
+  /** Float over the content with no background of its own, each control cluster on a pill. */
+  floating?: boolean;
 }) {
   const navigate = useNavigate();
   const { canBack, canForward } = useNavigationStack();
@@ -148,11 +151,24 @@ export function TopBar({
   const toggleLabel = popover ? (menuLabel ?? "Menu") : "Toggle sidebar";
   const showMenuLabel = popover && menuLabelVisible;
 
+  // Floating mode takes the bar out of flow over the content, so it must not swallow clicks
+  // meant for what's underneath. Each cluster opts its own hit area back in and carries the
+  // background the header itself has given up.
+  const pill = floating
+    ? "pointer-events-auto h-9 rounded-full border border-border bg-background/80 backdrop-blur-sm"
+    : "";
+
   return (
     <header
-      data-tauri-drag-region
-      className="relative flex h-12 shrink-0 items-center gap-1 border-b border-border bg-background px-2"
+      data-floating={floating || undefined}
+      className={cn(
+        "group/topbar flex h-12 shrink-0 items-center gap-1 px-2",
+        floating
+          ? "pointer-events-none absolute inset-x-0 top-0 z-30"
+          : "relative border-b border-border bg-background",
+      )}
     >
+      <div className={cn("flex items-center gap-1", pill, floating && "px-1")}>
       <div className="relative" {...toggleHoverHandlers}>
         {showMenuLabel ? (
           <button
@@ -187,13 +203,18 @@ export function TopBar({
           </IconButton>
         </>
       )}
+      </div>
 
       {/* `min-w-0` lets the trail shrink on a narrow window instead of pushing the right-hand
           slot cluster off the bar. Individual crumbs truncate rather than wrap. */}
       {!breadcrumbHidden && (
       <div
         data-slot="breadcrumbs"
-        className="group ml-1 flex min-w-0 items-center gap-1 overflow-hidden text-sm font-medium"
+        className={cn(
+          "group ml-1 flex min-w-0 items-center gap-1 overflow-hidden text-sm font-medium",
+          pill,
+          floating && "px-3",
+        )}
       >
         {crumbs.length === 0 ? (
           <span>{title}</span>
@@ -230,7 +251,9 @@ export function TopBar({
       </div>
       )}
 
-      <div className="ml-2 flex items-center gap-1">
+      {/* Slot regions get their hit area back but no pill. Floating backgrounds are the app's
+          call, off the header's `data-floating` marker. */}
+      <div className={cn("ml-2 flex items-center gap-1", floating && "pointer-events-auto")}>
         <Slot id="topbar.left" />
       </div>
       {/* Absolutely centered so it stays centered regardless of the side clusters' widths. */}
@@ -240,7 +263,7 @@ export function TopBar({
       >
         <Slot id="topbar.center" />
       </div>
-      <div className="ml-auto flex items-center gap-1">
+      <div className={cn("ml-auto flex items-center gap-1", floating && "pointer-events-auto")}>
         <Slot id="topbar.right" />
       </div>
     </header>
