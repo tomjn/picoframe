@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/store",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Disk-backed persistence adapter for picoframe, built on tauri-plugin-store",
   "license": "MIT",
   "repository": {
