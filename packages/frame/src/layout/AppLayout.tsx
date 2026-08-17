@@ -14,6 +14,42 @@ import { Sidebar, SIDEBAR_DEFAULT_WIDTH } from "./Sidebar";
 import { useSidebarState } from "./useSidebarState";
 import { TopBar } from "./TopBar";
 
+/** The scroll container the skip link jumps to, and the page's `<main>` landmark. */
+const MAIN_ID = "pf-main";
+
+/**
+ * The first stop of every Tab walk: a link that jumps past the chrome to the page.
+ *
+ * The sidebar, the resize handle, the toggle and the top-bar slots come before the
+ * page in the DOM, and a keyboard reader would otherwise pass all of them on every
+ * visit. That is WCAG 2.4.1 Bypass Blocks, and a heading structure only answers it
+ * for a screen reader.
+ *
+ * It sits off the top of the viewport until focused rather than being hidden, so it
+ * stays focusable, and it moves focus itself: following an in-page link scrolls in
+ * WebKit without moving focus, which would leave the reader tabbing from the chrome
+ * again.
+ */
+function SkipLink() {
+  return (
+    <a
+      href={`#${MAIN_ID}`}
+      data-slot="skip-link"
+      onClick={(e) => {
+        e.preventDefault();
+        document.getElementById(MAIN_ID)?.focus();
+      }}
+      className={cn(
+        "fixed left-3 top-3 z-50 -translate-y-20 rounded-md border border-border bg-background px-3 py-2",
+        "text-sm font-medium text-foreground shadow-md transition-transform",
+        "focus:translate-y-0 focus:outline-2 focus:outline-offset-2 focus:outline-ring",
+      )}
+    >
+      Skip to content
+    </a>
+  );
+}
+
 /** The frame's single layout route: sidebar + top bar + routed content. */
 export function AppLayout() {
   const { nav, title } = useFrame();
@@ -67,6 +103,7 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
+      <SkipLink />
       {!popoverMode && (
         <Sidebar
           groups={nav}
@@ -112,7 +149,10 @@ export function AppLayout() {
           showHistoryButtons={historyButtons}
           floating={floatingTopBar}
         />
+        {/* `tabIndex={-1}` so the skip link can put focus here. It is not a tab stop. */}
         <main
+          id={MAIN_ID}
+          tabIndex={-1}
           data-slot="content-scroll"
           className="min-h-0 flex-1 overflow-auto overscroll-none pt-[var(--pf-topbar-inset)]"
         >

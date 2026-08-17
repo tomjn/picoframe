@@ -123,6 +123,28 @@ test("explicit popover mode stays an anchored card on a wide window", () => {
   expect(panel?.dataset.fullscreen).toBeUndefined();
 });
 
+test("the skip link is the first thing a Tab walk reaches, and it points at the content", () => {
+  const { container } = renderLayout();
+  const focusable = container.querySelectorAll<HTMLElement>(
+    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  );
+  const skip = container.querySelector("[data-slot=skip-link]") as HTMLAnchorElement;
+  expect(focusable[0]).toBe(skip);
+  expect(skip.textContent).toBe("Skip to content");
+  const main = container.querySelector("[data-slot=content-scroll]") as HTMLElement;
+  expect(skip.getAttribute("href")).toBe(`#${main.id}`);
+});
+
+test("following the skip link moves focus to the content, not just the scroll position", () => {
+  // WebKit scrolls to an in-page target without focusing it, which would drop the
+  // reader back at the chrome on the next Tab.
+  const { container } = renderLayout();
+  const main = container.querySelector("[data-slot=content-scroll]") as HTMLElement;
+  expect(main.tabIndex).toBe(-1);
+  fireEvent.click(screen.getByText("Skip to content"));
+  expect(document.activeElement).toBe(main);
+});
+
 test("a floating top bar insets the scroll area so content starts below it", () => {
   const { container } = renderLayout({ topBar: { floating: true } });
   const main = container.querySelector("[data-slot=content-scroll]") as HTMLElement;

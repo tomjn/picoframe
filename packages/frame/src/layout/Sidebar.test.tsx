@@ -32,6 +32,14 @@ function renderAt(path: string, groups: NavGroup[], label: string) {
 // The active-state class only present when an item is highlighted.
 const ACTIVE = "font-medium";
 
+test("the resize handle is a keyboard stop that shows where it is", () => {
+  const { container } = renderSidebar(oneItem);
+  const handle = container.querySelector('[aria-label="Resize sidebar"]') as HTMLElement;
+  expect(handle.tabIndex).toBe(0);
+  expect(handle.className).toContain("focus-visible:outline-ring");
+  expect(handle.className).not.toContain("focus-visible:outline-none");
+});
+
 test("collapsed rail still renders nav item icons", () => {
   const { container } = render(
     <MemoryRouter>
