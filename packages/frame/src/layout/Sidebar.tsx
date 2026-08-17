@@ -167,7 +167,10 @@ function ResizeHandle({ width, onResize }: { width: number; onResize: (px: numbe
       className={cn(
         "absolute -right-1 top-0 z-10 h-full w-2 cursor-col-resize",
         "after:absolute after:inset-y-0 after:left-1/2 after:w-px after:-translate-x-1/2 after:bg-transparent after:transition-colors",
-        "hover:after:bg-ring focus-visible:outline-none focus-visible:after:bg-ring",
+        // A keyboard stop has to show where it is, and the hairline the hover state
+        // paints is thinner than a 2px perimeter of the handle, so focus outlines the
+        // whole splitter as well as colouring the line.
+        "hover:after:bg-ring focus-visible:outline-2 focus-visible:outline-ring focus-visible:after:bg-ring",
         dragging && "after:bg-ring",
       )}
     />
