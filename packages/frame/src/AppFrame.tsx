@@ -9,6 +9,7 @@ import { type DrawerContainer, DrawerProvider } from "./drawer/DrawerProvider";
 import { NavigationStackProvider } from "./history/navigation-stack";
 import { DefaultFallback } from "./layout/DefaultFallback";
 import { composeNav } from "./nav/composeNav";
+import { RouteAppearance, buildAppearanceRules } from "./routing/appearance";
 import { buildRoutes } from "./routing/buildRoutes";
 import { buildCrumbResolvers } from "./routing/crumbs";
 import { composeSettings } from "./settings/composeSettings";
@@ -99,6 +100,7 @@ export function AppFrame({
     return resolvers;
   }, [composed, settings]);
   const slots = useMemo(() => composeSlots(composed.flatMap((p) => p.slots ?? [])), [composed]);
+  const appearance = useMemo(() => buildAppearanceRules(composed), [composed]);
 
   let routed: ReactNode = <RoutedApp routes={routes} />;
   for (const plugin of [...resolved].reverse()) {
@@ -115,6 +117,9 @@ export function AppFrame({
       defaultBase={theme?.defaultBase}
     >
       <HashRouter>
+        {/* Inside the router so it can read the path, inside ThemeProvider so it can
+            override the appearance. Renders nothing. */}
+        <RouteAppearance rules={appearance} />
         <NavigationStackProvider>
           <SlotProvider slots={slots}>
             <PersistentStoreProvider storage={store ?? settingsStorage}>

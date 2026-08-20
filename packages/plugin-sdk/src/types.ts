@@ -94,6 +94,9 @@ export interface CrumbContext {
  */
 export type CrumbFn = (ctx: CrumbContext) => string | string[];
 
+/** A forced light/dark appearance, overriding the user's own theme setting. */
+export type RouteAppearance = "light" | "dark";
+
 /** A route contributed by a plugin. Lazy by default for code-splitting. */
 export interface FrameRoute {
   /** Path relative to the app root (no leading slash needed). Omit for an index route. */
@@ -121,6 +124,16 @@ export interface FrameRoute {
    * instead of a title-cased `Acme` followed by it.
    */
   crumbSpan?: number;
+  /**
+   * Force light or dark for this route, whatever the user's theme setting. Omit to
+   * follow the setting, which is what almost every route should do.
+   *
+   * It applies to the whole window, chrome included, so a page whose content is
+   * inherently one appearance (a photo or video canvas, a print preview) does not
+   * leave the top bar and sidebar clashing with it. Nested routes inherit it, and
+   * the most specific matching route wins.
+   */
+  appearance?: RouteAppearance;
   children?: FrameRoute[];
 }
 

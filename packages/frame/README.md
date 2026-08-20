@@ -215,6 +215,26 @@ persisted collapse state and width alone, so navigating away restores the rail e
 user had it. Requests from several mounted components compose: the rail comes back when the
 last one unmounts or turns its request off.
 
+## Forcing light or dark on one route
+
+Most routes should follow the user's theme setting. A page whose content is inherently one
+appearance is the exception: a photo or video canvas, a map, a print preview. Left alone, the
+top bar and sidebar keep the user's setting and clash with it.
+
+Set `appearance` on the route and the whole window follows, chrome included:
+
+```tsx
+routes: [
+  { path: "gallery", lazy: () => import("./Gallery"), appearance: "dark" },
+];
+```
+
+It is a route-level declaration rather than something the page does on mount, so the frame
+knows the appearance before the page renders and there is no flash of the old one on the way
+in. The user's stored setting is untouched, so the Appearance panel still shows what they
+chose and navigating away restores it. Nested routes inherit it, and the most specific
+matching route wins, so a child can opt back out.
+
 ## Theming
 
 The frame's design tokens ship as `@picoframe/frame/theme.css` (mode / accent / base axes).
