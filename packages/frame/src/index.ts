@@ -30,14 +30,21 @@ export { toast } from "sonner";
 
 // Side/bottom drawer: open a single, frame-managed drawer from anywhere. Portals into
 // `document.body` by default, or a caller-supplied `container` (side sheet or bottom sheet).
+// `DrawerProvider` + `DrawerHost` are the same building blocks AppFrame mounts, exported
+// so a drawer can live outside the frame. `Drawer` is the controlled form: it renders its
+// children live, for content that changes while the drawer is open.
 export {
+  DrawerProvider,
   useDrawer,
   type DrawerController,
+  type DrawerProviderProps,
   type DrawerOptions,
   type DrawerContainer,
   type DrawerDirection,
   type DrawerSize,
 } from "./drawer/DrawerProvider";
+export { DrawerHost } from "./drawer/DrawerHost";
+export { Drawer, type DrawerProps } from "./drawer/Drawer";
 
 // Persistence: read/write persisted values, and supply a custom storage backend.
 // `useSetting` is the settings-flavoured alias of `usePersistentValue`.
