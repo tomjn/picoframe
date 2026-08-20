@@ -28,13 +28,19 @@ export interface CrumbResolvers {
    */
   static: Map<string, string | string[]>;
   /** Route patterns (possibly with `:params`) and their crumb, in registration order. */
-  patterns: { pattern: string; crumb: string | CrumbFn }[];
+  patterns: { pattern: string; crumb: string | string[] | CrumbFn }[];
   /**
    * Full pattern of every contributed route (with or without a `crumb`), so a
    * breadcrumb segment can be tested for navigability. A static label alone does
    * not imply a route — parent segments may be labeled but have nowhere to go.
    */
   routes: string[];
+  /**
+   * Patterns of the routes that declared a `crumbSpan` above 1, so the bar knows
+   * how many trailing segments one crumb covers. Only multi-segment routes appear
+   * here. Everything else spans a single segment.
+   */
+  spans: { pattern: string; span: number }[];
 }
 
 /**
@@ -44,9 +50,10 @@ export interface CrumbResolvers {
  * without a React Router data router.
  */
 export function buildCrumbResolvers(plugins: FramePlugin[]): CrumbResolvers {
-  const staticMap = new Map<string, string>();
-  const patterns: { pattern: string; crumb: string | CrumbFn }[] = [];
+  const staticMap = new Map<string, string | string[]>();
+  const patterns: { pattern: string; crumb: string | string[] | CrumbFn }[] = [];
   const routes: string[] = [];
+  const spans: { pattern: string; span: number }[] = [];
 
   for (const p of plugins) {
     for (const [path, label] of Object.entries(p.crumbs ?? {})) {
@@ -59,12 +66,13 @@ export function buildCrumbResolvers(plugins: FramePlugin[]): CrumbResolvers {
       const full = r.index ? base || "/" : joinPath(base, r.path ?? "");
       routes.push(full);
       if (r.crumb !== undefined) patterns.push({ pattern: full, crumb: r.crumb });
+      if (r.crumbSpan !== undefined && r.crumbSpan > 1) spans.push({ pattern: full, span: r.crumbSpan });
       if (r.children) walk(r.children, full);
     }
   };
   walk(plugins.flatMap((p) => p.routes), "/");
 
-  return { static: staticMap, patterns, routes };
+  return { static: staticMap, patterns, routes, spans };
 }
 
 /**
@@ -80,6 +88,18 @@ export function resolveCrumb(resolvers: CrumbResolvers, path: string): string | 
     if (match) return typeof crumb === "function" ? crumb({ params: match.params, pathname: path }) : crumb;
   }
   return undefined;
+}
+
+/**
+ * How many trailing URL segments the crumb at this path stands for. 1 unless a
+ * route declared a larger `crumbSpan`, in which case the caller drops the crumbs
+ * it already emitted for the segments now covered by this one.
+ */
+export function resolveCrumbSpan(resolvers: CrumbResolvers, path: string): number {
+  for (const { pattern, span } of resolvers.spans) {
+    if (matchPath({ path: pattern, end: true }, path)) return span;
+  }
+  return 1;
 }
 
 /**

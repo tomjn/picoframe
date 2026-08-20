@@ -8,7 +8,7 @@ import { TopBar } from "./TopBar";
 
 afterEach(cleanup);
 
-const emptyResolvers: CrumbResolvers = { static: new Map(), patterns: [], routes: [] };
+const emptyResolvers: CrumbResolvers = { static: new Map(), patterns: [], routes: [], spans: [] };
 const nav: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
 
 function renderTopBar(
@@ -83,6 +83,43 @@ test("collapsed breadcrumb with a single crumb just shows it (no wrapper)", () =
   const { container } = renderTopBar("/reports", true);
   expect(screen.getByText("Reports")).toBeTruthy();
   expect(container.querySelector("[data-crumb-ancestors]")).toBeNull();
+});
+
+function renderTopBarWith(resolvers: CrumbResolvers, path: string) {
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <FrameProvider value={{ title: "App", nav, crumbs: resolvers } as unknown as FrameContextValue}>
+        <TopBar title="App" onToggleSidebar={() => {}} />
+      </FrameProvider>
+    </MemoryRouter>,
+  );
+}
+
+test("an array crumb gives a flat route a synthetic, non-navigable ancestor", () => {
+  const resolvers: CrumbResolvers = {
+    static: new Map([["/inbox", ["Catch-up", "Inbox"]]]),
+    patterns: [],
+    routes: ["/inbox"],
+    spans: [],
+  };
+  renderTopBarWith(resolvers, "/inbox");
+  // The synthetic parent has no path of its own, so it is text, never a link.
+  expect(screen.getByText("Catch-up").tagName).toBe("SPAN");
+  expect(screen.getByText("Inbox")).toBeTruthy();
+});
+
+test("crumbSpan collapses the segments it covers into one merged crumb", () => {
+  const resolvers: CrumbResolvers = {
+    static: new Map(),
+    patterns: [{ pattern: "/:owner/:name", crumb: (c) => `${c.params.owner}/${c.params.name}` }],
+    routes: ["/:owner/:name"],
+    spans: [{ pattern: "/:owner/:name", span: 2 }],
+  };
+  renderTopBarWith(resolvers, "/acme/repo");
+  expect(screen.getByText("acme/repo")).toBeTruthy();
+  // The intermediate segment matches no route, so without the span it would have
+  // title-cased into a stray "Acme" crumb ahead of the merged one.
+  expect(screen.queryByText("Acme")).toBeNull();
 });
 
 test("popover menu anchors inside the menu button's positioned wrapper", () => {
