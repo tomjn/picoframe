@@ -48,7 +48,7 @@ export function DrawerProvider({ children, container }: DrawerProviderProps) {
 
 function useDrawerContext(): DrawerContextValue {
   const ctx = useContext(DrawerContext);
-  if (!ctx) throw new Error("useDrawer must be used within <AppFrame>");
+  if (!ctx) throw new Error("useDrawer must be used within <AppFrame> / <DrawerProvider>");
   return ctx;
 }
 

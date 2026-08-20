@@ -23,6 +23,7 @@ createRoot(root).render(<AppFrame plugins={plugins} title="My app" />);
 | `framePlugin` | Built-in plugin (home route launcher) |
 | `useFrame`, `useNavigationStack`, `useDrawer`, `useSidebarState`, `useHideSidebar` | Hooks |
 | `ThemeProvider`, `useTheme` | Theming |
+| `DrawerProvider`, `DrawerHost`, `Drawer` | Drawer building blocks, and the controlled form |
 | `Slot` | Named slot for plugin contributions |
 | `cn` | Class-name merge helper |
 | `Button`, `Input` | The **only** UI primitives shipped here (see below) |
@@ -83,6 +84,33 @@ open({ direction: "bottom", size: "lg", container: () => panelRef.current, conte
 
 Set a **provider-level default** for every drawer via `<AppFrame drawer={{ container }} />`; a per-open
 `container` overrides it. See the demo's "Drawer lab" page for a worked example.
+
+### Controlled drawers, and drawers outside the frame
+
+`useDrawer()` takes a snapshot of `content` when you call `open()`, so it can't express content
+that changes while the drawer is open. `<Drawer>` is the controlled form for that: async loading
+states, an error and its retry, a multi-step form. It takes the same options as props, plus
+`open` / `onOpenChange`, and renders its `children` live.
+
+```tsx
+<Drawer open={open} onOpenChange={setOpen} title="Details" size="lg">
+  {loading ? <Spinner /> : <Details data={data} />}
+</Drawer>
+```
+
+It owns its own dialog rather than the frame's single global one, so it needs no provider and
+several can coexist.
+
+For the imperative API outside `AppFrame` (a secondary window, or an app adopting the frame a
+piece at a time), mount the building blocks yourself. `useDrawer()` then works anywhere under
+the provider:
+
+```tsx
+<DrawerProvider container={panelRef.current}>
+  <App />
+  <DrawerHost />
+</DrawerProvider>
+```
 
 ### Native `<select>` caveat
 
