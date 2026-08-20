@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 const nav: NavGroup[] = [{ id: "main", items: [{ id: "a", label: "Alpha", to: "/a" }] }];
-const emptyResolvers: CrumbResolvers = { static: new Map(), patterns: [], routes: [] };
+const emptyResolvers: CrumbResolvers = { static: new Map(), patterns: [], routes: [], spans: [] };
 
 /** Render the layout with real child routes, so pages mount under RouteHost's `Outlet`. */
 function renderPages(

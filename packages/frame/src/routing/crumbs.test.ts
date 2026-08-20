@@ -1,11 +1,22 @@
 import { expect, test } from "bun:test";
 import type { ComponentType } from "react";
 import type { FramePlugin, FrameRoute } from "@picoframe/plugin-sdk";
-import { buildCrumbResolvers, decodeSegment, isRoutePath, resolveCrumb, titleCase } from "./crumbs";
+import {
+  buildCrumbResolvers,
+  decodeSegment,
+  isRoutePath,
+  resolveCrumb,
+  resolveCrumbSpan,
+  titleCase,
+} from "./crumbs";
 
 const page = () => Promise.resolve({ default: (() => null) as ComponentType });
 
-function plugin(id: string, routes: FrameRoute[], crumbs?: Record<string, string>): FramePlugin {
+function plugin(
+  id: string,
+  routes: FrameRoute[],
+  crumbs?: Record<string, string | string[]>,
+): FramePlugin {
   return { id, version: "0", routes, crumbs };
 }
 
@@ -74,6 +85,30 @@ test("unmatched path resolves to undefined (caller falls back to titleCase)", ()
   const r = buildCrumbResolvers([plugin("p", [{ path: "hello", lazy: page, crumb: "Hello" }])]);
   expect(resolveCrumb(r, "/unknown-area")).toBeUndefined();
   expect(titleCase("unknown-area")).toBe("Unknown Area");
+});
+
+test("a plugin's static crumb may be an array, giving a flat route a synthetic ancestor", () => {
+  const r = buildCrumbResolvers([plugin("p", [{ path: "inbox", lazy: page }], { inbox: ["Catch-up", "Inbox"] })]);
+  expect(resolveCrumb(r, "/inbox")).toEqual(["Catch-up", "Inbox"]);
+});
+
+test("a route's crumb function may return an array of labels", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [{ path: "orgs/:org", lazy: page, crumb: (c) => ["Organisations", c.params.org ?? ""] }]),
+  ]);
+  expect(resolveCrumb(r, "/orgs/acme")).toEqual(["Organisations", "acme"]);
+});
+
+test("crumbSpan is reported for the route that declares it, and defaults to 1", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [
+      { path: ":owner/:name", lazy: page, crumb: (c) => `${c.params.owner}/${c.params.name}`, crumbSpan: 2 },
+      { path: "hello", lazy: page, crumb: "Hello" },
+    ]),
+  ]);
+  expect(resolveCrumbSpan(r, "/acme/repo")).toBe(2);
+  expect(resolveCrumbSpan(r, "/hello")).toBe(1);
+  expect(resolveCrumbSpan(r, "/unknown")).toBe(1);
 });
 
 test("decodeSegment turns encoded path segments into readable text", () => {

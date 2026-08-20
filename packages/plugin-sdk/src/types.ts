@@ -88,8 +88,11 @@ export interface CrumbContext {
   pathname: string;
 }
 
-/** Resolve a breadcrumb label dynamically from the matched route params. */
-export type CrumbFn = (ctx: CrumbContext) => string;
+/**
+ * Resolve a breadcrumb label dynamically from the matched route params. Return an
+ * array to expand the one segment into several crumbs (see {@link FrameRoute.crumb}).
+ */
+export type CrumbFn = (ctx: CrumbContext) => string | string[];
 
 /** A route contributed by a plugin. Lazy by default for code-splitting. */
 export interface FrameRoute {
@@ -102,8 +105,22 @@ export interface FrameRoute {
    * Breadcrumb label: a string, or a function of the matched route params for
    * dynamic segments (e.g. `(c) => userName(c.params.id)`). Falls back to a
    * title-cased path segment when omitted.
+   *
+   * An array expands this one segment into several crumbs, giving a flat route a
+   * synthetic ancestor it has no URL segment for: `["Catch-up", "Inbox"]` on
+   * `/inbox` reads as `Catch-up / Inbox`. Only the last piece corresponds to the
+   * path, so only it can be a link. The ancestors render as plain text.
    */
-  crumb?: string | CrumbFn;
+  crumb?: string | string[] | CrumbFn;
+  /**
+   * Number of trailing URL segments this route's single crumb stands for. Default 1.
+   *
+   * Set it on an entity route whose leading segment is not a route of its own.
+   * `path: ":owner/:name"` with `crumbSpan: 2` and a crumb of
+   * `` `${params.owner}/${params.name}` `` renders one merged `acme/repo` crumb
+   * instead of a title-cased `Acme` followed by it.
+   */
+  crumbSpan?: number;
   children?: FrameRoute[];
 }
 
@@ -177,8 +194,11 @@ export interface FramePlugin {
    * registered route — typically an intermediate parent segment. Keys are
    * absolute paths (leading slash optional): `{ "reports/archive": "Archived" }`.
    * For labels that depend on route params, use a `FrameRoute.crumb` function instead.
+   *
+   * An array expands one path into several crumbs, the same as `FrameRoute.crumb`:
+   * `{ "/inbox": ["Catch-up", "Inbox"] }` reads as `Catch-up / Inbox`.
    */
-  crumbs?: Record<string, string>;
+  crumbs?: Record<string, string | string[]>;
   slots?: SlotContribution[];
   settings?: SettingsSection[];
   /** Optional provider wrapping the whole app (e.g. a React Query context). */
