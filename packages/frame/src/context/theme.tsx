@@ -1,4 +1,13 @@
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useRef } from "react";
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { usePersistentState } from "../lib/usePersistentState";
 import type { Accent, Base } from "./themeConfig";
 
@@ -28,8 +37,14 @@ migrateLegacyAccent();
 interface ThemeValue {
   mode: ThemeMode;
   setMode: (mode: ThemeMode) => void;
-  /** The resolved appearance after applying `system`. */
+  /** The resolved appearance after applying `system` and any route override. */
   resolved: "light" | "dark";
+  /**
+   * Force an appearance regardless of `mode`, or `null` to go back to following it.
+   * Drives `FrameRoute.appearance`. It does not touch the user's stored setting, so
+   * the Appearance panel keeps showing what they chose.
+   */
+  setAppearanceOverride: (appearance: "light" | "dark" | null) => void;
   accent: Accent;
   setAccent: (accent: Accent) => void;
   base: Base;
@@ -56,6 +71,12 @@ export function ThemeProvider({
   const [mode, setMode] = usePersistentState<ThemeMode>("picoframe.theme", defaultMode);
   const [accent, setAccentState] = usePersistentState<Accent>("picoframe.accent", defaultAccent);
   const [base, setBase] = usePersistentState<Base>("picoframe.base", defaultBase);
+  // The current route's forced appearance, if any. Deliberately not persisted: it belongs
+  // to wherever the user happens to be, not to their preferences.
+  const [override, setAppearanceOverride] = useState<"light" | "dark" | null>(null);
+  // `system` has to be state rather than a read at render time, so that an OS change
+  // both repaints and reaches `resolved` (which the toast surface reads).
+  const [systemDark, setSystemDark] = useState(systemPrefersDark);
 
   // Applying an accent flips a transient `data-accent-anim` attribute for ~500ms;
   // theme.css uses it to briefly cross-fade colour-bearing surfaces so the new accent
@@ -80,9 +101,13 @@ export function ThemeProvider({
     if (accentAnimTimer.current) clearTimeout(accentAnimTimer.current);
   }, []);
 
-  const resolved: "light" | "dark" = mode === "system" ? (systemPrefersDark() ? "dark" : "light") : mode;
+  const preferred: "light" | "dark" = mode === "system" ? (systemDark ? "dark" : "light") : mode;
+  const resolved: "light" | "dark" = override ?? preferred;
 
-  useEffect(() => {
+  // A layout effect so the class is on the document before the new route paints. A
+  // passive effect would show one frame of the outgoing appearance on every navigation
+  // that changes it.
+  useLayoutEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("dark", resolved === "dark");
   }, [resolved]);
@@ -102,16 +127,21 @@ export function ThemeProvider({
     else root.dataset.base = base;
   }, [base]);
 
+  // Tracked whatever the mode, since `preferred` ignores it unless the mode is `system`.
+  // One listener for the life of the provider beats re-subscribing on every mode change.
   useEffect(() => {
-    if (mode !== "system" || typeof matchMedia === "undefined") return;
+    if (typeof matchMedia === "undefined") return;
     const mq = matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => document.documentElement.classList.toggle("dark", mq.matches);
+    const onChange = () => setSystemDark(mq.matches);
+    onChange();
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, [mode]);
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ mode, setMode, resolved, accent, setAccent, base, setBase }}>
+    <ThemeContext.Provider
+      value={{ mode, setMode, resolved, setAppearanceOverride, accent, setAccent, base, setBase }}
+    >
       {children}
     </ThemeContext.Provider>
   );

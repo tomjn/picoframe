@@ -2,12 +2,13 @@ import {
   type FramePlugin,
   Button,
   Input,
+  cn,
   useDrawer,
   useHideSidebar,
   usePersistentValue,
   useSetting,
 } from "@picoframe/frame";
-import { Cpu, Globe, LayoutDashboard, Maximize, PanelRight, SlidersHorizontal } from "lucide-react";
+import { Cpu, Globe, Images, LayoutDashboard, Maximize, PanelRight, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useDemoLayoutControls } from "./demo-layout-controls";
@@ -126,6 +127,29 @@ function FocusPage() {
   );
 }
 
+/**
+ * A page that is dark whatever the user's theme setting is. The route declares
+ * `appearance: "dark"`, so the top bar and sidebar come with it rather than framing the
+ * photos in a bright chrome. Switch the theme in Appearance and this page will not budge.
+ */
+function GalleryPage() {
+  return (
+    <div className="grid max-w-lg gap-4 p-6">
+      <h1 className="text-lg font-semibold">Gallery</h1>
+      <p className="text-sm text-muted-foreground">
+        This route sets appearance: "dark". The whole window follows, chrome included, and
+        the setting in Appearance is left exactly as you had it. Navigate away and your own
+        theme comes straight back.
+      </p>
+      <div className="grid grid-cols-3 gap-2">
+        {["from-sky-900", "from-violet-900", "from-emerald-900"].map((tint) => (
+          <div key={tint} className={cn("aspect-square rounded-md bg-gradient-to-br to-black", tint)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Example content for the centered top-bar slot. */
 function CenterSlot() {
   return (
@@ -188,6 +212,12 @@ export const demoExtrasPlugin: FramePlugin = {
     { path: "notes", lazy: () => Promise.resolve({ default: DraftPage }), crumb: "Notes" },
     { path: "drawer-lab", lazy: () => import("./demo-drawer-lab"), crumb: "Drawer lab" },
     { path: "focus", lazy: () => Promise.resolve({ default: FocusPage }), crumb: "Focus mode" },
+    {
+      path: "gallery",
+      lazy: () => Promise.resolve({ default: GalleryPage }),
+      crumb: "Gallery",
+      appearance: "dark",
+    },
   ],
   nav: [
     {
@@ -197,6 +227,7 @@ export const demoExtrasPlugin: FramePlugin = {
         { id: "demo.notes", label: "Notes", to: "/notes", order: 10 },
         { id: "demo.drawer-lab", label: "Drawer lab", to: "/drawer-lab", icon: PanelRight, order: 20 },
         { id: "demo.focus", label: "Focus mode", to: "/focus", icon: Maximize, order: 30 },
+        { id: "demo.gallery", label: "Gallery", to: "/gallery", icon: Images, order: 40 },
       ],
     },
     {

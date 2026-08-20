@@ -5,6 +5,7 @@ export type {
   FrameRoute,
   CrumbContext,
   CrumbFn,
+  RouteAppearance,
   SlotId,
   SlotContribution,
   SettingsSection,
