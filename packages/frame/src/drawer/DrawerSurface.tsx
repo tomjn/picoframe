@@ -1,12 +1,12 @@
 "use client";
 
 import { Dialog } from "radix-ui";
-import type { ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
 import { cn } from "../lib/cn";
 import { drawerStyle } from "./drawerStyles";
-import type { DrawerDirection, DrawerSize } from "./reducer";
+import type { DrawerDirection, DrawerFocusOptions, DrawerSize } from "./reducer";
 
-export interface DrawerSurfaceProps {
+export interface DrawerSurfaceProps extends DrawerFocusOptions {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Already-resolved portal target, or `null` for `document.body`. */
@@ -45,8 +45,33 @@ export function DrawerSurface({
   description,
   width,
   height,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   children,
 }: DrawerSurfaceProps) {
+  // Radix restores focus by focusing its `Dialog.Trigger`, and this drawer is driven by an
+  // `open` prop rather than a trigger, so on its own it drops focus on the floor when the
+  // drawer closes. Remember what had focus on the way in and hand it back on the way out.
+  const openerRef = useRef<HTMLElement | null>(null);
+
+  const handleOpenAutoFocus = (event: Event) => {
+    // Fires before Radix moves focus into the panel, so this is still the opener.
+    const active = document.activeElement;
+    openerRef.current = active instanceof HTMLElement ? active : null;
+    onOpenAutoFocus?.(event);
+  };
+
+  const handleCloseAutoFocus = (event: Event) => {
+    onCloseAutoFocus?.(event);
+    const opener = openerRef.current;
+    // Only step in if the panel took focus down with it. Focus somewhere else means the
+    // caller placed it there, or the user moved on out of a non-modal drawer.
+    const focusLost = document.activeElement === null || document.activeElement === document.body;
+    if (event.defaultPrevented || !focusLost || !opener?.isConnected) return;
+    event.preventDefault();
+    opener.focus();
+  };
+
   const contained = target !== null;
   const { contentClass, sizeStyle } = drawerStyle(direction, size, contained);
   // Explicit width/height override the named size for the relevant axis.
@@ -72,6 +97,10 @@ export function DrawerSurface({
         />
         <Dialog.Content
           style={style}
+          // A caller's handler runs first and can `preventDefault()` to take focus over on
+          // the way in or out, rather than timing a focus call against the exit animation.
+          onOpenAutoFocus={handleOpenAutoFocus}
+          onCloseAutoFocus={handleCloseAutoFocus}
           className={cn(
             "z-50 flex flex-col gap-4 bg-background p-6 text-foreground shadow-lg outline-none",
             contentClass,

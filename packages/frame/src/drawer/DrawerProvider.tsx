@@ -6,6 +6,7 @@ import { type DrawerContainer, type DrawerOptions, drawerReducer, initialDrawerS
 export type {
   DrawerContainer,
   DrawerDirection,
+  DrawerFocusHandler,
   DrawerOptions,
   DrawerSize,
 } from "./reducer";
