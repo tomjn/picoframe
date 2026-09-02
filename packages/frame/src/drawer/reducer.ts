@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { Dialog } from "radix-ui";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 /** Edge the drawer slides in from. `left`/`right` are side sheets, `bottom` is a bottom sheet. */
 export type DrawerDirection = "left" | "right" | "bottom";
@@ -14,7 +15,30 @@ export type DrawerSize = "sm" | "md" | "lg" | "full";
  */
 export type DrawerContainer = HTMLElement | null | (() => HTMLElement | null);
 
-export interface DrawerOptions {
+/**
+ * Handler for the drawer's focus events. Call `preventDefault()` on the event to stop the
+ * drawer moving focus, and put it where you want instead.
+ */
+export type DrawerFocusHandler = NonNullable<
+  ComponentPropsWithoutRef<typeof Dialog.Content>["onCloseAutoFocus"]
+>;
+
+/** Focus escape hatches, shared by every way of opening a drawer. */
+export interface DrawerFocusOptions {
+  /**
+   * Fires as the drawer opens, before it focuses its own content. `preventDefault()` to
+   * place focus yourself.
+   */
+  onOpenAutoFocus?: DrawerFocusHandler;
+  /**
+   * Fires as the drawer closes. `preventDefault()` to stop the drawer restoring focus and
+   * send it somewhere of your choosing, e.g. the field a row in the drawer points at. This
+   * is the only way to do it without guessing at the exit animation's duration.
+   */
+  onCloseAutoFocus?: DrawerFocusHandler;
+}
+
+export interface DrawerOptions extends DrawerFocusOptions {
   content: ReactNode;
   /** Edge the drawer slides in from. Default "right". */
   direction?: DrawerDirection;

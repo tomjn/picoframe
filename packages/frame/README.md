@@ -65,6 +65,7 @@ open({ title: "Details", content: <Details /> });
 | `size` | `"md"` | `"sm"` / `"md"` / `"lg"` / `"full"` — a width (side) or height (bottom). |
 | `width` / `height` | — | Explicit CSS size overriding `size` for that axis. |
 | `container` | provider default → `document.body` | Portal target (see below). |
+| `onOpenAutoFocus` / `onCloseAutoFocus` | none | Take focus over as the drawer opens or closes (see Focus below). |
 | `title`, `description` | — | Accessible name/description; omit to keep them screen-reader-only. |
 
 ### Container targeting
@@ -111,6 +112,30 @@ the provider:
   <DrawerHost />
 </DrawerProvider>
 ```
+
+### Focus
+
+Closing a drawer hands focus back to whatever had it when the drawer opened, unless focus has
+since moved somewhere outside the drawer, in which case it is left where the user put it.
+
+A drawer whose job is to send you somewhere needs focus to land on the thing it sent you to
+instead. For a keyboard or screen reader user, that focus move is the navigation. Handle
+`onCloseAutoFocus`, call `preventDefault()` on the event, and focus what you like:
+
+```tsx
+<Drawer
+  open={open}
+  onOpenChange={setOpen}
+  onCloseAutoFocus={(event) => {
+    event.preventDefault();
+    document.getElementById("field-3")?.focus();
+  }}
+>
+```
+
+`useDrawer().open()` takes the same option, and `onOpenAutoFocus` is its mirror for the way in,
+for when the drawer's first focusable element is the wrong place to start. Both fire at the right
+point in the drawer's lifecycle, so nothing has to be timed against the exit animation.
 
 ### Native `<select>` caveat
 

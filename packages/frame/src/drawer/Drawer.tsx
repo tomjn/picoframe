@@ -36,6 +36,8 @@ export function Drawer({
   description,
   width,
   height,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   children,
 }: DrawerProps) {
   return (
@@ -49,6 +51,8 @@ export function Drawer({
       description={description}
       width={width}
       height={height}
+      onOpenAutoFocus={onOpenAutoFocus}
+      onCloseAutoFocus={onCloseAutoFocus}
     >
       {children}
     </DrawerSurface>

@@ -27,6 +27,8 @@ export function DrawerHost() {
       description={options?.description}
       width={options?.width}
       height={options?.height}
+      onOpenAutoFocus={options?.onOpenAutoFocus}
+      onCloseAutoFocus={options?.onCloseAutoFocus}
     >
       {options?.content}
     </DrawerSurface>

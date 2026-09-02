@@ -41,6 +41,7 @@ export {
   type DrawerOptions,
   type DrawerContainer,
   type DrawerDirection,
+  type DrawerFocusHandler,
   type DrawerSize,
 } from "./drawer/DrawerProvider";
 export { DrawerHost } from "./drawer/DrawerHost";
