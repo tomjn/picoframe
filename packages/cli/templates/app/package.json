@@ -10,14 +10,14 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@picoframe/frame": "^0.8.0",
-    "@picoframe/plugin-sdk": "^0.8.0",
-    "@picoframe/store": "^0.8.0",
+    "@picoframe/frame": "^0.9.0",
+    "@picoframe/plugin-sdk": "^0.9.0",
+    "@picoframe/store": "^0.9.0",
     "@tauri-apps/api": "^2.11.0",
     "@tauri-apps/plugin-store": "^2.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router": "^7.6.3"
+    "react-router": "^7.18.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
