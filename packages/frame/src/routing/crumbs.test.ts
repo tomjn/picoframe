@@ -3,6 +3,7 @@ import type { ComponentType } from "react";
 import type { FramePlugin, FrameRoute } from "@picoframe/plugin-sdk";
 import {
   buildCrumbResolvers,
+  buildCrumbTrail,
   decodeSegment,
   isRoutePath,
   resolveCrumb,
@@ -109,6 +110,68 @@ test("crumbSpan is reported for the route that declares it, and defaults to 1", 
   expect(resolveCrumbSpan(r, "/acme/repo")).toBe(2);
   expect(resolveCrumbSpan(r, "/hello")).toBe(1);
   expect(resolveCrumbSpan(r, "/unknown")).toBe(1);
+});
+
+test("the trail links navigable ancestors and leaves the current crumb as text", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [
+      { path: "reports", lazy: page, crumb: "Reports" },
+      { path: "reports/q1", lazy: page, crumb: "Q1" },
+    ]),
+  ]);
+  expect(buildCrumbTrail(r, "/reports/q1").crumbs).toEqual([
+    { label: "Reports", to: "/reports" },
+    { label: "Q1", to: undefined },
+  ]);
+});
+
+test("the trail falls back to a title-cased segment and expands an array crumb", () => {
+  const r = buildCrumbResolvers([plugin("p", [{ path: "inbox", lazy: page }], { inbox: ["Catch-up", "Inbox"] })]);
+  expect(buildCrumbTrail(r, "/inbox").crumbs).toEqual([
+    { label: "Catch-up", to: undefined },
+    { label: "Inbox", to: undefined },
+  ]);
+  expect(buildCrumbTrail(r, "/nothing-here").crumbs).toEqual([{ label: "Nothing Here", to: undefined }]);
+});
+
+test("a crumbSpan route merges the segments it covers into one trail entry", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [{ path: ":owner/:name", lazy: page, crumb: (c) => `${c.params.owner}/${c.params.name}`, crumbSpan: 2 }]),
+  ]);
+  expect(buildCrumbTrail(r, "/acme/repo").crumbs).toEqual([{ label: "acme/repo", to: undefined }]);
+});
+
+// The `dynamic` flag is what the top bar subscribes on: a function may read a name the
+// user is about to change, a string or an array cannot.
+test("a path is dynamic when any crumb on it is a function, and not otherwise", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [
+      { path: "users", lazy: page, crumb: "Users" },
+      { path: "users/:id", lazy: page, crumb: (c) => `User ${c.params.id}` },
+      { path: "about", lazy: page, crumb: ["Help", "About"] },
+    ]),
+  ]);
+  expect(buildCrumbTrail(r, "/users/42").dynamic).toBe(true);
+  expect(buildCrumbTrail(r, "/users").dynamic).toBe(false);
+  expect(buildCrumbTrail(r, "/about").dynamic).toBe(false);
+  // Title-cased fallbacks call nothing, so an unknown path has nothing to follow.
+  expect(buildCrumbTrail(r, "/unknown").dynamic).toBe(false);
+});
+
+test("a static label beating a function crumb leaves the path static", () => {
+  const r = buildCrumbResolvers([
+    plugin("p", [{ path: "users/:id", lazy: page, crumb: (c) => `User ${c.params.id}` }], { "/users/42": "Ada" }),
+  ]);
+  expect(buildCrumbTrail(r, "/users/42").crumbs.at(-1)).toEqual({ label: "Ada", to: undefined });
+  expect(buildCrumbTrail(r, "/users/42").dynamic).toBe(false);
+});
+
+test("the trail re-reads a function crumb on every call, so a renamed thing renames", () => {
+  let name = "Old name";
+  const r = buildCrumbResolvers([plugin("p", [{ path: "projects/:id", lazy: page, crumb: () => name }])]);
+  expect(buildCrumbTrail(r, "/projects/1").crumbs.at(-1)?.label).toBe("Old name");
+  name = "New name";
+  expect(buildCrumbTrail(r, "/projects/1").crumbs.at(-1)?.label).toBe("New name");
 });
 
 test("decodeSegment turns encoded path segments into readable text", () => {

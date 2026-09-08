@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router";
 import { useFrame } from "../context/frame";
 import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
-import { decodeSegment, isRoutePath, resolveCrumb, resolveCrumbSpan, titleCase } from "../routing/crumbs";
+import { useCrumbTrail } from "../routing/useCrumbTrail";
 import { Slot } from "../slots/slots";
 import type { HoverRevealHandlers } from "./HoverRevealSidebar";
 import { SidebarPopover } from "./SidebarPopover";
@@ -90,46 +90,9 @@ export function TopBar({
   const { crumbs: resolvers, nav } = useFrame();
   const { pathname } = useLocation();
 
-  // Build cumulative breadcrumbs from the path; honor static parent labels and
-  // per-route `crumb` (string or param-aware function), else title-case. Each
-  // crumb carries `to` only when the accumulated path is a real, non-current
-  // route, so ancestors you can navigate to become clickable and the rest stay
-  // plain text.
-  const crumbs: { label: string; to?: string }[] = [];
-  const segments = pathname.split("/").filter(Boolean);
-  // Where each segment's crumbs begin, so a `crumbSpan` route can rewind past the
-  // segments it covers. A segment may contribute more than one crumb, so this has to
-  // be an index into `crumbs` rather than a count of segments.
-  const crumbStart: number[] = [];
-  let acc = "";
-  segments.forEach((rawSeg, i) => {
-    // `pathname` is URL-encoded (spaces -> %20); decode so lookups match the
-    // unencoded route/crumb definitions and the fallback label reads cleanly.
-    const seg = decodeSegment(rawSeg);
-    acc += `/${seg}`;
-    // A route may claim several trailing segments as one merged crumb, dropping the
-    // crumbs already emitted for the segments it now covers, so `/acme/repo` reads as
-    // a single "acme/repo" rather than "Acme / acme/repo".
-    const span = resolveCrumbSpan(resolvers, acc);
-    if (span > 1) {
-      crumbs.length = Math.min(crumbs.length, crumbStart[Math.max(0, i - (span - 1))] ?? crumbs.length);
-    }
-    crumbStart.push(crumbs.length);
-    const isCurrent = i === segments.length - 1;
-    const to = !isCurrent && isRoutePath(resolvers, acc) ? acc : undefined;
-    const label = resolveCrumb(resolvers, acc);
-    // A label may expand one segment into several crumbs (e.g. settings ancestry);
-    // only the final piece maps to the accumulated path, so only it can link.
-    if (Array.isArray(label)) {
-      label.forEach((l, j) => crumbs.push({ label: l, to: j === label.length - 1 ? to : undefined }));
-    } else {
-      crumbs.push({ label: label ?? titleCase(seg), to });
-    }
-  });
-  if (crumbs.length === 0) {
-    const root = resolveCrumb(resolvers, "/");
-    if (typeof root === "string") crumbs.push({ label: root });
-  }
+  // The trail, resolved from the path and kept current: a crumb that names a thing by
+  // reading the store follows a rename made while you are on the page.
+  const crumbs = useCrumbTrail(resolvers, pathname);
 
   // Render one crumb as a link (navigable ancestor) or plain text. `muted` dims
   // non-current crumbs; the current route header stays full-strength.
