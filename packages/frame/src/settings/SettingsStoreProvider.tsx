@@ -35,6 +35,16 @@ export function PersistentStoreProvider({
 export const SettingsStoreProvider = PersistentStoreProvider;
 
 /**
+ * The store itself, or null when there is no provider above.
+ *
+ * Internal. For frame chrome that wants to follow persisted values without owning a
+ * key of its own, and that still has to render in a test that mounts it bare.
+ */
+export function useOptionalPersistentStore(): SettingsStore | null {
+  return useContext(PersistentStoreContext);
+}
+
+/**
  * Read/write a persisted value. Frame-managed and reactive: components bound to the same
  * `key` stay in sync, the value persists via the configured `store`, and a value written
  * by another process (e.g. the Rust side) updates live. Namespace `key` yourself, e.g.

@@ -56,6 +56,25 @@ test("unsubscribe stops notifications", () => {
   expect(calls).toBe(0);
 });
 
+test("a write to any key notifies the any-listeners and moves the revision", () => {
+  const store = createSettingsStore(mockStorage());
+  let calls = 0;
+  const before = store.revision();
+  const unsub = store.subscribeAny(() => calls++);
+  store.set("k", 1);
+  store.set("other", 2);
+  expect(calls).toBe(2);
+  expect(store.revision()).not.toBe(before);
+
+  unsub();
+  const settled = store.revision();
+  store.set("k", 3);
+  expect(calls).toBe(2);
+  // The counter keeps moving with no listeners, so a reader that missed the write
+  // still sees that something changed.
+  expect(store.revision()).not.toBe(settled);
+});
+
 test("createSettingsStore is an alias of createPersistentStore", () => {
   expect(createSettingsStore).toBe(createPersistentStore);
 });
@@ -79,9 +98,15 @@ test("a storage-level change notifies the key's subscribers", () => {
   let calls = 0;
   const unsub = store.subscribe("k", () => calls++);
 
+  let anyCalls = 0;
+  store.subscribeAny(() => anyCalls++);
+
   // Simulate a cross-process write arriving through the storage adapter.
   for (const l of storageListeners.get("k") ?? []) l();
   expect(calls).toBe(1);
+  // A crumb reading that key has no subscription of its own, so the outside write has
+  // to reach the any-listeners too.
+  expect(anyCalls).toBe(1);
 
   // After unsubscribe, storage-level changes no longer reach the listener.
   unsub();
