@@ -1,9 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import type { IconComponent, NavGroup } from "@picoframe/plugin-sdk";
 import { FrameProvider, type FrameContextValue } from "../context/frame";
 import type { CrumbResolvers } from "../routing/crumbs";
+import { PersistentStoreProvider, useSetting } from "../settings/SettingsStoreProvider";
+import { memoryStorage } from "../settings/storage";
 import { TopBar } from "./TopBar";
 
 afterEach(cleanup);
@@ -120,6 +122,43 @@ test("crumbSpan collapses the segments it covers into one merged crumb", () => {
   // The intermediate segment matches no route, so without the span it would have
   // title-cased into a stray "Acme" crumb ahead of the merged one.
   expect(screen.queryByText("Acme")).toBeNull();
+});
+
+test("a crumb that reads a stored name follows a rename made without leaving the page", () => {
+  const storage = memoryStorage();
+  storage.set("project.name", JSON.stringify("Old name"));
+  // Reads the store the way a plugin's crumb does: synchronously, outside React, with
+  // only the route param to go on.
+  const resolvers: CrumbResolvers = {
+    static: new Map(),
+    patterns: [
+      { pattern: "/projects/:id", crumb: () => JSON.parse(storage.get("project.name") ?? '"Project"') as string },
+    ],
+    routes: ["/projects/:id"],
+    spans: [],
+  };
+  function Rename() {
+    const [, setName] = useSetting("project.name", "Old name");
+    return (
+      <button type="button" onClick={() => setName("New name")}>
+        rename
+      </button>
+    );
+  }
+  render(
+    <PersistentStoreProvider storage={storage}>
+      <MemoryRouter initialEntries={["/projects/1"]}>
+        <FrameProvider value={{ title: "App", nav, crumbs: resolvers } as unknown as FrameContextValue}>
+          <Rename />
+          <TopBar title="App" onToggleSidebar={() => {}} />
+        </FrameProvider>
+      </MemoryRouter>
+    </PersistentStoreProvider>,
+  );
+  expect(screen.getByText("Old name")).toBeTruthy();
+  fireEvent.click(screen.getByText("rename"));
+  expect(screen.getByText("New name")).toBeTruthy();
+  expect(screen.queryByText("Old name")).toBeNull();
 });
 
 test("popover menu anchors inside the menu button's positioned wrapper", () => {

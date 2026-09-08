@@ -76,18 +76,37 @@ export function buildCrumbResolvers(plugins: FramePlugin[]): CrumbResolvers {
 }
 
 /**
+ * Resolve one path, and say whether the answer came from a `CrumbFn`.
+ *
+ * The flag is what makes a crumb able to follow a rename: a function may read
+ * anything, including a value the user is about to change, so the bar has to
+ * re-resolve when the store is written. A string or an array cannot change, so a
+ * path made only of those needs no subscription at all.
+ */
+function resolveEntry(
+  resolvers: CrumbResolvers,
+  path: string,
+): { label: string | string[] | undefined; dynamic: boolean } {
+  const fromStatic = resolvers.static.get(path);
+  if (fromStatic !== undefined) return { label: fromStatic, dynamic: false };
+  for (const { pattern, crumb } of resolvers.patterns) {
+    const match = matchPath({ path: pattern, end: true }, path);
+    if (!match) continue;
+    if (typeof crumb === "function") {
+      return { label: crumb({ params: match.params, pathname: path }), dynamic: true };
+    }
+    return { label: crumb, dynamic: false };
+  }
+  return { label: undefined, dynamic: false };
+}
+
+/**
  * Resolve the breadcrumb label for one absolute path: a static label wins, else
  * the first route pattern that matches (calling a `CrumbFn` with the matched
  * params), else `undefined` so the caller can fall back to `titleCase`.
  */
 export function resolveCrumb(resolvers: CrumbResolvers, path: string): string | string[] | undefined {
-  const fromStatic = resolvers.static.get(path);
-  if (fromStatic !== undefined) return fromStatic;
-  for (const { pattern, crumb } of resolvers.patterns) {
-    const match = matchPath({ path: pattern, end: true }, path);
-    if (match) return typeof crumb === "function" ? crumb({ params: match.params, pathname: path }) : crumb;
-  }
-  return undefined;
+  return resolveEntry(resolvers, path).label;
 }
 
 /**
@@ -122,6 +141,67 @@ export function decodeSegment(segment: string): string {
  */
 export function isRoutePath(resolvers: CrumbResolvers, path: string): boolean {
   return resolvers.routes.some((pattern) => matchPath({ path: pattern, end: true }, path) != null);
+}
+
+/** One rendered breadcrumb. `to` is set only when it leads somewhere you can go. */
+export interface Crumb {
+  label: string;
+  to?: string;
+}
+
+/**
+ * The whole breadcrumb trail for a path, plus whether any of it came from a
+ * `CrumbFn`. Pure: the same resolvers and path give the same answer, so it can be
+ * called on every render and the caller decides what to subscribe to.
+ */
+export function buildCrumbTrail(
+  resolvers: CrumbResolvers,
+  pathname: string,
+): { crumbs: Crumb[]; dynamic: boolean } {
+  // Cumulative breadcrumbs from the path, honoring static parent labels and per-route
+  // `crumb` (string or param-aware function), else title-case. Each crumb carries `to`
+  // only when the accumulated path is a real, non-current route, so ancestors you can
+  // navigate to become clickable and the rest stay plain text.
+  const crumbs: Crumb[] = [];
+  const segments = pathname.split("/").filter(Boolean);
+  // Where each segment's crumbs begin, so a `crumbSpan` route can rewind past the
+  // segments it covers. A segment may contribute more than one crumb, so this has to
+  // be an index into `crumbs` rather than a count of segments.
+  const crumbStart: number[] = [];
+  let dynamic = false;
+  let acc = "";
+  segments.forEach((rawSeg, i) => {
+    // `pathname` is URL-encoded (spaces -> %20), so decode it. Lookups then match the
+    // unencoded route and crumb definitions, and the fallback label reads cleanly.
+    const seg = decodeSegment(rawSeg);
+    acc += `/${seg}`;
+    // A route may claim several trailing segments as one merged crumb, dropping the
+    // crumbs already emitted for the segments it now covers, so `/acme/repo` reads as
+    // a single "acme/repo" rather than "Acme / acme/repo".
+    const span = resolveCrumbSpan(resolvers, acc);
+    if (span > 1) {
+      crumbs.length = Math.min(crumbs.length, crumbStart[Math.max(0, i - (span - 1))] ?? crumbs.length);
+    }
+    crumbStart.push(crumbs.length);
+    const isCurrent = i === segments.length - 1;
+    const to = !isCurrent && isRoutePath(resolvers, acc) ? acc : undefined;
+    const entry = resolveEntry(resolvers, acc);
+    if (entry.dynamic) dynamic = true;
+    // A label may expand one segment into several crumbs, e.g. settings ancestry. Only
+    // the final piece maps to the accumulated path, so only it can link.
+    if (Array.isArray(entry.label)) {
+      const labels = entry.label;
+      labels.forEach((l, j) => crumbs.push({ label: l, to: j === labels.length - 1 ? to : undefined }));
+    } else {
+      crumbs.push({ label: entry.label ?? titleCase(seg), to });
+    }
+  });
+  if (crumbs.length === 0) {
+    const root = resolveEntry(resolvers, "/");
+    if (root.dynamic) dynamic = true;
+    if (typeof root.label === "string") crumbs.push({ label: root.label });
+  }
+  return { crumbs, dynamic };
 }
 
 /** Fallback breadcrumb label for a path segment: "user-settings" -> "User Settings". */

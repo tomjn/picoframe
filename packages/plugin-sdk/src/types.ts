@@ -91,6 +91,13 @@ export interface CrumbContext {
 /**
  * Resolve a breadcrumb label dynamically from the matched route params. Return an
  * array to expand the one segment into several crumbs (see {@link FrameRoute.crumb}).
+ *
+ * Called while the top bar renders, so read what you need synchronously. Reading a
+ * persisted value is the normal case, and the bar re-resolves the trail after a write,
+ * so a name the crumb read follows a rename made on the page.
+ *
+ * Do not call hooks in here. The bar calls one of these per URL segment, so the number
+ * of calls changes with the path and hooks inside would change order as you navigate.
  */
 export type CrumbFn = (ctx: CrumbContext) => string | string[];
 
