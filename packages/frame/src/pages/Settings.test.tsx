@@ -53,6 +53,12 @@ test("section width maps to the content constraint; md stays the default", () =>
   expect(b.querySelector(".mx-auto")?.className).toContain("max-w-none");
 });
 
+test("the content pane is positioned, so a stray absolute child cannot escape it", () => {
+  const settings = compose([{ id: "form", title: "Form Section", Component: () => <div>FORM</div> }]);
+  const { container } = renderAt(settings, "form");
+  expect(container.querySelector(".overflow-y-auto.p-8")?.className).toContain("relative");
+});
+
 test("hides a top-level section whose useVisible returns false from the tree", () => {
   const settings = compose([
     { id: "home", title: "Home", Component: () => <div>HOME PANEL</div> },

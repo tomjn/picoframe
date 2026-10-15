@@ -135,7 +135,7 @@ export default function Settings() {
           <NavNode key={node.id} node={node} activeId={sectionId} />
         ))}
       </nav>
-      <div className="min-w-0 flex-1 overflow-y-auto p-8">
+      <div className="relative min-w-0 flex-1 overflow-y-auto p-8">
         {selected ? (
           <SectionContent node={selected} />
         ) : (

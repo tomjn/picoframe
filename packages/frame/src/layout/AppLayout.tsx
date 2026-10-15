@@ -154,7 +154,7 @@ export function AppLayout() {
           id={MAIN_ID}
           tabIndex={-1}
           data-slot="content-scroll"
-          className="min-h-0 flex-1 overflow-auto overscroll-none pt-[var(--pf-topbar-inset)]"
+          className="relative min-h-0 flex-1 overflow-auto overscroll-none pt-[var(--pf-topbar-inset)]"
         >
           {/* Scoped to the routed page: `useHideSidebar` is a page-level opt-out, not
               something the surrounding shell (top bar slots, drawer) reaches for. */}

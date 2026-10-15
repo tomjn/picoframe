@@ -145,6 +145,12 @@ test("following the skip link moves focus to the content, not just the scroll po
   expect(document.activeElement).toBe(main);
 });
 
+test("the scroll area is positioned, so a stray absolute child cannot escape it", () => {
+  const { container } = renderLayout();
+  const main = container.querySelector("[data-slot=content-scroll]") as HTMLElement;
+  expect(main.className).toContain("relative");
+});
+
 test("a floating top bar insets the scroll area so content starts below it", () => {
   const { container } = renderLayout({ topBar: { floating: true } });
   const main = container.querySelector("[data-slot=content-scroll]") as HTMLElement;
