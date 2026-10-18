@@ -1,7 +1,11 @@
 import type { Dialog } from "radix-ui";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
-/** Edge the drawer slides in from. `left`/`right` are side sheets, `bottom` is a bottom sheet. */
+/**
+ * Edge the drawer slides in from. `left`/`right` are side sheets and follow the reading
+ * direction: `left` is the start edge and `right` the end edge, so in an rtl frame
+ * `right` opens on the left. `bottom` is a bottom sheet.
+ */
 export type DrawerDirection = "left" | "right" | "bottom";
 
 /** Named size, mapped per-direction to a width (side sheets) or height (bottom sheet). */

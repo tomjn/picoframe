@@ -173,22 +173,22 @@ export function TopBar({
       {showHistoryButtons && (
         <>
           <IconButton label={t.back} disabled={!canBack} onClick={() => navigate(-1)}>
-            <ChevronLeft size={18} />
+            <ChevronLeft size={18} className="rtl:-scale-x-100" />
           </IconButton>
           <IconButton label={t.forward} disabled={!canForward} onClick={() => navigate(1)}>
-            <ChevronRight size={18} />
+            <ChevronRight size={18} className="rtl:-scale-x-100" />
           </IconButton>
         </>
       )}
       </div>
 
-      {/* `min-w-0` lets the trail shrink on a narrow window instead of pushing the right-hand
+      {/* `min-w-0` lets the trail shrink on a narrow window instead of pushing the end-side
           slot cluster off the bar. Individual crumbs truncate rather than wrap. */}
       {!breadcrumbHidden && (
       <div
         data-slot="breadcrumbs"
         className={cn(
-          "group ml-1 flex min-w-0 items-center gap-1 overflow-hidden text-sm font-medium",
+          "group ms-1 flex min-w-0 items-center gap-1 overflow-hidden text-sm font-medium",
           pill,
           floating && "px-3",
         )}
@@ -230,17 +230,17 @@ export function TopBar({
 
       {/* Slot regions get their hit area back but no pill. Floating backgrounds are the app's
           call, off the header's `data-floating` marker. */}
-      <div className={cn("ml-2 flex items-center gap-1", floating && "pointer-events-auto")}>
+      <div className={cn("ms-2 flex items-center gap-1", floating && "pointer-events-auto")}>
         <Slot id="topbar.left" />
       </div>
       {/* Absolutely centered so it stays centered regardless of the side clusters' widths. */}
       <div
         data-slot="topbar-center"
-        className="pointer-events-none absolute left-1/2 top-0 flex h-full -translate-x-1/2 items-center [&>*]:pointer-events-auto"
+        className="pointer-events-none absolute start-1/2 top-0 flex h-full -translate-x-1/2 rtl:translate-x-1/2 items-center [&>*]:pointer-events-auto"
       >
         <Slot id="topbar.center" />
       </div>
-      <div className={cn("ml-auto flex items-center gap-1", floating && "pointer-events-auto")}>
+      <div className={cn("ms-auto flex items-center gap-1", floating && "pointer-events-auto")}>
         <Slot id="topbar.right" />
       </div>
     </header>

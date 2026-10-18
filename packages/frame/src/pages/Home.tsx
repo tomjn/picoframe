@@ -73,9 +73,9 @@ function ToolCard({ item }: { item: NavItem }) {
   if (!visible) return null;
 
   // Full-width single column on phones; a fixed 16rem on larger screens so cards pack
-  // left and wrap instead of stretching to fill a grid cell.
+  // at the start and wrap instead of stretching to fill a grid cell.
   const cardClass =
-    "group flex w-full items-center gap-3 rounded-lg border border-border bg-card p-4 text-left text-card-foreground transition-colors hover:border-ring hover:bg-accent sm:w-64";
+    "group flex w-full items-center gap-3 rounded-lg border border-border bg-card p-4 text-start text-card-foreground transition-colors hover:border-ring hover:bg-accent sm:w-64";
   const inner = (
     <>
       {Icon && (

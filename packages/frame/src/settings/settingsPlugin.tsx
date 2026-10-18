@@ -19,7 +19,7 @@ function BadgeIndicator({ badge }: { badge: SettingsBadge }) {
       <span
         data-settings-badge="dot"
         aria-hidden
-        className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-sidebar"
+        className="absolute -end-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-sidebar"
       />
     );
   }
@@ -27,7 +27,7 @@ function BadgeIndicator({ badge }: { badge: SettingsBadge }) {
   return (
     <span
       data-settings-badge="count"
-      className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium leading-none text-primary-foreground ring-2 ring-sidebar"
+      className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium leading-none text-primary-foreground ring-2 ring-sidebar"
     >
       {badge}
     </span>

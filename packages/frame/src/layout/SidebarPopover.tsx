@@ -80,7 +80,7 @@ export function SidebarPopover({
           fullscreen && "fixed inset-x-0 bottom-0 top-12 border-t",
           fullscreen && (entered ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"),
           !fullscreen &&
-            "absolute left-0 top-full mt-1 max-h-[calc(100vh-4rem)] w-64 origin-top-left rounded-lg border shadow-lg",
+            "absolute start-0 top-full mt-1 max-h-[calc(100vh-4rem)] w-64 origin-top-left rtl:origin-top-right rounded-lg border shadow-lg",
           !fullscreen && (entered ? "scale-100 opacity-100" : "scale-95 opacity-0"),
         )}
       >

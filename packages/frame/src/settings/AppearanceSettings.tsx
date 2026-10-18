@@ -39,7 +39,7 @@ function LayoutOptionToggle({ optionKey, label, description }: { optionKey: Layo
         <span
           className={cn(
             "inline-block size-4 rounded-full bg-background transition-transform",
-            value ? "translate-x-[1.125rem]" : "translate-x-1",
+            value ? "translate-x-[1.125rem] rtl:-translate-x-[1.125rem]" : "translate-x-1 rtl:-translate-x-1",
           )}
         />
       </button>
