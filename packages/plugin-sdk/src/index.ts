@@ -11,5 +11,5 @@ export type {
   SettingsSection,
   FramePlugin,
 } from "./types";
-export { defineCommand, type CliResult } from "./command";
+export { defineCommand, type CliResult, type CliErrorDetail, type CommandError } from "./command";
 export { onSidecarProgress, type ProgressEvent } from "./sidecar";

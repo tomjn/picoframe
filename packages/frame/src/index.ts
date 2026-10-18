@@ -77,4 +77,9 @@ export type {
   SettingsSection,
   IconComponent,
 } from "@picoframe/plugin-sdk";
-export { defineCommand, type CliResult } from "@picoframe/plugin-sdk";
+export {
+  defineCommand,
+  type CliResult,
+  type CliErrorDetail,
+  type CommandError,
+} from "@picoframe/plugin-sdk";
