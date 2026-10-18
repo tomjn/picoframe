@@ -1,13 +1,14 @@
 "use client";
 
 import { type ProgressEvent, onSidecarProgress } from "@picoframe/plugin-sdk";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { useStrings } from "../strings/strings";
 
 export interface SidecarProgressOptions {
-  /** Toast title while running. Default: the event's `detail`, else the op name. */
+  /** Toast title while running. Default: the event's `detail`, else the `sidecarWorking` string. */
   runningTitle?: (event: ProgressEvent) => string;
-  /** Toast title on completion. Default `"Done"`. */
+  /** Toast title on completion. Default: the `sidecarDone` string, "Done" in English. */
   completeTitle?: (event: ProgressEvent) => string;
 }
 
@@ -22,6 +23,10 @@ export interface SidecarProgressOptions {
  */
 export function useSidecarProgress(eventPrefix: string, options: SidecarProgressOptions = {}): void {
   const { runningTitle, completeTitle } = options;
+  // Read through a ref so a host passing a new table each render does not resubscribe.
+  const strings = useStrings();
+  const stringsRef = useRef(strings);
+  stringsRef.current = strings;
   useEffect(() => {
     let cancelled = false;
     let unlisten: (() => void) | undefined;
@@ -34,13 +39,13 @@ export function useSidecarProgress(eventPrefix: string, options: SidecarProgress
           ? `${event.current} / ${event.total}`
           : undefined;
       if (event.status === "running") {
-        const title = runningTitle?.(event) ?? event.detail ?? `Working: ${event.op}`;
+        const title = runningTitle?.(event) ?? event.detail ?? stringsRef.current.sidecarWorking(event.op);
         id = toast.loading(title, { id, description });
       } else if (event.status === "complete") {
-        toast.success(completeTitle?.(event) ?? "Done", { id, description });
+        toast.success(completeTitle?.(event) ?? stringsRef.current.sidecarDone, { id, description });
         id = undefined;
       } else {
-        toast.error(event.detail ?? `${event.op} failed`, { id, description });
+        toast.error(event.detail ?? stringsRef.current.sidecarFailed(event.op), { id, description });
         id = undefined;
       }
     }).then((fn) => {
