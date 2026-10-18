@@ -3,7 +3,8 @@ import { House } from "lucide-react";
 import type { ComponentType } from "react";
 import { Navigate } from "react-router";
 import { useFrame } from "./context/frame";
-import { framePlugin } from "./framePlugin";
+import { createFramePlugin, framePlugin } from "./framePlugin";
+import { type ResolvedStrings, defaultStrings } from "./strings/defaultStrings";
 
 /**
  * Override for the built-in home page. A bare component replaces just the `/`
@@ -23,12 +24,17 @@ export function RedirectToFirst() {
 
 /**
  * Resolve the home plugin from the `home` prop:
- * - `undefined` -> the default `framePlugin` (launcher home + "Home" nav item).
+ * - `undefined` -> the default `framePlugin` (launcher home + "Home" nav item, labelled from `strings`).
  * - `false` -> no home page or nav item; `/` redirects to the first nav route.
  * - a component / `{ Component, label, icon }` -> override the page and/or nav item.
  */
-export function homePlugin(home: HomeOverride | false | undefined): FramePlugin {
-  if (home === undefined) return framePlugin;
+export function homePlugin(
+  home: HomeOverride | false | undefined,
+  strings: Pick<ResolvedStrings, "home"> = defaultStrings,
+): FramePlugin {
+  if (home === undefined) {
+    return strings.home === defaultStrings.home ? framePlugin : createFramePlugin(strings.home);
+  }
 
   if (home === false) {
     return {
@@ -39,7 +45,7 @@ export function homePlugin(home: HomeOverride | false | undefined): FramePlugin 
   }
 
   const cfg = typeof home === "function" ? { Component: home } : home;
-  const label = cfg.label ?? "Home";
+  const label = cfg.label ?? strings.home;
   const icon = cfg.icon ?? House;
   const custom = cfg.Component;
   const lazyHome: FrameRoute["lazy"] = custom

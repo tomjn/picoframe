@@ -95,3 +95,16 @@ test("the popover menu's close button uses the translated label", () => {
   );
   expect(screen.getByRole("button", { name: "Menue schliessen" })).toBeTruthy();
 });
+
+test("the sidebar and breadcrumb show the translated Home label", async () => {
+  openAt("/");
+  render(<AppFrame plugins={[]} strings={{ home: "Startseite" }} />);
+  expect((await screen.findAllByText("Startseite")).length).toBeGreaterThan(1);
+  expect(screen.queryByText("Home")).toBeNull();
+});
+
+test("the Home label is English when the host passes no strings table", async () => {
+  openAt("/");
+  render(<AppFrame plugins={[]} />);
+  expect((await screen.findAllByText("Home")).length).toBeGreaterThan(1);
+});

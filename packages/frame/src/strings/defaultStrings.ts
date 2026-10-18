@@ -86,6 +86,13 @@ export const defaultStrings = {
   /** Screen reader title and description of a drawer that gives none. */
   drawer: "Drawer",
 
+  /** Label of the Home nav item and its breadcrumb. */
+  home: "Home",
+  /** Sidecar progress toast text. The two templates take the operation name. */
+  sidecarDone: "Done",
+  sidecarWorking: (op: string) => `Working: ${op}`,
+  sidecarFailed: (op: string) => `${op} failed`,
+
   menu: "Menu",
   toggleSidebar: "Toggle sidebar",
   back: "Back",
