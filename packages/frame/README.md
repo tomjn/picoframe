@@ -260,6 +260,27 @@ in. The user's stored setting is untouched, so the Appearance panel still shows 
 chose and navigating away restores it. Nested routes inherit it, and the most specific
 matching route wins, so a child can opt back out.
 
+## Translating the frame's text
+
+The frame draws some English of its own: the Settings and Appearance headings, the theme and layout controls, colour names, and the labels on its buttons. Pass a `strings` table to `AppFrame` to change any of it. Every key is optional and falls back to English.
+
+```tsx
+import type { FrameStrings } from "@picoframe/frame";
+
+const strings: FrameStrings = {
+  settings: "Einstellungen",
+  appearance: "Darstellung",
+  drawer: "Schublade",
+  accentNames: { neutral: "Standard", blue: "Blau" },
+};
+
+<AppFrame plugins={plugins} strings={strings} />;
+```
+
+The frame ships no translations. Build the table from your own translation runtime. The colour names are maps keyed by the colour id (`accentNames`, `baseNames`), so you do not need to know their order. The English defaults, and the full list of keys, are in `src/strings/defaultStrings.ts`.
+
+A `Drawer` mounted outside `AppFrame` reads no table and uses the English fallback.
+
 ## Theming
 
 The frame's design tokens ship as `@picoframe/frame/theme.css` (mode / accent / base axes).

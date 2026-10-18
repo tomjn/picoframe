@@ -3,6 +3,8 @@ import { Palette, Settings as SettingsIcon } from "lucide-react";
 import { NavLink } from "react-router";
 import { cn } from "../lib/cn";
 import { AppearanceSettings } from "./AppearanceSettings";
+import { type ResolvedStrings, defaultStrings } from "../strings/defaultStrings";
+import { useStrings } from "../strings/strings";
 import { type SettingsBadge, useSettingsBadge } from "./SettingsBadge";
 
 /** Id of the built-in, frame-owned Appearance (theme) settings section. Declare a section
@@ -34,6 +36,7 @@ function BadgeIndicator({ badge }: { badge: SettingsBadge }) {
 
 function SettingsFooterLink() {
   const { badge } = useSettingsBadge();
+  const { settings } = useStrings();
   return (
     <NavLink
       to="/settings"
@@ -49,7 +52,7 @@ function SettingsFooterLink() {
         <SettingsIcon size={18} className="shrink-0" />
         <BadgeIndicator badge={badge} />
       </span>
-      <span className="truncate group-data-[collapsed]/sidebar:hidden">Settings</span>
+      <span className="truncate group-data-[collapsed]/sidebar:hidden">{settings}</span>
     </NavLink>
   );
 }
@@ -60,22 +63,24 @@ function SettingsFooterLink() {
  * (theme) section. `AppFrame` injects it unconditionally, so every app has a settings
  * area with at least the theme control.
  */
-export function settingsPlugin(): FramePlugin {
+export function settingsPlugin(
+  strings: Pick<ResolvedStrings, "settings" | "appearance" | "appearanceDescription"> = defaultStrings,
+): FramePlugin {
   return {
     id: "frame.settings",
     version: "0.0.0",
     routes: [
-      { path: "settings", lazy: () => import("../pages/Settings"), crumb: "Settings" },
+      { path: "settings", lazy: () => import("../pages/Settings"), crumb: strings.settings },
       { path: "settings/:sectionId", lazy: () => import("../pages/Settings") },
     ],
     slots: [{ slot: "sidebar.footer", order: 100, Component: SettingsFooterLink }],
     settings: [
       {
         id: FRAME_APPEARANCE_SETTINGS_ID,
-        title: "Appearance",
+        title: strings.appearance,
         icon: Palette,
         order: 10,
-        description: "Theme and visual preferences.",
+        description: strings.appearanceDescription,
         Component: AppearanceSettings,
       },
     ],
