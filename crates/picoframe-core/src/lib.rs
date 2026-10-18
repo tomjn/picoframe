@@ -6,6 +6,7 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::BTreeMap;
 use tauri::{
     plugin::{Builder, TauriPlugin},
     AppHandle, Runtime,
@@ -17,7 +18,18 @@ mod mouse_nav;
 pub mod sidecar;
 pub use sidecar::{Sidecar, SidecarOptions};
 
+/// A stable, translatable identifier for an error, so a host can look up text in the
+/// user's language instead of matching on the English message.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ErrorDetail {
+    pub code: String,
+    pub params: BTreeMap<String, String>,
+}
+
 /// Uniform result envelope returned by picoframe plugin commands.
+///
+/// `error` is always the human readable fallback message. `error_detail` is present only
+/// for errors built with [`CliResult::err_coded`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CliResult {
     pub success: bool,
@@ -25,17 +37,34 @@ pub struct CliResult {
     pub data: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub error: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub error_detail: Option<ErrorDetail>,
 }
 
 impl CliResult {
     /// A successful result carrying a JSON payload.
     pub fn ok(data: Value) -> Self {
-        Self { success: true, data: Some(data), error: None }
+        Self { success: true, data: Some(data), error: None, error_detail: None }
     }
 
     /// A failed result carrying an error message.
     pub fn err(message: impl Into<String>) -> Self {
-        Self { success: false, data: None, error: Some(message.into()) }
+        Self { success: false, data: None, error: Some(message.into()), error_detail: None }
+    }
+
+    /// A failed result with a translatable `code` and `params`. `fallback_message` is the
+    /// English text shown by hosts that do not translate.
+    pub fn err_coded(
+        code: impl Into<String>,
+        params: BTreeMap<String, String>,
+        fallback_message: impl Into<String>,
+    ) -> Self {
+        Self {
+            success: false,
+            data: None,
+            error: Some(fallback_message.into()),
+            error_detail: Some(ErrorDetail { code: code.into(), params }),
+        }
     }
 }
 
@@ -96,4 +125,47 @@ pub fn store<R: Runtime>(
 ) -> Result<std::sync::Arc<tauri_plugin_store::Store<R>>, tauri_plugin_store::Error> {
     use tauri_plugin_store::StoreExt;
     app.store(STORE_PATH)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use std::collections::BTreeMap;
+
+    #[test]
+    fn err_serialises_without_error_detail() {
+        let value = serde_json::to_value(CliResult::err("disk full")).unwrap();
+        assert_eq!(value, json!({ "success": false, "error": "disk full" }));
+    }
+
+    #[test]
+    fn err_coded_serialises_code_and_params_beside_the_message() {
+        let params = BTreeMap::from([("path".to_string(), "/tmp/a".to_string())]);
+        let value = serde_json::to_value(CliResult::err_coded(
+            "file.missing",
+            params,
+            "File not found: /tmp/a",
+        ))
+        .unwrap();
+        assert_eq!(
+            value,
+            json!({
+                "success": false,
+                "error": "File not found: /tmp/a",
+                "error_detail": { "code": "file.missing", "params": { "path": "/tmp/a" } }
+            })
+        );
+    }
+
+    #[test]
+    fn both_shapes_round_trip_and_old_json_still_parses() {
+        let coded = CliResult::err_coded("x.y", BTreeMap::new(), "fallback");
+        let back: CliResult = serde_json::from_str(&serde_json::to_string(&coded).unwrap()).unwrap();
+        assert_eq!(back.error_detail.unwrap().code, "x.y");
+        assert_eq!(back.error.as_deref(), Some("fallback"));
+
+        let old: CliResult = serde_json::from_str(r#"{"success":false,"error":"boom"}"#).unwrap();
+        assert!(old.error_detail.is_none());
+    }
 }

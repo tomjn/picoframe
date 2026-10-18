@@ -30,6 +30,7 @@ interface CliResult<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
+  error_detail?: { code: string; params: Record<string, string> };
 }
 
 /** Progress record streamed over SSE and re-emitted by Rust as a Tauri event. */

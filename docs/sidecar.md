@@ -38,7 +38,7 @@ The Rust parent passes these to the child via env:
 Endpoints (all require the bearer token):
 
 - `GET /health` -> `{ "ok": true }`
-- `POST /command` with `{ "command": string, "args": object }` -> a `CliResult` (`{ success, data?, error? }`)
+- `POST /command` with `{ "command": string, "args": object }` -> a `CliResult` (`{ success, data?, error?, error_detail? }`)
 - `GET /events` -> `text/event-stream`; each `data:` line is a `ProgressEvent`
 
 `ProgressEvent`: `{ type: "progress", op, status: "running"|"complete"|"failed", current?, total?, detail? }`.
