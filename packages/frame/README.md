@@ -281,6 +281,8 @@ The frame ships no translations. Build the table from your own translation runti
 
 A `Drawer` mounted outside `AppFrame` reads no table and uses the English fallback.
 
+The `home` key sets the Home nav label and breadcrumb. A label passed through `home={{ label }}` wins over it. The sidecar progress toast reads `sidecarDone`, `sidecarWorking` and `sidecarFailed`. The last two are functions that take the operation name, for example `sidecarWorking: (op) => "Arbeite: " + op`. A progress event's own `detail` still replaces the working and failed text.
+
 ## Theming
 
 The frame's design tokens ship as `@picoframe/frame/theme.css` (mode / accent / base axes).
