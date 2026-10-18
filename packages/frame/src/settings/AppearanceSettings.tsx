@@ -9,6 +9,7 @@ import {
 import { type ThemeMode, useTheme } from "../context/theme";
 import { ACCENTS, BASES, type ThemeOption } from "../context/themeConfig";
 import { cn } from "../lib/cn";
+import { useStrings } from "../strings/strings";
 
 /** A labeled on/off switch for one exposed layout option; renders nothing when locked. */
 function LayoutOptionToggle({ optionKey, label, description }: { optionKey: LayoutOptionKey; label: string; description: string }) {
@@ -46,21 +47,23 @@ function LayoutOptionToggle({ optionKey, label, description }: { optionKey: Layo
   );
 }
 
-const OPTIONS: { mode: ThemeMode; label: string; Icon: ComponentType<{ size?: number }> }[] = [
-  { mode: "light", label: "Light", Icon: Sun },
-  { mode: "dark", label: "Dark", Icon: Moon },
-  { mode: "system", label: "System", Icon: Monitor },
+const OPTIONS: { mode: ThemeMode; Icon: ComponentType<{ size?: number }> }[] = [
+  { mode: "light", Icon: Sun },
+  { mode: "dark", Icon: Moon },
+  { mode: "system", Icon: Monitor },
 ];
 
 /** A labeled radiogroup of circular colour swatches (used for both base and accent). */
 function SwatchGroup<V extends string>({
   label,
   options,
+  names,
   selected,
   onSelect,
 }: {
   label: string;
   options: readonly ThemeOption<V>[];
+  names: Record<V, string>;
   selected: V;
   onSelect: (value: V) => void;
 }) {
@@ -68,14 +71,14 @@ function SwatchGroup<V extends string>({
     <div className="space-y-2">
       <div className="text-sm font-medium text-foreground">{label}</div>
       <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
-        {options.map(({ value, label: optLabel, swatch }) => (
+        {options.map(({ value, swatch }) => (
           <button
             key={value}
             type="button"
             role="radio"
             aria-checked={selected === value}
-            aria-label={optLabel}
-            title={optLabel}
+            aria-label={names[value]}
+            title={names[value]}
             onClick={() => onSelect(value)}
             className={cn(
               "size-7 rounded-full border border-border transition-shadow",
@@ -94,17 +97,28 @@ function SwatchGroup<V extends string>({
 export function AppearanceSettings() {
   const { mode, setMode, accent, setAccent, base, setBase } = useTheme();
   const layoutConfig = useLayoutConfig();
-  const anyExposed = LAYOUT_OPTIONS.some((o) => layoutConfig[o.key].exposed);
+  const t = useStrings();
+  const modeLabels: Record<ThemeMode, string> = { light: t.light, dark: t.dark, system: t.system };
+  const layoutText: Record<LayoutOptionKey, { label: string; description: string }> = {
+    popover: { label: t.layoutPopover, description: t.layoutPopoverDescription },
+    hideWhenCollapsed: { label: t.layoutHideWhenCollapsed, description: t.layoutHideWhenCollapsedDescription },
+    hoverReveal: { label: t.layoutHoverReveal, description: t.layoutHoverRevealDescription },
+    collapseWhenNarrow: { label: t.layoutCollapseWhenNarrow, description: t.layoutCollapseWhenNarrowDescription },
+    floatingTopBar: { label: t.layoutFloatingTopBar, description: t.layoutFloatingTopBarDescription },
+    breadcrumbCollapsed: { label: t.layoutBreadcrumbCollapsed, description: t.layoutBreadcrumbCollapsedDescription },
+    historyButtons: { label: t.layoutHistoryButtons, description: t.layoutHistoryButtonsDescription },
+  };
+  const anyExposed = LAYOUT_OPTIONS.some((key) => layoutConfig[key].exposed);
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <div className="text-sm font-medium text-foreground">Theme</div>
+        <div className="text-sm font-medium text-foreground">{t.theme}</div>
         <div
           role="radiogroup"
-          aria-label="Theme"
+          aria-label={t.theme}
           className="inline-flex gap-0.5 rounded-md border border-border p-0.5"
         >
-          {OPTIONS.map(({ mode: m, label, Icon }) => (
+          {OPTIONS.map(({ mode: m, Icon }) => (
             <button
               key={m}
               type="button"
@@ -120,21 +134,21 @@ export function AppearanceSettings() {
               )}
             >
               <Icon size={16} />
-              {label}
+              {modeLabels[m]}
             </button>
           ))}
         </div>
       </div>
 
-      <SwatchGroup label="Base color" options={BASES} selected={base} onSelect={setBase} />
+      <SwatchGroup label={t.baseColor} options={BASES} names={t.baseNames} selected={base} onSelect={setBase} />
 
-      <SwatchGroup label="Accent color" options={ACCENTS} selected={accent} onSelect={setAccent} />
+      <SwatchGroup label={t.accentColor} options={ACCENTS} names={t.accentNames} selected={accent} onSelect={setAccent} />
 
       {anyExposed && (
         <div className="space-y-3">
-          <div className="text-sm font-medium text-foreground">Layout</div>
-          {LAYOUT_OPTIONS.map((o) => (
-            <LayoutOptionToggle key={o.key} optionKey={o.key} label={o.label} description={o.description} />
+          <div className="text-sm font-medium text-foreground">{t.layout}</div>
+          {LAYOUT_OPTIONS.map((key) => (
+            <LayoutOptionToggle key={key} optionKey={key} {...layoutText[key]} />
           ))}
         </div>
       )}

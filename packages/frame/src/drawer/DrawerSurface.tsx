@@ -3,6 +3,7 @@
 import { Dialog } from "radix-ui";
 import { type ReactNode, useRef } from "react";
 import { cn } from "../lib/cn";
+import { useStrings } from "../strings/strings";
 import { drawerStyle } from "./drawerStyles";
 import type { DrawerDirection, DrawerFocusOptions, DrawerSize } from "./reducer";
 
@@ -52,6 +53,7 @@ export function DrawerSurface({
   // Radix restores focus by focusing its `Dialog.Trigger`, and this drawer is driven by an
   // `open` prop rather than a trigger, so on its own it drops focus on the floor when the
   // drawer closes. Remember what had focus on the way in and hand it back on the way out.
+  const { drawer: drawerFallback } = useStrings();
   const openerRef = useRef<HTMLElement | null>(null);
 
   const handleOpenAutoFocus = (event: Event) => {
@@ -107,10 +109,10 @@ export function DrawerSurface({
           )}
         >
           <Dialog.Title className={cn("text-lg font-semibold", !title && "sr-only")}>
-            {title ?? "Drawer"}
+            {title ?? drawerFallback}
           </Dialog.Title>
           <Dialog.Description className={cn("text-sm text-muted-foreground", !description && "sr-only")}>
-            {description ?? "Drawer"}
+            {description ?? drawerFallback}
           </Dialog.Description>
           {/* `-m-1 p-1`: give the scroll viewport ~4px of interior room so focus
               rings (box-shadows extend past the control box) aren't clipped at the

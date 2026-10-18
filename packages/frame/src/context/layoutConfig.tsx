@@ -115,43 +115,15 @@ export function resolveOption<T>(cfg: Configurable<T> | undefined, fallback: T):
   return { default: cfg, exposed: false };
 }
 
-/** User-facing labels for the exposed options, used by the Appearance settings. */
-export const LAYOUT_OPTIONS: { key: LayoutOptionKey; label: string; description: string }[] = [
-  {
-    key: "popover",
-    label: "Sidebar as popover menu",
-    description: "Hide the sidebar and open it from a menu button instead.",
-  },
-  {
-    key: "hideWhenCollapsed",
-    label: "Hide sidebar when collapsed",
-    description: "Collapsing the sidebar hides it fully instead of showing an icon rail.",
-  },
-  {
-    key: "hoverReveal",
-    label: "Hover-reveal sidebar",
-    description: "When collapsed, hide the sidebar and slide it out on hovering the left edge.",
-  },
-  {
-    key: "collapseWhenNarrow",
-    label: "Collapse sidebar on narrow windows",
-    description: "On a narrow window, the sidebar becomes a menu button and opens fullscreen.",
-  },
-  {
-    key: "floatingTopBar",
-    label: "Floating top bar",
-    description: "The top bar loses its background and sits over the content as it scrolls.",
-  },
-  {
-    key: "breadcrumbCollapsed",
-    label: "Collapse breadcrumb",
-    description: "Show only the current page; reveal the full path on hover.",
-  },
-  {
-    key: "historyButtons",
-    label: "Back/forward buttons",
-    description: "Show the back and forward navigation buttons in the top bar.",
-  },
+/** The user-toggleable options, in the order the Appearance settings list them. */
+export const LAYOUT_OPTIONS: LayoutOptionKey[] = [
+  "popover",
+  "hideWhenCollapsed",
+  "hoverReveal",
+  "collapseWhenNarrow",
+  "floatingTopBar",
+  "breadcrumbCollapsed",
+  "historyButtons",
 ];
 
 const LayoutConfigContext = createContext<ResolvedLayoutConfig | null>(null);

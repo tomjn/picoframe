@@ -18,6 +18,7 @@ import { PersistentStoreProvider } from "./settings/SettingsStoreProvider";
 import { settingsPlugin } from "./settings/settingsPlugin";
 import type { PersistentStorage } from "./settings/storage";
 import { SlotProvider, composeSlots } from "./slots/slots";
+import { type FrameStrings, StringsProvider, resolveStrings } from "./strings/strings";
 
 export interface AppFrameProps {
   /** Plugins to compose. The built-in home page is provided automatically. */
@@ -31,6 +32,12 @@ export interface AppFrameProps {
    */
   home?: HomeOverride | false;
   theme?: { defaultMode?: ThemeMode; defaultAccent?: Accent; defaultBase?: Base };
+  /**
+   * Translate the text the frame draws itself. Every key is optional and falls back to
+   * English. The frame ships no translations: build the table from your own translation
+   * runtime and pass it here.
+   */
+  strings?: FrameStrings;
   /**
    * Configure sidebar/breadcrumb layout behaviours. Each option is a bare value (locked)
    * or `{ default, userConfigurable: true }` (exposed as a user setting seeded to `default`).
@@ -64,6 +71,7 @@ export function AppFrame({
   title = "picoframe",
   home,
   theme,
+  strings,
   layout,
   fallback,
   drawer,
@@ -77,7 +85,13 @@ export function AppFrame({
   );
   // The frame always owns the settings route, footer link, and Appearance (theme)
   // section, so settings compose from the full plugin set including settingsPlugin.
-  const composed = useMemo(() => [...resolved, settingsPlugin()], [resolved]);
+  // Its titles are read when settings and routes compose, so they come in as plain values and
+  // a table rebuilt every render does not rebuild the routes.
+  const { settings: settingsLabel, appearance: appearanceTitle, appearanceDescription } = resolveStrings(strings);
+  const composed = useMemo(
+    () => [...resolved, settingsPlugin({ settings: settingsLabel, appearance: appearanceTitle, appearanceDescription })],
+    [resolved, settingsLabel, appearanceTitle, appearanceDescription],
+  );
   const settings = useMemo(() => composeSettings(composed), [composed]);
   const routes = useMemo(() => buildRoutes(composed), [composed]);
   const nav = useMemo(() => composeNav(resolved), [resolved]);
@@ -111,6 +125,7 @@ export function AppFrame({
   }
 
   return (
+    <StringsProvider strings={strings}>
     <ThemeProvider
       defaultMode={theme?.defaultMode}
       defaultAccent={theme?.defaultAccent}
@@ -137,5 +152,6 @@ export function AppFrame({
         </NavigationStackProvider>
       </HashRouter>
     </ThemeProvider>
+    </StringsProvider>
   );
 }
