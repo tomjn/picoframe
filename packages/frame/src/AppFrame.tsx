@@ -1,5 +1,6 @@
 import type { FramePlugin } from "@picoframe/plugin-sdk";
 import { type ReactNode, useMemo } from "react";
+import { Direction } from "radix-ui";
 import { HashRouter, type RouteObject, useRoutes } from "react-router";
 import { FrameProvider } from "./context/frame";
 import { type LayoutConfig, LayoutConfigProvider } from "./context/layoutConfig";
@@ -44,6 +45,12 @@ export interface AppFrameProps {
    */
   locale?: string;
   /**
+   * Reading direction of the frame. The frame sets it on its root element and hands it to
+   * Radix, so menus, selects and popovers align to the right edge. Omit to follow
+   * `document.documentElement.dir`, which falls back to `ltr`.
+   */
+  dir?: "ltr" | "rtl";
+  /**
    * Configure sidebar/breadcrumb layout behaviours. Each option is a bare value (locked)
    * or `{ default, userConfigurable: true }` (exposed as a user setting seeded to `default`).
    */
@@ -78,12 +85,14 @@ export function AppFrame({
   theme,
   strings,
   locale,
+  dir,
   layout,
   fallback,
   drawer,
   store,
   settingsStorage,
 }: AppFrameProps) {
+  const resolvedDir = dir ?? (document.documentElement.dir === "rtl" ? "rtl" : "ltr");
   const { home: homeLabel, settings: settingsLabel, appearance: appearanceTitle, appearanceDescription } =
     resolveStrings(strings);
   // The frame owns the home route/nav; replace any user-passed `frame` plugin.
@@ -132,6 +141,7 @@ export function AppFrame({
   }
 
   return (
+    <Direction.DirectionProvider dir={resolvedDir}>
     <StringsProvider strings={strings}>
     <ThemeProvider
       defaultMode={theme?.defaultMode}
@@ -160,5 +170,6 @@ export function AppFrame({
       </HashRouter>
     </ThemeProvider>
     </StringsProvider>
+    </Direction.DirectionProvider>
   );
 }
