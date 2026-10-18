@@ -39,6 +39,11 @@ export interface AppFrameProps {
    */
   strings?: FrameStrings;
   /**
+   * BCP 47 tag (for example `de`) used to sort the frame's settings sections. Omit to use the
+   * runtime's default locale. Match it to the language your `strings` table is in.
+   */
+  locale?: string;
+  /**
    * Configure sidebar/breadcrumb layout behaviours. Each option is a bare value (locked)
    * or `{ default, userConfigurable: true }` (exposed as a user setting seeded to `default`).
    */
@@ -72,6 +77,7 @@ export function AppFrame({
   home,
   theme,
   strings,
+  locale,
   layout,
   fallback,
   drawer,
@@ -92,7 +98,7 @@ export function AppFrame({
     () => [...resolved, settingsPlugin({ settings: settingsLabel, appearance: appearanceTitle, appearanceDescription })],
     [resolved, settingsLabel, appearanceTitle, appearanceDescription],
   );
-  const settings = useMemo(() => composeSettings(composed), [composed]);
+  const settings = useMemo(() => composeSettings(composed, locale), [composed, locale]);
   const routes = useMemo(() => buildRoutes(composed), [composed]);
   const nav = useMemo(() => composeNav(resolved), [resolved]);
   const crumbs = useMemo(() => {
