@@ -17,9 +17,10 @@ export interface ComposedSettings {
  * Sections with the same `id` merge (first declarer wins; later declarations fill only
  * unset fields), so a plugin can attach a sub-section to a category it does not own.
  * `parent` builds the tree; an unknown parent is logged and the node falls back to
- * top-level. Siblings sort by `order` (default 100), then `title`.
+ * top-level. Siblings sort by `order` (default 100), then `title`,
+ * compared with `locale` (a BCP 47 tag; `undefined` uses the runtime default).
  */
-export function composeSettings(plugins: FramePlugin[]): ComposedSettings {
+export function composeSettings(plugins: FramePlugin[], locale?: string): ComposedSettings {
   const byId = new Map<string, SettingsNode>();
 
   for (const plugin of plugins) {
@@ -54,8 +55,9 @@ export function composeSettings(plugins: FramePlugin[]): ComposedSettings {
     else nodes.push(node);
   }
 
+  const collator = new Intl.Collator(locale);
   const sortNodes = (list: SettingsNode[]) => {
-    list.sort((a, b) => (a.order ?? 100) - (b.order ?? 100) || a.title.localeCompare(b.title));
+    list.sort((a, b) => (a.order ?? 100) - (b.order ?? 100) || collator.compare(a.title, b.title));
     for (const n of list) sortNodes(n.children);
   };
   sortNodes(nodes);

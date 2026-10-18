@@ -109,3 +109,16 @@ test("a later same-id declaration fills useVisible when the first omitted it", (
   ]);
   expect(byId.get("x")?.useVisible).toBe(gate);
 });
+
+test("the locale decides where Ä sorts", () => {
+  const sections = [
+    plugin("p", [
+      { id: "z", title: "Zebra" },
+      { id: "a", title: "Ärger" },
+      { id: "p", title: "Apfel" },
+    ]),
+  ];
+  const titles = (locale: string) => composeSettings(sections, locale).nodes.map((n) => n.title);
+  expect(titles("de")).toEqual(["Apfel", "Ärger", "Zebra"]);
+  expect(titles("sv")).toEqual(["Apfel", "Zebra", "Ärger"]);
+});
