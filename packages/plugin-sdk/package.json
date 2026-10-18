@@ -1,6 +1,6 @@
 {
   "name": "@picoframe/plugin-sdk",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "description": "Manifest types and the defineCommand IPC helper for picoframe plugins",
   "license": "MIT",
   "repository": {
