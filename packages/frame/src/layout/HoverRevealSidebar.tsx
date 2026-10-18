@@ -2,6 +2,7 @@ import type { NavGroup } from "@picoframe/plugin-sdk";
 import { type KeyboardEvent as ReactKeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { cn } from "../lib/cn";
+import { useStrings } from "../strings/strings";
 import { SidebarNav } from "./Sidebar";
 
 /** Grace period before a pointer-leave dismisses the panel, so crossing the gap between the
@@ -86,6 +87,7 @@ export function HoverRevealSidebar({
   onClose: () => void;
 }) {
   const { pathname } = useLocation();
+  const t = useStrings();
   const prevPath = useRef(pathname);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -137,7 +139,7 @@ export function HoverRevealSidebar({
         {...hoverHandlers}
         ref={triggerRef}
         type="button"
-        aria-label="Reveal sidebar"
+        aria-label={t.revealSidebar}
         aria-expanded={revealed}
         onKeyDown={onTriggerKeyDown}
         className={cn(

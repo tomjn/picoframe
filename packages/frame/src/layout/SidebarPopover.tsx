@@ -2,6 +2,7 @@ import type { NavGroup } from "@picoframe/plugin-sdk";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { cn } from "../lib/cn";
+import { useStrings } from "../strings/strings";
 import { SidebarNav } from "./Sidebar";
 
 /**
@@ -27,6 +28,7 @@ export function SidebarPopover({
   fullscreen?: boolean;
 }) {
   const { pathname } = useLocation();
+  const t = useStrings();
   const prevPath = useRef(pathname);
   // Enter transition: mount at scale-95/opacity-0, then flip on the next frame so the panel
   // animates in rather than snapping. Reset whenever it closes.
@@ -63,7 +65,7 @@ export function SidebarPopover({
     <>
       <button
         type="button"
-        aria-label="Close menu"
+        aria-label={t.closeMenu}
         onClick={onClose}
         className="fixed inset-0 z-40 cursor-default"
       />

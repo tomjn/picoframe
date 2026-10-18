@@ -10,6 +10,7 @@ import { cn } from "../lib/cn";
 import { useResolvedNavItem } from "../nav/useResolvedNavItem";
 import { openExternal } from "../lib/openExternal";
 import { Slot } from "../slots/slots";
+import { useStrings } from "../strings/strings";
 
 /** Shared base styling for sidebar entries (internal links and external buttons). */
 const navItemBase =
@@ -128,6 +129,7 @@ export function SidebarNav({ groups, collapsed }: { groups: NavGroup[]; collapse
 }
 
 function ResizeHandle({ width, onResize }: { width: number; onResize: (px: number) => void }) {
+  const t = useStrings();
   const [dragging, setDragging] = useState(false);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -157,7 +159,7 @@ function ResizeHandle({ width, onResize }: { width: number; onResize: (px: numbe
     <div
       role="separator"
       aria-orientation="vertical"
-      aria-label="Resize sidebar"
+      aria-label={t.resizeSidebar}
       aria-valuenow={width}
       aria-valuemin={SIDEBAR_MIN_WIDTH}
       aria-valuemax={SIDEBAR_MAX_WIDTH}
