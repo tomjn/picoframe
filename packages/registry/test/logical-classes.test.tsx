@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { Direction, DropdownMenu } from "radix-ui";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { HoverCard, HoverCardContent } from "@/components/ui/hover-card";
 import { Popover, PopoverContent } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -174,3 +175,15 @@ test("a tooltip takes the direction from DirectionProvider", () => {
   );
   expect(screen.getAllByText("tip")[0].closest("[data-slot]")?.getAttribute("dir")).toBe("rtl");
 });
+
+for (const [dir, transform] of [["ltr", "translateX(-60%)"], ["rtl", "translateX(60%)"]] as const) {
+  test(`a progress indicator fills from the start edge under ${dir}`, () => {
+    const { container } = render(
+      <Direction.DirectionProvider dir={dir}>
+        <Progress value={40} />
+      </Direction.DirectionProvider>,
+    );
+    const indicator = container.querySelector("[data-slot=progress-indicator]") as HTMLElement;
+    expect(indicator.style.transform).toBe(transform);
+  });
+}
