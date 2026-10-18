@@ -84,16 +84,17 @@ export function AppFrame({
   store,
   settingsStorage,
 }: AppFrameProps) {
+  const { home: homeLabel, settings: settingsLabel, appearance: appearanceTitle, appearanceDescription } =
+    resolveStrings(strings);
   // The frame owns the home route/nav; replace any user-passed `frame` plugin.
   const resolved = useMemo(
-    () => [homePlugin(home), ...plugins.filter((p) => p.id !== "frame")],
-    [plugins, home],
+    () => [homePlugin(home, { home: homeLabel }), ...plugins.filter((p) => p.id !== "frame")],
+    [plugins, home, homeLabel],
   );
   // The frame always owns the settings route, footer link, and Appearance (theme)
   // section, so settings compose from the full plugin set including settingsPlugin.
   // Its titles are read when settings and routes compose, so they come in as plain values and
   // a table rebuilt every render does not rebuild the routes.
-  const { settings: settingsLabel, appearance: appearanceTitle, appearanceDescription } = resolveStrings(strings);
   const composed = useMemo(
     () => [...resolved, settingsPlugin({ settings: settingsLabel, appearance: appearanceTitle, appearanceDescription })],
     [resolved, settingsLabel, appearanceTitle, appearanceDescription],
