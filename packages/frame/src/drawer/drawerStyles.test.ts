@@ -1,19 +1,27 @@
 import { expect, test } from "bun:test";
 import { drawerStyle, resolveContainer } from "./drawerStyles";
 
-test("right (default) is a side sheet anchored right with a width", () => {
+test("right (default) is a side sheet anchored at the end with a width", () => {
   const s = drawerStyle("right", "md", false);
   expect(s.contentClass).toContain("fixed");
-  expect(s.contentClass).toContain("right-0");
-  expect(s.contentClass).toContain("border-l");
+  expect(s.contentClass).toContain("end-0");
+  expect(s.contentClass).toContain("border-s");
   expect(s.sizeStyle).toEqual({ width: "24rem" });
 });
 
-test("left is a side sheet anchored left with a width", () => {
+test("left is a side sheet anchored at the start with a width", () => {
   const s = drawerStyle("left", "sm", false);
-  expect(s.contentClass).toContain("left-0");
-  expect(s.contentClass).toContain("border-r");
+  expect(s.contentClass).toContain("start-0");
+  expect(s.contentClass).toContain("border-e");
   expect(s.sizeStyle).toEqual({ width: "20rem" });
+});
+
+test("side sheets swap their slide animation under rtl", () => {
+  const end = drawerStyle("right", "md", false).contentClass;
+  expect(end).toContain("rtl:data-[state=open]:animate-[pf-drawer-in-left_300ms_ease-out]");
+  expect(end).toContain("rtl:data-[state=closed]:animate-[pf-drawer-out-left_200ms_ease-in]");
+  const start = drawerStyle("left", "md", false).contentClass;
+  expect(start).toContain("rtl:data-[state=open]:animate-[pf-drawer-in-right_300ms_ease-out]");
 });
 
 test("bottom is a bottom sheet anchored bottom with a height", () => {

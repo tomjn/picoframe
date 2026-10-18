@@ -66,7 +66,7 @@ export function useHoverReveal(enabled: boolean) {
 }
 
 /**
- * The collapsed-state floating sidebar: a left-edge trigger strip plus a panel that slides in
+ * The collapsed-state floating sidebar: a start-edge trigger strip plus a panel that slides in
  * over the content. Reveal is driven by hover (via the shared `hoverHandlers`) or by activating
  * the focusable edge trigger with the keyboard. Dismisses on pointer-leave (grace timer, owned by
  * the hook), Escape, an outside pointer-down, or a route change. Render only while the sidebar is
@@ -143,7 +143,7 @@ export function HoverRevealSidebar({
         aria-expanded={revealed}
         onKeyDown={onTriggerKeyDown}
         className={cn(
-          "fixed left-0 top-12 bottom-0 z-40 w-3 cursor-pointer",
+          "fixed start-0 top-12 bottom-0 z-40 w-3 cursor-pointer",
           "transition-colors hover:bg-sidebar-border/40",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
         )}
@@ -155,10 +155,10 @@ export function HoverRevealSidebar({
         // Inert while closed so its links leave the tab order (no invisible-but-tabbable trap).
         inert={!revealed}
         className={cn(
-          "fixed left-0 top-12 bottom-0 z-50 flex min-w-[160px] w-max max-w-[420px] flex-col",
-          "border-r border-sidebar-border bg-sidebar shadow-lg",
+          "fixed start-0 top-12 bottom-0 z-50 flex min-w-[160px] w-max max-w-[420px] flex-col",
+          "border-e border-sidebar-border bg-sidebar shadow-lg",
           "transition duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-          revealed ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0",
+          revealed ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 rtl:translate-x-full",
         )}
       >
         <SidebarNav groups={groups} collapsed={false} />

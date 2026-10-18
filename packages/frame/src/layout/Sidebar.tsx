@@ -1,4 +1,5 @@
 import type { NavGroup, NavItem } from "@picoframe/plugin-sdk";
+import { Direction } from "radix-ui";
 import { ExternalLink } from "lucide-react";
 import {
   type KeyboardEvent as ReactKeyboardEvent,
@@ -57,11 +58,11 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
         data-nav-item=""
         onClick={() => openExternal(href)}
         title={collapsed ? label : undefined}
-        className={cn(navItemBase, "w-full text-left", collapsed && "justify-center")}
+        className={cn(navItemBase, "w-full text-start", collapsed && "justify-center")}
       >
         {glyph}
         {!collapsed && <span className="truncate">{label}</span>}
-        {!collapsed && <ExternalLink size={14} className="ml-auto shrink-0 text-muted-foreground" />}
+        {!collapsed && <ExternalLink size={14} className="ms-auto shrink-0 text-muted-foreground" />}
       </button>
     );
   }
@@ -82,7 +83,7 @@ function NavItemView({ item, collapsed }: { item: NavItem; collapsed: boolean })
     >
       {glyph}
       {!collapsed && <span className="truncate">{label}</span>}
-      {!collapsed && item.badge && <span className="ml-auto text-xs text-muted-foreground">{item.badge()}</span>}
+      {!collapsed && item.badge && <span className="ms-auto text-xs text-muted-foreground">{item.badge()}</span>}
     </NavLink>
   );
 }
@@ -131,13 +132,15 @@ export function SidebarNav({ groups, collapsed }: { groups: NavGroup[]; collapse
 function ResizeHandle({ width, onResize }: { width: number; onResize: (px: number) => void }) {
   const t = useStrings();
   const [dragging, setDragging] = useState(false);
+  // The sidebar sits on the right in rtl, so dragging left widens it.
+  const sign = Direction.useDirection() === "rtl" ? -1 : 1;
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     e.preventDefault();
     const startX = e.clientX;
     const startW = width;
     setDragging(true);
-    const onMove = (ev: PointerEvent) => onResize(clampWidth(startW + (ev.clientX - startX)));
+    const onMove = (ev: PointerEvent) => onResize(clampWidth(startW + sign * (ev.clientX - startX)));
     const onUp = () => {
       setDragging(false);
       window.removeEventListener("pointermove", onMove);
@@ -148,8 +151,8 @@ function ResizeHandle({ width, onResize }: { width: number; onResize: (px: numbe
   };
 
   const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "ArrowLeft") onResize(clampWidth(width - SIDEBAR_KEY_STEP));
-    else if (e.key === "ArrowRight") onResize(clampWidth(width + SIDEBAR_KEY_STEP));
+    if (e.key === "ArrowLeft") onResize(clampWidth(width - sign * SIDEBAR_KEY_STEP));
+    else if (e.key === "ArrowRight") onResize(clampWidth(width + sign * SIDEBAR_KEY_STEP));
     else return;
     e.preventDefault();
   };
@@ -167,8 +170,8 @@ function ResizeHandle({ width, onResize }: { width: number; onResize: (px: numbe
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}
       className={cn(
-        "absolute -right-1 top-0 z-10 h-full w-2 cursor-col-resize",
-        "after:absolute after:inset-y-0 after:left-1/2 after:w-px after:-translate-x-1/2 after:bg-transparent after:transition-colors",
+        "absolute -end-1 top-0 z-10 h-full w-2 cursor-col-resize",
+        "after:absolute after:inset-y-0 after:start-1/2 after:w-px after:-translate-x-1/2 rtl:after:translate-x-1/2 after:bg-transparent after:transition-colors",
         // A keyboard stop has to show where it is, and the hairline the hover state
         // paints is thinner than a 2px perimeter of the handle, so focus outlines the
         // whole splitter as well as colouring the line.
@@ -203,10 +206,10 @@ export function Sidebar({
       data-collapsed={collapsed || undefined}
       style={collapsed ? undefined : { width: clampWidth(width) }}
       className={cn(
-        "group/sidebar relative flex h-full flex-col border-r border-sidebar-border bg-sidebar",
+        "group/sidebar relative flex h-full flex-col border-e border-sidebar-border bg-sidebar",
         !collapsed && "shrink-0",
         collapsed && !fullyHidden && "w-14 transition-[width] duration-200",
-        fullyHidden && "w-0 overflow-hidden border-r-0 transition-[width] duration-200",
+        fullyHidden && "w-0 overflow-hidden border-e-0 transition-[width] duration-200",
       )}
     >
       {!fullyHidden && (

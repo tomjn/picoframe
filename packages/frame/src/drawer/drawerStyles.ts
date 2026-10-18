@@ -6,7 +6,7 @@ import type { DrawerContainer, DrawerDirection, DrawerSize } from "./reducer";
  * DrawerHost stays a thin shell). Mirrors the reducer-extraction pattern used elsewhere.
  */
 
-/** Named side-sheet widths (left/right). "full" fills the portal target. */
+/** Named side-sheet widths (start/end). "full" fills the portal target. */
 const SIDE_SIZES: Record<DrawerSize, string> = {
   sm: "20rem",
   md: "24rem",
@@ -52,17 +52,21 @@ export function drawerStyle(
     case "left":
       return {
         contentClass:
-          `${anchor} inset-y-0 left-0 max-w-[90%] border-r border-border ` +
+          `${anchor} inset-y-0 start-0 max-w-[90%] border-e border-border ` +
           "data-[state=closed]:animate-[pf-drawer-out-left_200ms_ease-in] " +
-          "data-[state=open]:animate-[pf-drawer-in-left_300ms_ease-out]",
+          "data-[state=open]:animate-[pf-drawer-in-left_300ms_ease-out] " +
+          "rtl:data-[state=closed]:animate-[pf-drawer-out-right_200ms_ease-in] " +
+          "rtl:data-[state=open]:animate-[pf-drawer-in-right_300ms_ease-out]",
         sizeStyle: { width: SIDE_SIZES[size] },
       };
     default:
       return {
         contentClass:
-          `${anchor} inset-y-0 right-0 max-w-[90%] border-l border-border ` +
+          `${anchor} inset-y-0 end-0 max-w-[90%] border-s border-border ` +
           "data-[state=closed]:animate-[pf-drawer-out-right_200ms_ease-in] " +
-          "data-[state=open]:animate-[pf-drawer-in-right_300ms_ease-out]",
+          "data-[state=open]:animate-[pf-drawer-in-right_300ms_ease-out] " +
+          "rtl:data-[state=closed]:animate-[pf-drawer-out-left_200ms_ease-in] " +
+          "rtl:data-[state=open]:animate-[pf-drawer-in-left_300ms_ease-out]",
         sizeStyle: { width: SIDE_SIZES[size] },
       };
   }

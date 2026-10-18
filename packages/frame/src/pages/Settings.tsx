@@ -34,9 +34,9 @@ function NavNode({ node, activeId, nested = false }: { node: SettingsNode; activ
         )}
         <span className="truncate">{node.title}</span>
       </NavLink>
-      {/* Nested sections sit inside a left guide line so they read as sub-pages. */}
+      {/* Nested sections sit inside a start-side guide line so they read as sub-pages. */}
       {node.children.length > 0 && (
-        <div className="mt-1 ml-4 space-y-1 border-l border-border pl-2">
+        <div className="mt-1 ms-4 space-y-1 border-s border-border ps-2">
           {node.children.map((child) => (
             <NavNode key={child.id} node={child} activeId={activeId} nested />
           ))}
@@ -69,7 +69,7 @@ function SectionCard({ node }: { node: SettingsNode }) {
             <span className="block truncate text-xs text-muted-foreground">{node.description}</span>
           )}
         </span>
-        <ChevronRight size={16} className="shrink-0 text-muted-foreground" />
+        <ChevronRight size={16} className="shrink-0 text-muted-foreground rtl:-scale-x-100" />
       </NavLink>
     </li>
   );
@@ -119,8 +119,8 @@ function FirstVisibleRedirect({ nodes }: { nodes: SettingsNode[] }) {
 }
 
 /**
- * Frame-owned settings page: the section tree on the left, the selected section on the
- * right. Every node is reachable at `/settings/<id>`, so any code can deep-link to it.
+ * Frame-owned settings page: the section tree at the start, the selected section at the
+ * end. Every node is reachable at `/settings/<id>`, so any code can deep-link to it.
  */
 export default function Settings() {
   const { settings } = useFrame();
@@ -132,7 +132,7 @@ export default function Settings() {
 
   return (
     <div className="flex h-full">
-      <nav className="w-60 shrink-0 space-y-1 overflow-y-auto border-r border-border p-3">
+      <nav className="w-60 shrink-0 space-y-1 overflow-y-auto border-e border-border p-3">
         {settings.nodes.map((node) => (
           <NavNode key={node.id} node={node} activeId={sectionId} />
         ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "radix-ui";
+import { Dialog, Direction } from "radix-ui";
 import { type ReactNode, useRef } from "react";
 import { cn } from "../lib/cn";
 import { useStrings } from "../strings/strings";
@@ -55,6 +55,8 @@ export function DrawerSurface({
   // drawer closes. Remember what had focus on the way in and hand it back on the way out.
   const { drawer: drawerFallback } = useStrings();
   const openerRef = useRef<HTMLElement | null>(null);
+  // The panel portals out of the frame root, so it carries the direction itself for `rtl:` variants.
+  const dir = Direction.useDirection();
 
   const handleOpenAutoFocus = (event: Event) => {
     // Fires before Radix moves focus into the panel, so this is still the opener.
@@ -98,6 +100,7 @@ export function DrawerSurface({
           )}
         />
         <Dialog.Content
+          dir={dir}
           style={style}
           // A caller's handler runs first and can `preventDefault()` to take focus over on
           // the way in or out, rather than timing a focus call against the exit animation.

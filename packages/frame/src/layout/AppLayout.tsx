@@ -1,3 +1,4 @@
+import { Direction } from "radix-ui";
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { useMouseNavigation } from "../history/useMouseNavigation";
 import { useFrame } from "../context/frame";
@@ -40,7 +41,7 @@ function SkipLink() {
         document.getElementById(MAIN_ID)?.focus();
       }}
       className={cn(
-        "fixed left-3 top-3 z-50 -translate-y-20 rounded-md border border-border bg-background px-3 py-2",
+        "fixed start-3 top-3 z-50 -translate-y-20 rounded-md border border-border bg-background px-3 py-2",
         "text-sm font-medium text-foreground shadow-md transition-transform",
         "focus:translate-y-0 focus:outline-2 focus:outline-offset-2 focus:outline-ring",
       )}
@@ -64,6 +65,7 @@ export function AppLayout() {
   const [floatingTopBar] = useLayoutOption("floatingTopBar");
   const { menuButton, breadcrumbHidden, narrowBreakpoint } = useLayoutConfig();
   const [menuOpen, setMenuOpen] = useState(false);
+  const dir = Direction.useDirection();
   useMouseNavigation();
 
   // A count, not a flag, so overlapping `useHideSidebar` callers (and React StrictMode's
@@ -102,7 +104,7 @@ export function AppLayout() {
   }, [popoverMode]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
+    <div dir={dir} className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
       <SkipLink />
       {!popoverMode && (
         <Sidebar
@@ -133,7 +135,7 @@ export function AppLayout() {
         <TopBar
           title={title}
           onToggleSidebar={onToggleSidebar}
-          // Hovering the toggle is a second reveal trigger (alongside the left-edge strip).
+          // Hovering the toggle is a second reveal trigger (alongside the start-edge strip).
           toggleHoverHandlers={hoverRevealActive && collapsed ? reveal.hoverHandlers : undefined}
           breadcrumbCollapsed={breadcrumbCollapsed}
           breadcrumbHidden={breadcrumbHidden}
@@ -164,7 +166,7 @@ export function AppLayout() {
         </main>
       </div>
       <DrawerHost />
-      <Toaster position="bottom-right" closeButton />
+      <Toaster position={dir === "rtl" ? "bottom-left" : "bottom-right"} dir={dir} closeButton />
     </div>
   );
 }
