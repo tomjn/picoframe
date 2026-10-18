@@ -5,6 +5,7 @@ import { useFrame } from "../context/frame";
 import { useResolvedNavItem } from "../nav/useResolvedNavItem";
 import { openExternal } from "../lib/openExternal";
 import { Slot } from "../slots/slots";
+import { useStrings } from "../strings/strings";
 
 /**
  * Default landing page contributed by the built-in `framePlugin`: a launcher that
@@ -20,6 +21,7 @@ import { Slot } from "../slots/slots";
  */
 export default function Home() {
   const { nav, title } = useFrame();
+  const t = useStrings();
   // Keep the composed group structure (already sorted by composeNav); drop Home
   // itself and any group left empty so the launcher mirrors the sidebar.
   const groups = nav
@@ -32,10 +34,10 @@ export default function Home() {
       <h1 className="text-2xl font-semibold">{title}</h1>
 
       {groups.length === 0 ? (
-        <p className="mt-2 max-w-prose text-muted-foreground">No tools available yet.</p>
+        <p className="mt-2 max-w-prose text-muted-foreground">{t.noTools}</p>
       ) : (
         <>
-          <p className="mt-1 text-muted-foreground">Choose a tool to get started.</p>
+          <p className="mt-1 text-muted-foreground">{t.chooseTool}</p>
           <div className="mt-6 space-y-8">
             {groups.map((group) => (
               // Collapse the section (header included) when it has no visible card, so an

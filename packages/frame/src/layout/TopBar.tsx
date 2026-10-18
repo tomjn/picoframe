@@ -7,6 +7,7 @@ import { useNavigationStack } from "../history/navigation-stack";
 import { cn } from "../lib/cn";
 import { useCrumbTrail } from "../routing/useCrumbTrail";
 import { Slot } from "../slots/slots";
+import { useStrings } from "../strings/strings";
 import type { HoverRevealHandlers } from "./HoverRevealSidebar";
 import { SidebarPopover } from "./SidebarPopover";
 
@@ -74,7 +75,7 @@ export function TopBar({
   menuIcon?: IconComponent;
   /** Popover-mode menu button icon while open (defaults to a chevron). */
   menuIconOpen?: IconComponent;
-  /** Popover-mode menu button accessible label + tooltip (defaults to "Menu"). */
+  /** Popover-mode menu button accessible label + tooltip (defaults to the `menu` string). */
   menuLabel?: string;
   /** Render the menu label as visible text beside the icon (default false; icon-only). */
   menuLabelVisible?: boolean;
@@ -89,6 +90,7 @@ export function TopBar({
   const { canBack, canForward } = useNavigationStack();
   const { crumbs: resolvers, nav } = useFrame();
   const { pathname } = useLocation();
+  const t = useStrings();
 
   // The trail, resolved from the path and kept current: a crumb that names a thing by
   // reading the store follows a rename made while you are on the page.
@@ -123,7 +125,7 @@ export function TopBar({
   const closedIcon = menuIcon ?? Menu;
   const openIcon = menuIconOpen ?? ChevronDown;
   const ToggleIcon = popover ? (menuOpen ? openIcon : closedIcon) : PanelLeft;
-  const toggleLabel = popover ? (menuLabel ?? "Menu") : "Toggle sidebar";
+  const toggleLabel = popover ? (menuLabel ?? t.menu) : t.toggleSidebar;
   const showMenuLabel = popover && menuLabelVisible;
 
   // Floating mode takes the bar out of flow over the content, so it must not swallow clicks
@@ -170,10 +172,10 @@ export function TopBar({
       </div>
       {showHistoryButtons && (
         <>
-          <IconButton label="Back" disabled={!canBack} onClick={() => navigate(-1)}>
+          <IconButton label={t.back} disabled={!canBack} onClick={() => navigate(-1)}>
             <ChevronLeft size={18} />
           </IconButton>
-          <IconButton label="Forward" disabled={!canForward} onClick={() => navigate(1)}>
+          <IconButton label={t.forward} disabled={!canForward} onClick={() => navigate(1)}>
             <ChevronRight size={18} />
           </IconButton>
         </>

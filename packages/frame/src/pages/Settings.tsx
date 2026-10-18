@@ -3,6 +3,7 @@ import { NavLink, Navigate, useParams } from "react-router";
 import { useFrame } from "../context/frame";
 import { cn } from "../lib/cn";
 import type { SettingsNode } from "../settings/composeSettings";
+import { useStrings } from "../strings/strings";
 
 function NavNode({ node, activeId, nested = false }: { node: SettingsNode; activeId: string; nested?: boolean }) {
   // A section can hide itself (and its rendered subtree) from the settings tree via a
@@ -109,8 +110,9 @@ function SectionContent({ node }: { node: SettingsNode }) {
  * empty flash. Falls through to the "no settings" placeholder when all are hidden.
  */
 function FirstVisibleRedirect({ nodes }: { nodes: SettingsNode[] }) {
+  const t = useStrings();
   const [node, ...rest] = nodes;
-  if (!node) return <div className="p-8 text-muted-foreground">No settings available.</div>;
+  if (!node) return <div className="p-8 text-muted-foreground">{t.noSettings}</div>;
   const visible = node.useVisible ? node.useVisible() : true;
   if (visible) return <Navigate to={`/settings/${node.id}`} replace />;
   return <FirstVisibleRedirect nodes={rest} />;
