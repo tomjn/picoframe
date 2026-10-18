@@ -70,7 +70,11 @@
    each token to its original value, so the default "zinc" base is byte-for-byte
    unchanged. Only hue and saturation vary across bases, lightness is fixed, so
    contrast is preserved. Achromatic tokens (white surfaces, near-white foregrounds,
-   destructive red) deliberately keep literal values and are not retinted. */
+   destructive red) deliberately keep literal values and are not retinted.
+
+   --ring draws every focus indicator, so its lightness is set to clear 3:1 against
+   --background and --card on every base (WCAG 1.4.11). ringContrast.test.ts
+   measures this for every base and accent. */
 :root {
   color-scheme: light;
   --radius: 0.5rem;
@@ -95,7 +99,7 @@
   --destructive-foreground: 0 0% 98%;
   --border: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
   --input: var(--base-hue) calc(var(--base-sat) * 6%) 90%;
-  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 65%;
+  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 48%;
   --sidebar: var(--base-hue) calc(var(--base-sat) * 5%) 96%;
   --sidebar-foreground: var(--base-hue) calc(var(--base-sat-text) * 6%) 24%;
   --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 5%) 90%;
@@ -131,7 +135,7 @@
   --destructive-foreground: 0 0% 98%;
   --border: var(--base-hue) calc(var(--base-sat) * 4%) 18%;
   --input: var(--base-hue) calc(var(--base-sat) * 4%) 20%;
-  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 40%;
+  --ring: var(--base-hue) calc(var(--base-sat) * 5%) 49%;
   --sidebar: var(--base-hue) calc(var(--base-sat) * 6%) 9%;
   --sidebar-foreground: var(--base-hue) calc(var(--base-sat-text) * 5%) 72%;
   --sidebar-accent: var(--base-hue) calc(var(--base-sat) * 4%) 16%;
@@ -198,10 +202,12 @@
    (hover/active/selected surfaces app-wide — settings nav, dropdown items, the
    segmented control) and --sidebar-accent/-foreground (the main-sidebar active
    item). The default "neutral" carries no attribute, so the neutral :root/.dark
-   values above apply unchanged. Primary/ring use shadcn's canonical theme values;
-   the --accent/--sidebar-accent tints stay near the neutral baseline lightness so
-   hovers read as gently accented, not saturated (accent and sidebar-accent share
-   one tint per accent). Light and dark are mutually exclusive (:not(.dark) vs
+   values above apply unchanged. Primary/ring use shadcn's canonical theme values,
+   except where the ring would fall under 3:1 against the page: there --ring keeps
+   the accent's hue and saturation and moves lightness only as far as it must
+   (darker in light, lighter in dark). The --accent/--sidebar-accent tints stay
+   near the neutral baseline lightness so hovers read as gently accented, not
+   saturated (accent and sidebar-accent share one tint per accent). Light and dark are mutually exclusive (:not(.dark) vs
    .dark) so neither can win by source order. */
 
 [data-accent="blue"]:not(.dark) {
@@ -273,7 +279,7 @@
 .dark[data-accent="violet"] {
   --primary: 263.4 70% 50.4%;
   --primary-foreground: 210 20% 98%;
-  --ring: 263.4 70% 50.4%;
+  --ring: 263.4 70% 57%;
   --accent: 262 40% 24%;
   --accent-foreground: 262 70% 86%;
   --sidebar-accent: 262 40% 24%;
@@ -283,7 +289,7 @@
 [data-accent="orange"]:not(.dark) {
   --primary: 24.6 95% 53.1%;
   --primary-foreground: 60 9.1% 97.8%;
-  --ring: 24.6 95% 53.1%;
+  --ring: 24.6 95% 49%;
   --accent: 25 95% 92%;
   --accent-foreground: 25 90% 32%;
   --sidebar-accent: 25 95% 92%;
@@ -324,7 +330,7 @@
 [data-accent="amber"]:not(.dark) {
   --primary: 38 92% 50%;
   --primary-foreground: 26 83% 14%;
-  --ring: 38 92% 50%;
+  --ring: 38 92% 41%;
   --accent: 38 96% 90%;
   --accent-foreground: 26 83% 30%;
   --sidebar-accent: 38 96% 90%;
@@ -343,7 +349,7 @@
 [data-accent="yellow"]:not(.dark) {
   --primary: 48 96% 53%;
   --primary-foreground: 26 83% 14%;
-  --ring: 48 96% 53%;
+  --ring: 48 96% 36%;
   --accent: 48 96% 89%;
   --accent-foreground: 32 81% 29%;
   --sidebar-accent: 48 96% 89%;
@@ -498,13 +504,14 @@
   --pf-accent-hue: 0deg;
   --primary: var(--pf-accent-hue) 68% 48%;
   --primary-foreground: 0 0% 100%;
-  --ring: var(--pf-accent-hue) 70% 55%;
+  --ring: var(--pf-accent-hue) 70% 35%;
   --accent: var(--pf-accent-hue) 70% 92%;
   --accent-foreground: var(--pf-accent-hue) 55% 32%;
   --sidebar-accent: var(--pf-accent-hue) 70% 92%;
   --sidebar-accent-foreground: var(--pf-accent-hue) 55% 32%;
 }
 .dark[data-accent="rainbow"] {
+  --ring: var(--pf-accent-hue) 70% 62%;
   --accent: var(--pf-accent-hue) 40% 24%;
   --accent-foreground: var(--pf-accent-hue) 80% 85%;
   --sidebar-accent: var(--pf-accent-hue) 40% 24%;
@@ -514,7 +521,7 @@
   --pf-accent-hue: 0deg;
   --primary: var(--pf-accent-hue) 60% 78%;
   --primary-foreground: var(--pf-accent-hue) 35% 25%;
-  --ring: var(--pf-accent-hue) 55% 68%;
+  --ring: var(--pf-accent-hue) 55% 38%;
   --accent: var(--pf-accent-hue) 65% 93%;
   --accent-foreground: var(--pf-accent-hue) 40% 32%;
   --sidebar-accent: var(--pf-accent-hue) 65% 93%;
